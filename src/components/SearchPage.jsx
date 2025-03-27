@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, MapPin, DollarSign, Filter, View, Grid3x3, Grid } from 'lucide-react';
+import { Search, MapPin, DollarSign, Filter, BarChart2, LayoutGrid, Grid } from 'lucide-react';
 
 // Mock data for search results
 const mockSearchResults = [
@@ -257,13 +257,13 @@ const SearchPage = () => {
               onClick={() => setViewMode('feed')}
               className={`p-2 rounded ${viewMode === 'feed' ? 'bg-white shadow' : ''}`}
             >
-              <View size={20} />
+              <BarChart2 size={20} />
             </button>
             <button 
               onClick={() => setViewMode('grid3')}
               className={`p-2 rounded mx-1 ${viewMode === 'grid3' ? 'bg-white shadow' : ''}`}
             >
-              <Grid3x3 size={20} />
+              <LayoutGrid size={20} />
             </button>
             <button 
               onClick={() => setViewMode('grid5')}

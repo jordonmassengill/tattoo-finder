@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Grid3x3, Grid } from 'lucide-react';
+import { BarChart2, LayoutGrid, Grid } from 'lucide-react';
 
 // Mock data for demonstration
 const mockPosts = [
@@ -15,7 +15,7 @@ const mockPosts = [
     timestamp: '2025-03-25T15:30:00',
     tags: ['sleeve', 'geometric', 'blackwork']
   },
-  // Add more mock posts here...
+  // More mock posts...
   {
     id: 2,
     artistId: 102,
@@ -156,19 +156,19 @@ const HomeFeed = () => {
             onClick={() => setViewMode('feed')}
             className={`p-2 rounded ${viewMode === 'feed' ? 'bg-white shadow' : ''}`}
           >
-            <ViewIcon size={20} />
+            <BarChart2 size={20} />
           </button>
           <button 
             onClick={() => setViewMode('grid3')}
             className={`p-2 rounded mx-1 ${viewMode === 'grid3' ? 'bg-white shadow' : ''}`}
           >
-            <Grid3x3Icon size={20} />
+            <LayoutGrid size={20} />
           </button>
           <button 
             onClick={() => setViewMode('grid5')}
             className={`p-2 rounded ${viewMode === 'grid5' ? 'bg-white shadow' : ''}`}
           >
-            <Grid5x5Icon size={20} />
+            <Grid size={20} />
           </button>
         </div>
       </div>

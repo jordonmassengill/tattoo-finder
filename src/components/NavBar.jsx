@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Home, Search, BookmarkIcon, PlusSquare, User } from 'lucide-react';
+import { Home, Search, Bookmark, PlusSquare, User } from 'lucide-react';
 
 const NavBar = ({ userType = 'enthusiast' }) => {
   const location = useLocation();
@@ -17,7 +17,7 @@ const NavBar = ({ userType = 'enthusiast' }) => {
         <div className="flex justify-between items-center">
           {/* Logo - only visible on medium screens and up */}
           <div className="hidden md:block">
-            <Link to="/" className="text-xl font-bold">InkConnect</Link>
+            <Link to="/" className="text-xl font-bold">InkSpace</Link>
           </div>
           
           {/* Navigation Links */}
@@ -63,7 +63,7 @@ const NavBar = ({ userType = 'enthusiast' }) => {
             )}
             
             <Link to="/saved" className={`p-2 flex flex-col md:flex-row items-center ${isActive('/saved') ? 'text-blue-500' : 'text-gray-500'}`}>
-              <BookmarkIcon size={24} className="md:mr-1" />
+              <Bookmark size={24} className="md:mr-1" />
               <span className="text-xs md:text-sm">Saved</span>
             </Link>
             

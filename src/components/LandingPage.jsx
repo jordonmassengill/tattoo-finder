@@ -40,7 +40,7 @@ const LandingPage = () => {
       
       {/* Footer */}
       <footer className="bg-black text-white py-6 text-center">
-        <p>© 2025 InkConnect - Find your perfect tattoo artist</p>
+        <p>© 2025 InkSpace - Find your perfect tattoo artist</p>
       </footer>
     </div>
   );
