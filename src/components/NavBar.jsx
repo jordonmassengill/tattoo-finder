@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Home, Search, Bookmark, PlusSquare, User, LogOut, Settings, Briefcase } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import UploadPost from './UploadPost';
 
 const NavBar = () => {
   const location = useLocation();
@@ -10,6 +11,27 @@ const NavBar = () => {
   
   const [showAddMenu, setShowAddMenu] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [showUploadModal, setShowUploadModal] = useState(false);
+  
+  const profileRef = useRef(null);
+  const addRef = useRef(null);
+  
+  // Close menus when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (profileRef.current && !profileRef.current.contains(event.target)) {
+        setShowProfileMenu(false);
+      }
+      if (addRef.current && !addRef.current.contains(event.target)) {
+        setShowAddMenu(false);
+      }
+    };
+    
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
   
   // Determine if a nav link is active
   const isActive = (path) => {
@@ -22,9 +44,10 @@ const NavBar = () => {
   };
   
   return (
-    <nav className="bg-white border-b fixed bottom-0 left-0 right-0 md:top-0 md:bottom-auto z-50">
-      <div className="max-w-screen-xl mx-auto px-4 py-3">
-        <div className="flex justify-between items-center">
+    <>
+      <nav className="bg-white border-b fixed bottom-0 left-0 right-0 md:top-0 md:bottom-auto z-40">
+        <div className="max-w-screen-xl mx-auto px-4 py-3">
+          <div className="flex justify-between items-center">
           {/* Logo - only visible on medium screens and up */}
           <div className="hidden md:block">
             <Link to="/" className="text-xl font-bold">InkSpace</Link>
@@ -44,7 +67,7 @@ const NavBar = () => {
             
             {/* Add Post Button - Only visible for artists and shops */}
             {['artist', 'shop'].includes(userType) && (
-              <div className="relative">
+              <div className="relative" ref={addRef}>
                 <button 
                   className={`p-2 flex flex-col md:flex-row items-center ${showAddMenu ? 'text-blue-500' : 'text-gray-500'}`}
                   onClick={() => setShowAddMenu(!showAddMenu)}
@@ -55,12 +78,15 @@ const NavBar = () => {
                 
                 {/* Add Menu Dropdown */}
                 {showAddMenu && (
-                  <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 bg-white rounded-lg shadow-lg p-2 w-48">
-                    <button className="w-full text-left px-3 py-2 hover:bg-gray-100 rounded">
-                      Upload Photo
-                    </button>
-                    <button className="w-full text-left px-3 py-2 hover:bg-gray-100 rounded">
-                      Upload Video
+                  <div className="absolute bottom-14 md:top-14 left-1/2 transform -translate-x-1/2 bg-white rounded-lg shadow-lg p-2 w-48 z-50">
+                    <button 
+                      className="w-full text-left px-3 py-2 hover:bg-gray-100 rounded"
+                      onClick={() => {
+                        setShowAddMenu(false);
+                        setShowUploadModal(true);
+                      }}
+                    >
+                      Upload Artwork
                     </button>
                     {userType === 'shop' && (
                       <button className="w-full text-left px-3 py-2 hover:bg-gray-100 rounded">
@@ -78,7 +104,7 @@ const NavBar = () => {
             </Link>
             
             {/* Profile Menu */}
-            <div className="relative">
+            <div className="relative" ref={profileRef}>
               <button 
                 className={`p-2 flex flex-col md:flex-row items-center ${showProfileMenu || isActive('/profile') ? 'text-blue-500' : 'text-gray-500'}`}
                 onClick={() => setShowProfileMenu(!showProfileMenu)}
@@ -89,7 +115,7 @@ const NavBar = () => {
               
               {/* Profile Menu Dropdown */}
               {showProfileMenu && (
-                <div className="absolute bottom-full mb-2 right-0 md:left-1/2 md:transform md:-translate-x-1/2 bg-white rounded-lg shadow-lg p-2 w-48 z-50">
+                <div className="absolute bottom-14 md:top-14 md:right-0 left-1/2 transform -translate-x-1/2 md:translate-x-0 bg-white rounded-lg shadow-lg p-2 w-48 z-50">
                   <div className="px-3 py-2 border-b mb-1">
                     <p className="font-medium">{currentUser?.name}</p>
                     <p className="text-xs text-gray-500 capitalize">{userType}</p>
@@ -152,6 +178,12 @@ const NavBar = () => {
         </div>
       </div>
     </nav>
+    
+    {/* Upload Modal */}
+    {showUploadModal && (
+      <UploadPost onClose={() => setShowUploadModal(false)} />
+    )}
+    </>
   );
 };
 

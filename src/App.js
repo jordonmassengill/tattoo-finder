@@ -11,6 +11,7 @@ import NavBar from './components/NavBar';
 import PublicNavBar from './components/PublicNavBar';
 import Login from './components/Login';
 import Signup from './components/Signup';
+import UploadPost from './components/UploadPost';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import './styles.css';
 
