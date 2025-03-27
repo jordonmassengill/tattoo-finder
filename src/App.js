@@ -1,24 +1,26 @@
-import logo from './logo.svg';
+import React from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './App.css';
+import LandingPage from './components/LandingPage';
+import SearchPage from './components/SearchPage';
+import './styles.css';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <div className="test-style">
+        This should be styled with blue background and white text
+      </div>
+      
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/search" element={<SearchPage />} />
+          <Route path="/login" element={<div className="p-8 text-center">Login page coming soon</div>} />
+          <Route path="/signup" element={<div className="p-8 text-center">Signup page coming soon</div>} />
+        </Routes>
+      </BrowserRouter>
+    </>
   );
 }
 
