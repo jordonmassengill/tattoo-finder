@@ -6,46 +6,138 @@ import SearchPage from './components/SearchPage';
 import HomeFeed from './components/HomeFeed';
 import ArtistProfile from './components/ArtistProfile';
 import ShopProfile from './components/ShopProfile';
+import ProfilePage from './components/ProfilePage';
 import NavBar from './components/NavBar';
 import PublicNavBar from './components/PublicNavBar';
+import Login from './components/Login';
+import Signup from './components/Signup';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import './styles.css';
 
-function App() {
-  // Mock authentication state - in a real app, this would come from your auth system
-  const isLoggedIn = false; // Set to false to test landing page flow
-  
-  // Mock user type - can be 'enthusiast', 'artist', or 'shop'
-  const userType = 'enthusiast'; 
+// Layout component that conditionally renders the appropriate NavBar
+const Layout = ({ children }) => {
+  const { currentUser, userType } = useAuth();
   
   return (
-    <BrowserRouter>
-      {/* Conditionally render NavBar only if user is logged in */}
-      {isLoggedIn && <NavBar userType={userType} />}
-      
-      {/* Public NavBar for search page when not logged in */}
-      {!isLoggedIn && <Routes>
-        <Route path="/search" element={<PublicNavBar />} />
-      </Routes>}
-      
-      <main className={isLoggedIn ? "pb-16 md:pt-16 md:pb-0" : "pt-16"}>
+    <>
+      {currentUser ? (
+        <NavBar userType={userType} />
+      ) : (
         <Routes>
-          {/* Landing page shown only to non-logged in users */}
-          <Route path="/" element={!isLoggedIn ? <LandingPage /> : <Navigate to="/home" />} />
-          
-          {/* Protected routes (require login) */}
-          <Route path="/home" element={isLoggedIn ? <HomeFeed /> : <Navigate to="/" />} />
-          <Route path="/search" element={<SearchPage />} />
-          <Route path="/artist/:id" element={<ArtistProfile />} />
-          <Route path="/shop/:id" element={<ShopProfile />} />
-          
-          {/* Placeholder routes */}
-          <Route path="/saved" element={<div className="p-8 text-center">Saved items coming soon</div>} />
-          <Route path="/profile" element={<div className="p-8 text-center">Profile page coming soon</div>} />
-          <Route path="/login" element={<div className="p-8 text-center">Login page coming soon</div>} />
-          <Route path="/signup" element={<div className="p-8 text-center">Signup page coming soon</div>} />
+          <Route path="/search" element={<PublicNavBar />} />
+          <Route path="/login" element={<PublicNavBar />} />
+          <Route path="/signup" element={<PublicNavBar />} />
+          <Route path="/artist/*" element={<PublicNavBar />} />
+          <Route path="/shop/*" element={<PublicNavBar />} />
         </Routes>
+      )}
+      
+      <main className={currentUser ? "pb-16 md:pt-16 md:pb-0" : "pt-16"}>
+        {children}
       </main>
+    </>
+  );
+};
+
+function App() {
+  return (
+    <BrowserRouter>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
     </BrowserRouter>
+  );
+}
+
+// Separate component to use the auth context
+function AppContent() {
+  const { currentUser, userType, loading } = useAuth();
+  
+  // Protected route renderer function
+  const renderProtectedRoute = (element, allowedUserTypes = []) => {
+    if (loading) {
+      return (
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+        </div>
+      );
+    }
+    
+    if (!currentUser) {
+      return <Navigate to="/login" />;
+    }
+    
+    if (allowedUserTypes.length > 0 && !allowedUserTypes.includes(userType)) {
+      return <Navigate to="/home" />;
+    }
+    
+    return element;
+  };
+  
+  return (
+    <Layout>
+      <Routes>
+        {/* Public routes */}
+        <Route path="/" element={!currentUser ? <LandingPage /> : <Navigate to="/home" />} />
+        <Route path="/login" element={!currentUser ? <Login /> : <Navigate to="/home" />} />
+        <Route path="/signup" element={!currentUser ? <Signup /> : <Navigate to="/home" />} />
+        <Route path="/search" element={<SearchPage />} />
+        <Route path="/artist/:id" element={<ArtistProfile />} />
+        <Route path="/shop/:id" element={<ShopProfile />} />
+        
+        {/* Protected routes (require authentication) */}
+        <Route 
+          path="/home" 
+          element={renderProtectedRoute(<HomeFeed />)} 
+        />
+        
+        <Route 
+          path="/saved" 
+          element={renderProtectedRoute(
+            <div className="p-8 text-center">Saved items coming soon</div>
+          )} 
+        />
+        
+        {/* Profile route - only accessible to logged in users */}
+        <Route 
+          path="/profile" 
+          element={renderProtectedRoute(<ProfilePage />)} 
+        />
+        
+        {/* Routes that require specific user types */}
+        <Route 
+          path="/artist-dashboard" 
+          element={renderProtectedRoute(
+            <div className="p-8 text-center">Artist Dashboard coming soon</div>,
+            ['artist']
+          )} 
+        />
+        
+        <Route 
+          path="/shop-dashboard" 
+          element={renderProtectedRoute(
+            <div className="p-8 text-center">Shop Dashboard coming soon</div>,
+            ['shop']
+          )} 
+        />
+        
+        {/* Settings page */}
+        <Route 
+          path="/settings" 
+          element={renderProtectedRoute(
+            <div className="p-8 max-w-screen-xl mx-auto">
+              <div className="bg-white shadow rounded-lg p-6">
+                <h1 className="text-2xl font-bold mb-6">Account Settings</h1>
+                <p className="text-gray-600">Settings page is coming soon.</p>
+              </div>
+            </div>
+          )} 
+        />
+        
+        {/* Catch all route */}
+        <Route path="*" element={<Navigate to="/" />} />
+      </Routes>
+    </Layout>
   );
 }
 

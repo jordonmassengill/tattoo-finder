@@ -1,14 +1,24 @@
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { Home, Search, Bookmark, PlusSquare, User } from 'lucide-react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Home, Search, Bookmark, PlusSquare, User, LogOut, Settings, Briefcase } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
-const NavBar = ({ userType = 'enthusiast' }) => {
+const NavBar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { currentUser, userType, logout } = useAuth();
+  
   const [showAddMenu, setShowAddMenu] = useState(false);
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
   
   // Determine if a nav link is active
   const isActive = (path) => {
     return location.pathname === path;
+  };
+  
+  const handleLogout = () => {
+    logout();
+    navigate('/');
   };
   
   return (
@@ -67,10 +77,77 @@ const NavBar = ({ userType = 'enthusiast' }) => {
               <span className="text-xs md:text-sm">Saved</span>
             </Link>
             
-            <Link to="/profile" className={`p-2 flex flex-col md:flex-row items-center ${isActive('/profile') ? 'text-blue-500' : 'text-gray-500'}`}>
-              <User size={24} className="md:mr-1" />
-              <span className="text-xs md:text-sm">Profile</span>
-            </Link>
+            {/* Profile Menu */}
+            <div className="relative">
+              <button 
+                className={`p-2 flex flex-col md:flex-row items-center ${showProfileMenu || isActive('/profile') ? 'text-blue-500' : 'text-gray-500'}`}
+                onClick={() => setShowProfileMenu(!showProfileMenu)}
+              >
+                <User size={24} className="md:mr-1" />
+                <span className="text-xs md:text-sm">Profile</span>
+              </button>
+              
+              {/* Profile Menu Dropdown */}
+              {showProfileMenu && (
+                <div className="absolute bottom-full mb-2 right-0 md:left-1/2 md:transform md:-translate-x-1/2 bg-white rounded-lg shadow-lg p-2 w-48 z-50">
+                  <div className="px-3 py-2 border-b mb-1">
+                    <p className="font-medium">{currentUser?.name}</p>
+                    <p className="text-xs text-gray-500 capitalize">{userType}</p>
+                  </div>
+                  
+                  <Link 
+                    to="/profile" 
+                    className="flex items-center w-full text-left px-3 py-2 hover:bg-gray-100 rounded"
+                    onClick={() => setShowProfileMenu(false)}
+                  >
+                    <User size={16} className="mr-2" />
+                    View Profile
+                  </Link>
+                  
+                  {userType === 'artist' && (
+                    <Link 
+                      to="/artist-dashboard" 
+                      className="flex items-center w-full text-left px-3 py-2 hover:bg-gray-100 rounded"
+                      onClick={() => setShowProfileMenu(false)}
+                    >
+                      <Briefcase size={16} className="mr-2" />
+                      Artist Dashboard
+                    </Link>
+                  )}
+                  
+                  {userType === 'shop' && (
+                    <Link 
+                      to="/shop-dashboard" 
+                      className="flex items-center w-full text-left px-3 py-2 hover:bg-gray-100 rounded"
+                      onClick={() => setShowProfileMenu(false)}
+                    >
+                      <Briefcase size={16} className="mr-2" />
+                      Shop Dashboard
+                    </Link>
+                  )}
+                  
+                  <Link 
+                    to="/settings" 
+                    className="flex items-center w-full text-left px-3 py-2 hover:bg-gray-100 rounded"
+                    onClick={() => setShowProfileMenu(false)}
+                  >
+                    <Settings size={16} className="mr-2" />
+                    Settings
+                  </Link>
+                  
+                  <button 
+                    onClick={() => {
+                      setShowProfileMenu(false);
+                      handleLogout();
+                    }}
+                    className="flex items-center w-full text-left px-3 py-2 hover:bg-gray-100 rounded text-red-600"
+                  >
+                    <LogOut size={16} className="mr-2" />
+                    Log Out
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
