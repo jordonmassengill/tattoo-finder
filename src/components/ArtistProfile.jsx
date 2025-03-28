@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { LayoutGrid, Grid, BarChart2, MapPin, DollarSign, Tag } from 'lucide-react';
+import { LayoutGrid, Grid, BarChart2, MapPin, DollarSign, Tag, Trash2, AlertTriangle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import api from '../services/api';
 
 const ArtistProfile = () => {
   const [viewMode, setViewMode] = useState('grid3');
@@ -10,30 +11,47 @@ const ArtistProfile = () => {
   const [loading, setLoading] = useState(true);
   const [following, setFollowing] = useState(false);
   const [followersCount, setFollowersCount] = useState(0);
+  const [selectedPost, setSelectedPost] = useState(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState('');
   
   const { id } = useParams();
   const { currentUser } = useAuth();
   
-  // Fetch artist data
+  // Check if current user is viewing their own profile
+  const isOwnProfile = currentUser && (currentUser.id === artistData?._id || currentUser.username === artistData?.username);
+  
   useEffect(() => {
-    const fetchArtistData = async () => {
-      try {
-        setLoading(true);
-        
-        // Fetch artist profile
-        const profileResponse = await fetch(`http://localhost:5000/api/users/${id}`, {
-          headers: {
-            'x-auth-token': localStorage.getItem('token')
-          }
-        });
-        
-        if (!profileResponse.ok) {
-          throw new Error('Failed to fetch artist profile');
+    console.log('ArtistProfile rendered with id parameter:', id);
+  }, [id]);
+
+  // Fetch artist data
+useEffect(() => {
+  const fetchArtistData = async () => {
+    try {
+      setLoading(true);
+      console.log(`Fetching artist profile for: ${id}`);
+      
+      // Fetch artist profile
+      const profileResponse = await fetch(`http://localhost:5000/api/users/${id}`, {
+        headers: {
+          'x-auth-token': localStorage.getItem('token')
         }
-        
-        const artistData = await profileResponse.json();
-        setArtistData(artistData);
-        setFollowersCount(artistData.followers?.length || 0);
+      });
+      
+      console.log('Profile response status:', profileResponse.status);
+      
+      if (!profileResponse.ok) {
+        const errorData = await profileResponse.json();
+        console.error('Error response:', errorData);
+        throw new Error(`Failed to fetch artist profile: ${errorData.message || profileResponse.statusText}`);
+      }
+      
+      const artistData = await profileResponse.json();
+      console.log('Artist data received:', artistData.username);
+      setArtistData(artistData);
+      setFollowersCount(artistData.followers?.length || 0);
         
         // Check if current user is following this artist
         if (currentUser && artistData.followers) {
@@ -41,18 +59,23 @@ const ArtistProfile = () => {
         }
         
         // Fetch artist posts
-        const postsResponse = await fetch(`http://localhost:5000/api/users/${id}/posts`, {
-          headers: {
-            'x-auth-token': localStorage.getItem('token')
-          }
-        });
-        
-        if (!postsResponse.ok) {
-          throw new Error('Failed to fetch artist posts');
-        }
-        
-        const postsData = await postsResponse.json();
-        setPosts(postsData);
+console.log(`Attempting to fetch posts for: ${id}`);
+const postsResponse = await fetch(`http://localhost:5000/api/users/${id}/posts`, {
+  headers: {
+    'x-auth-token': localStorage.getItem('token')
+  }
+});
+
+console.log('Posts response status:', postsResponse.status);
+if (!postsResponse.ok) {
+  const errorData = await postsResponse.json().catch(() => ({}));
+  console.error('Error response:', errorData);
+  throw new Error('Failed to fetch artist posts');
+}
+
+const postsData = await postsResponse.json();
+console.log(`Received ${postsData.length} posts for artist ${id}`);
+setPosts(postsData);
         
       } catch (error) {
         console.error('Error fetching artist data:', error);
@@ -60,8 +83,9 @@ const ArtistProfile = () => {
         setLoading(false);
       }
     };
-    
+    if (id) {
     fetchArtistData();
+    }
   }, [id, currentUser]);
   
   // Handle follow/unfollow
@@ -96,6 +120,28 @@ const ArtistProfile = () => {
       
     } catch (error) {
       console.error(`Error ${following ? 'unfollowing' : 'following'} artist:`, error);
+    }
+  };
+  
+  // Handle delete post
+  const handleDeletePost = async () => {
+    if (!selectedPost) return;
+    
+    setIsDeleting(true);
+    setDeleteError('');
+    
+    try {
+      await api.deletePost(selectedPost._id);
+      
+      // Update posts list after deletion
+      setPosts(posts.filter(post => post._id !== selectedPost._id));
+      setSelectedPost(null);
+      setShowDeleteConfirm(false);
+    } catch (error) {
+      console.error('Error deleting post:', error);
+      setDeleteError('Failed to delete post. Please try again.');
+    } finally {
+      setIsDeleting(false);
     }
   };
   
@@ -245,9 +291,80 @@ const ArtistProfile = () => {
                 <div className="flex items-center">
                   <span className="mr-2">💬</span> {post.comments.length}
                 </div>
+                
+                {/* Delete post button - Only visible on own profile */}
+                {isOwnProfile && (
+                  <button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedPost(post);
+                      setShowDeleteConfirm(true);
+                    }}
+                    className="absolute top-2 right-2 p-2 bg-red-600 rounded-full hover:bg-red-700"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                )}
               </div>
             </div>
           ))}
+        </div>
+      )}
+      
+      {/* Delete Post Confirmation Modal */}
+      {showDeleteConfirm && selectedPost && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-md w-full p-6">
+            <div className="flex items-center text-red-600 mb-4">
+              <AlertTriangle size={24} className="mr-2" />
+              <h2 className="text-xl font-bold">Delete Post</h2>
+            </div>
+            
+            <p className="mb-4">
+              Are you sure you want to delete this post? This action cannot be undone.
+            </p>
+            
+            <div className="mb-4 border rounded overflow-hidden">
+              <img 
+                src={`http://localhost:5000/${selectedPost.image}`}
+                alt="Post to delete"
+                className="w-full h-40 object-cover"
+              />
+            </div>
+            
+            {deleteError && (
+              <div className="bg-red-50 text-red-700 p-3 rounded mb-4">
+                {deleteError}
+              </div>
+            )}
+            
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => {
+                  setShowDeleteConfirm(false);
+                  setSelectedPost(null);
+                }}
+                className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
+                disabled={isDeleting}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeletePost}
+                className="flex items-center px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:bg-red-300"
+                disabled={isDeleting}
+              >
+                {isDeleting ? (
+                  <>
+                    <span className="mr-2">Deleting...</span>
+                    <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
+                  </>
+                ) : (
+                  'Delete Post'
+                )}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

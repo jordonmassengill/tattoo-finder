@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Home, Search, Bookmark, PlusSquare, User, LogOut, Settings, Briefcase } from 'lucide-react';
+import { Home, Search, Bookmark, PlusSquare, User, LogOut, Settings } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import UploadPost from './UploadPost';
 
@@ -9,22 +9,17 @@ const NavBar = () => {
   const navigate = useNavigate();
   const { currentUser, userType, logout } = useAuth();
   
-  const [showAddMenu, setShowAddMenu] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [refreshFeed, setRefreshFeed] = useState(false);
   
   const profileRef = useRef(null);
-  const addRef = useRef(null);
   
   // Close menus when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (profileRef.current && !profileRef.current.contains(event.target)) {
         setShowProfileMenu(false);
-      }
-      if (addRef.current && !addRef.current.contains(event.target)) {
-        setShowAddMenu(false);
       }
     };
     
@@ -68,35 +63,13 @@ const NavBar = () => {
               
               {/* Add Post Button - Only visible for artists and shops */}
               {['artist', 'shop'].includes(userType) && (
-                <div className="relative" ref={addRef}>
-                  <button 
-                    className={`p-2 flex flex-col md:flex-row items-center ${showAddMenu ? 'text-blue-500' : 'text-gray-500'}`}
-                    onClick={() => setShowAddMenu(!showAddMenu)}
-                  >
-                    <PlusSquare size={24} className="md:mr-1" />
-                    <span className="text-xs md:text-sm">Add</span>
-                  </button>
-                  
-                  {/* Add Menu Dropdown */}
-                  {showAddMenu && (
-                    <div className="absolute bottom-14 md:top-14 left-1/2 transform -translate-x-1/2 bg-white rounded-lg shadow-lg p-2 w-48 z-50">
-                      <button 
-                        className="w-full text-left px-3 py-2 hover:bg-gray-100 rounded"
-                        onClick={() => {
-                          setShowAddMenu(false);
-                          setShowUploadModal(true);
-                        }}
-                      >
-                        Upload Artwork
-                      </button>
-                      {userType === 'shop' && (
-                        <button className="w-full text-left px-3 py-2 hover:bg-gray-100 rounded">
-                          Add Artist
-                        </button>
-                      )}
-                    </div>
-                  )}
-                </div>
+                <button 
+                  className={`p-2 flex flex-col md:flex-row items-center ${isActive('/upload') ? 'text-blue-500' : 'text-gray-500'}`}
+                  onClick={() => setShowUploadModal(true)}
+                >
+                  <PlusSquare size={24} className="md:mr-1" />
+                  <span className="text-xs md:text-sm">Add</span>
+                </button>
               )}
               
               <Link to="/saved" className={`p-2 flex flex-col md:flex-row items-center ${isActive('/saved') ? 'text-blue-500' : 'text-gray-500'}`}>
@@ -122,39 +95,20 @@ const NavBar = () => {
                       <p className="text-xs text-gray-500 capitalize">{userType}</p>
                     </div>
                     
+                    {/* Only show Profile link for artists and shops */}
+                    {['artist', 'shop'].includes(userType) && currentUser?.username && (
+                      <Link 
+                        to={`/${userType}/${currentUser.username}`} 
+                        className="flex items-center w-full text-left px-3 py-2 hover:bg-gray-100 rounded"
+                        onClick={() => setShowProfileMenu(false)}
+                      >
+                        <User size={16} className="mr-2" />
+                        Profile
+                      </Link>
+                    )}
+                    
                     <Link 
                       to="/profile" 
-                      className="flex items-center w-full text-left px-3 py-2 hover:bg-gray-100 rounded"
-                      onClick={() => setShowProfileMenu(false)}
-                    >
-                      <User size={16} className="mr-2" />
-                      View Profile
-                    </Link>
-                    
-                    {userType === 'artist' && (
-                      <Link 
-                        to="/artist-dashboard" 
-                        className="flex items-center w-full text-left px-3 py-2 hover:bg-gray-100 rounded"
-                        onClick={() => setShowProfileMenu(false)}
-                      >
-                        <Briefcase size={16} className="mr-2" />
-                        Artist Dashboard
-                      </Link>
-                    )}
-                    
-                    {userType === 'shop' && (
-                      <Link 
-                        to="/shop-dashboard" 
-                        className="flex items-center w-full text-left px-3 py-2 hover:bg-gray-100 rounded"
-                        onClick={() => setShowProfileMenu(false)}
-                      >
-                        <Briefcase size={16} className="mr-2" />
-                        Shop Dashboard
-                      </Link>
-                    )}
-                    
-                    <Link 
-                      to="/settings" 
                       className="flex items-center w-full text-left px-3 py-2 hover:bg-gray-100 rounded"
                       onClick={() => setShowProfileMenu(false)}
                     >

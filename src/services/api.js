@@ -38,5 +38,8 @@ export default {
   },
   likePost: (id) => api.put(`/posts/like/${id}`),
   unlikePost: (id) => api.put(`/posts/unlike/${id}`),
-  addComment: (id, text) => api.post(`/posts/comment/${id}`, { text })
+  addComment: (id, text) => api.post(`/posts/comment/${id}`, { text }),
+  updateProfile: (userData) => api.put('/users/update', userData),
+  deleteUser: (id) => api.delete(`/users/${id}`),
+  deletePost: (id) => api.delete(`/posts/${id}`)
 };

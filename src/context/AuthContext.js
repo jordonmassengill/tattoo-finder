@@ -1,3 +1,5 @@
+// Add an updateCurrentUser function to AuthContext.js
+
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import api from '../services/api';
 
@@ -30,6 +32,11 @@ export const AuthProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
+  };
+  
+  // Update current user data
+  const updateCurrentUser = (userData) => {
+    setCurrentUser(userData);
   };
   
   // Login
@@ -76,7 +83,8 @@ export const AuthProvider = ({ children }) => {
     error,
     login,
     signup,
-    logout
+    logout,
+    updateCurrentUser // Add this to the context value
   };
   
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

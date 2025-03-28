@@ -133,26 +133,26 @@ const ShopProfile = () => {
       </div>
       
       {/* Artists Section */}
-      <div className="p-4 border-b">
-        <h2 className="text-xl font-bold mb-4">Our Artists</h2>
-        <div className="flex overflow-x-auto space-x-4 pb-4">
-          {mockShopData.artists.map(artist => (
-            <Link to={`/artist/${artist.id}`} key={artist.id} className="flex-shrink-0">
-              <div className="w-24 flex flex-col items-center">
-                <div className="w-20 h-20 rounded-full overflow-hidden mb-2">
-                  <img 
-                    src={artist.profilePic} 
-                    alt={artist.username} 
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <p className="text-sm font-medium text-center">{artist.username.split(' ')[0]}</p>
-                <p className="text-xs text-gray-500 text-center">{artist.specialty}</p>
-              </div>
-            </Link>
-          ))}
+<div className="p-4 border-b">
+  <h2 className="text-xl font-bold mb-4">Our Artists</h2>
+  <div className="flex overflow-x-auto space-x-4 pb-4">
+    {mockShopData.artists.map(artist => (
+      <Link to={`/artist/${artist.name}`} key={artist.id} className="flex-shrink-0">
+        <div className="w-24 flex flex-col items-center">
+          <div className="w-20 h-20 rounded-full overflow-hidden mb-2">
+            <img 
+              src={artist.profilePic} 
+              alt={artist.name} 
+              className="w-full h-full object-cover"
+            />
+          </div>
+          <p className="text-sm font-medium text-center">{artist.name.split(' ')[0]}</p>
+          <p className="text-xs text-gray-500 text-center">{artist.specialty}</p>
         </div>
-      </div>
+      </Link>
+    ))}
+  </div>
+</div>
       
       {/* View Mode Selector */}
       <div className="flex justify-end p-4 border-b">
@@ -188,20 +188,20 @@ const ShopProfile = () => {
       }`}>
         {mockShopData.gallery.map(item => (
           <div key={item.id} className="relative group cursor-pointer">
-            <img 
-              src={item.image} 
-              alt="Tattoo artwork" 
-              className="w-full aspect-square object-cover"
-            />
-            <div className="absolute inset-0 bg-black bg-opacity-40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white">
-              <div className="flex items-center">
-                <span className="mr-2">❤️</span> {item.likes}
-              </div>
-              <Link to={`/artist/${item.artistId}`} className="absolute bottom-2 left-2 text-xs font-medium hover:underline">
-                By: {mockShopData.artists.find(a => a.id === item.artistId)?.username.split(' ')[0]}
-              </Link>
+          <img 
+            src={item.image} 
+            alt="Tattoo artwork" 
+            className="w-full aspect-square object-cover"
+          />
+          <div className="absolute inset-0 bg-black bg-opacity-40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white">
+            <div className="flex items-center">
+              <span className="mr-2">❤️</span> {item.likes}
             </div>
+            <Link to={`/artist/${mockShopData.artists.find(a => a.id === item.artistId)?.name || ''}`} className="absolute bottom-2 left-2 text-xs font-medium hover:underline">
+              By: {mockShopData.artists.find(a => a.id === item.artistId)?.name.split(' ')[0]}
+            </Link>
           </div>
+        </div>
         ))}
       </div>
     </div>

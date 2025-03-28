@@ -139,14 +139,13 @@ const Signup = () => {
       const userData = {
         email: formData.email,
         password: formData.password,
-        name: formData.username,
+        username: formData.username,
         userType,
         profilePic: '/api/placeholder/150/150', // Default profile pic
       };
       
       // Add fields based on user type
       if (userType === 'artist' || userType === 'shop') {
-        userData.username = formData.username;
         userData.bio = formData.bio;
         userData.location = formData.location;
       }

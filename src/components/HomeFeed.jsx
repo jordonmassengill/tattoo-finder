@@ -39,74 +39,74 @@ const HomeFeed = () => {
 
   // In src/components/HomeFeed.jsx, update the Post component:
 
-const Post = ({ post, isGrid }) => {
-  if (isGrid) {
+  const Post = ({ post, isGrid }) => {
+    if (isGrid) {
+      return (
+        <div className="relative group cursor-pointer">
+          <img 
+            src={`http://localhost:5000/${post.image}`} 
+            alt={post.caption} 
+            className="w-full aspect-square object-cover"
+          />
+          <div className="absolute inset-0 bg-black bg-opacity-40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white">
+            <div className="flex items-center mr-4">
+              <span className="mr-2">❤️</span> {post.likes.length}
+            </div>
+            <div className="flex items-center">
+              <span className="mr-2">💬</span> {post.comments.length}
+            </div>
+          </div>
+          <Link to={`/artist/${post.user.username}`} className="absolute top-2 left-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded-full text-xs opacity-0 group-hover:opacity-100">
+            {post.user.username}
+          </Link>
+        </div>
+      );
+    }
+  
     return (
-      <div className="relative group cursor-pointer">
+      <div className="bg-white border border-gray-200 rounded-md mb-6">
+        {/* Post Header - Make this clickable */}
+        <div className="flex items-center p-3">
+          <Link to={`/artist/${post.user.username}`} className="flex items-center">
+            <img 
+              src={`http://localhost:5000/${post.user.profilePic}`} 
+              alt={post.user.username} 
+              className="w-10 h-10 rounded-full object-cover"
+            />
+            <div className="ml-3">
+              <p className="font-semibold">{post.user.username}</p>
+            </div>
+          </Link>
+        </div>
+        
+        {/* Post Image */}
         <img 
           src={`http://localhost:5000/${post.image}`} 
           alt={post.caption} 
-          className="w-full aspect-square object-cover"
+          className="w-full object-cover"
         />
-        <div className="absolute inset-0 bg-black bg-opacity-40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white">
-          <div className="flex items-center mr-4">
-            <span className="mr-2">❤️</span> {post.likes.length}
+        
+        {/* Post Actions */}
+        <div className="p-3">
+          <div className="flex items-center mb-3">
+            <button className="mr-4" onClick={() => handleLike(post._id)}>❤️</button>
+            <button className="mr-4">💬</button>
+            <button>🔖</button>
           </div>
-          <div className="flex items-center">
-            <span className="mr-2">💬</span> {post.comments.length}
-          </div>
+          <p className="font-semibold mb-1">{post.likes.length} likes</p>
+          <p>
+            <Link to={`/artist/${post.user.username}`} className="font-semibold">{post.user.username}</Link> {post.caption}
+          </p>
+          <p className="text-gray-500 text-sm mt-1">
+            View all {post.comments.length} comments
+          </p>
+          <p className="text-gray-400 text-xs mt-2">
+            {new Date(post.createdAt).toLocaleDateString()}
+          </p>
         </div>
-        <Link to={`/artist/${post.user._id}`} className="absolute top-2 left-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded-full text-xs opacity-0 group-hover:opacity-100">
-          {post.user.username}
-        </Link>
       </div>
     );
-  }
-
-  return (
-    <div className="bg-white border border-gray-200 rounded-md mb-6">
-      {/* Post Header - Make this clickable */}
-      <div className="flex items-center p-3">
-        <Link to={`/artist/${post.user._id}`} className="flex items-center">
-          <img 
-            src={`http://localhost:5000/${post.user.profilePic}`} 
-            alt={post.user.username} 
-            className="w-10 h-10 rounded-full object-cover"
-          />
-          <div className="ml-3">
-            <p className="font-semibold">{post.user.username}</p>
-          </div>
-        </Link>
-      </div>
-      
-      {/* Post Image */}
-      <img 
-        src={`http://localhost:5000/${post.image}`} 
-        alt={post.caption} 
-        className="w-full object-cover"
-      />
-      
-      {/* Post Actions */}
-      <div className="p-3">
-        <div className="flex items-center mb-3">
-          <button className="mr-4" onClick={() => handleLike(post._id)}>❤️</button>
-          <button className="mr-4">💬</button>
-          <button>🔖</button>
-        </div>
-        <p className="font-semibold mb-1">{post.likes.length} likes</p>
-        <p>
-          <Link to={`/artist/${post.user._id}`} className="font-semibold">{post.user.username}</Link> {post.caption}
-        </p>
-        <p className="text-gray-500 text-sm mt-1">
-          View all {post.comments.length} comments
-        </p>
-        <p className="text-gray-400 text-xs mt-2">
-          {new Date(post.createdAt).toLocaleDateString()}
-        </p>
-      </div>
-    </div>
-  );
-};
+  };
   
   return (
     <div className="max-w-screen-xl mx-auto px-4 py-8">
