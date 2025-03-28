@@ -1,9 +1,10 @@
+// src/components/Login.jsx
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const Login = () => {
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [formError, setFormError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -16,7 +17,7 @@ const Login = () => {
     setFormError('');
     
     // Simple validation
-    if (!email || !password) {
+    if (!username || !password) {
       setFormError('Please fill in all fields');
       return;
     }
@@ -24,7 +25,7 @@ const Login = () => {
     setIsLoading(true);
     
     try {
-      const success = login(email, password);
+      const success = await login(username, password);
       
       if (success) {
         navigate('/home');
@@ -63,17 +64,17 @@ const Login = () => {
           
           <div className="rounded-md shadow-sm -space-y-px">
             <div>
-              <label htmlFor="email-address" className="sr-only">Email address</label>
+              <label htmlFor="username" className="sr-only">Username</label>
               <input
-                id="email-address"
-                name="email"
-                type="email"
-                autoComplete="email"
+                id="username"
+                name="username"
+                type="text"
+                autoComplete="username"
                 required
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="Email address"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
               />
             </div>
             <div>
@@ -129,7 +130,7 @@ const Login = () => {
               <button
                 type="button"
                 onClick={() => {
-                  setEmail('user@example.com');
+                  setUsername('user1');
                   setPassword('password123');
                 }}
                 className="py-1 px-2 text-xs border border-gray-300 rounded hover:bg-gray-100"
@@ -139,7 +140,7 @@ const Login = () => {
               <button
                 type="button"
                 onClick={() => {
-                  setEmail('artist@example.com');
+                  setUsername('artist1');
                   setPassword('password123');
                 }}
                 className="py-1 px-2 text-xs border border-gray-300 rounded hover:bg-gray-100"
@@ -149,7 +150,7 @@ const Login = () => {
               <button
                 type="button"
                 onClick={() => {
-                  setEmail('shop@example.com');
+                  setUsername('shop1');
                   setPassword('password123');
                 }}
                 className="py-1 px-2 text-xs border border-gray-300 rounded hover:bg-gray-100"

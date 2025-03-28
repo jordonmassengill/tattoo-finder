@@ -19,7 +19,7 @@ const ProfilePage = () => {
           <div className="w-24 h-24 bg-white rounded-full overflow-hidden border-4 border-white">
             <img 
               src={currentUser?.profilePic || '/api/placeholder/150/150'} 
-              alt={currentUser?.name} 
+              alt={currentUser?.username} 
               className="w-full h-full object-cover"
             />
           </div>
@@ -27,7 +27,7 @@ const ProfilePage = () => {
         
         <div className="p-6">
           <h1 className="text-2xl font-bold text-center mb-6">
-            {currentUser?.name}
+            {currentUser?.username}
           </h1>
           
           <div className="space-y-4 max-w-lg mx-auto">

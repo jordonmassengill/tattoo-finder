@@ -1,214 +1,74 @@
-import React, { useState } from 'react';
+// src/components/SearchPage.jsx
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, MapPin, DollarSign, Filter, BarChart2, LayoutGrid, Grid } from 'lucide-react';
-
-// Mock data for search results
-const mockSearchResults = [
-  {
-    id: 1,
-    image: '/api/placeholder/600/600',
-    artistId: 101,
-    artistName: 'InkMaster',
-    shopName: 'InkCraft Studio',
-    location: 'Brooklyn, NY',
-    priceRange: '$$-$$$',
-    styles: ['Geometric', 'Blackwork', 'Minimalist'],
-    likes: 245,
-    caption: 'Custom sleeve design with geometric elements.'
-  },
-  {
-    id: 2,
-    image: '/api/placeholder/600/600',
-    artistId: 102,
-    artistName: 'ColorQueen',
-    shopName: 'Vivid Ink Gallery',
-    location: 'Los Angeles, CA',
-    priceRange: '$$$',
-    styles: ['Watercolor', 'Illustrative', 'Floral'],
-    likes: 189,
-    caption: 'Watercolor butterfly piece I did yesterday.'
-  },
-  {
-    id: 3,
-    image: '/api/placeholder/600/600',
-    artistId: 103,
-    artistName: 'Traditional_Joe',
-    shopName: 'Old School Tattoo',
-    location: 'Chicago, IL',
-    priceRange: '$$',
-    styles: ['Traditional', 'American', 'Sailor'],
-    likes: 320,
-    caption: 'Classic sailor design with a modern twist.'
-  },
-  {
-    id: 4,
-    image: '/api/placeholder/600/600',
-    artistId: 104,
-    artistName: 'LineArtist',
-    shopName: 'Minimalist Ink',
-    location: 'Seattle, WA',
-    priceRange: '$$',
-    styles: ['Linework', 'Minimalist', 'Fineline'],
-    likes: 178,
-    caption: 'Minimalist line work on forearm.'
-  },
-  {
-    id: 5,
-    image: '/api/placeholder/600/600',
-    artistId: 105,
-    artistName: 'BlackworkSpecialist',
-    shopName: 'Dark Matter Tattoo',
-    location: 'Portland, OR',
-    priceRange: '$$$',
-    styles: ['Blackwork', 'Mandala', 'Dotwork'],
-    likes: 412,
-    caption: 'Detailed mandala back piece, 8-hour session.'
-  },
-  {
-    id: 6,
-    image: '/api/placeholder/600/600',
-    artistId: 106,
-    artistName: 'NeoTradQueen',
-    shopName: 'Modern Classic Tattoo',
-    location: 'Denver, CO',
-    priceRange: '$$$',
-    styles: ['Neo-Traditional', 'Illustrative', 'Color'],
-    likes: 267,
-    caption: 'Neo-traditional fox with floral elements.'
-  },
-  {
-    id: 7,
-    image: '/api/placeholder/600/600',
-    artistId: 107,
-    artistName: 'JapaneseInkMaster',
-    shopName: 'Rising Sun Tattoo',
-    location: 'San Francisco, CA',
-    priceRange: '$$$$',
-    styles: ['Japanese', 'Irezumi', 'Traditional'],
-    likes: 380,
-    caption: 'Traditional Japanese koi sleeve.'
-  },
-  {
-    id: 8,
-    image: '/api/placeholder/600/600',
-    artistId: 108,
-    artistName: 'RealismPro',
-    shopName: 'Hyperreal Ink',
-    location: 'Miami, FL',
-    priceRange: '$$$$',
-    styles: ['Realism', 'Portrait', 'Black and Grey'],
-    likes: 456,
-    caption: 'Hyperrealistic portrait, 12 hour session.'
-  },
-  {
-    id: 9,
-    image: '/api/placeholder/600/600',
-    artistId: 109,
-    artistName: 'SciFiInker',
-    shopName: 'Future Ink',
-    location: 'Austin, TX',
-    priceRange: '$$$',
-    styles: ['Sci-Fi', 'Cyberpunk', 'Illustrative'],
-    likes: 201,
-    caption: 'Cyberpunk themed sleeve design.'
-  }
-];
-
-// Available tattoo styles for filtering
-const tattooStyles = [
-  'Geometric', 'Blackwork', 'Minimalist', 'Watercolor', 'Illustrative', 
-  'Traditional', 'Neo-Traditional', 'Japanese', 'Irezumi', 'Realism', 
-  'Portrait', 'Tribal', 'Dotwork', 'Linework', 'Mandala', 'Sci-Fi',
-  'Abstract', 'Floral', 'American Traditional', 'Black and Grey'
-];
-
-// Component for a single search result in grid view
-const SearchResultGrid = ({ result, viewMode }) => (
-  <div className="relative group cursor-pointer">
-    <Link to={`/artist/${result.artistId}`}>
-      <img 
-        src={result.image} 
-        alt={result.caption} 
-        className="w-full aspect-square object-cover"
-      />
-      <div className="absolute inset-0 bg-black bg-opacity-40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white p-2">
-        <p className="font-bold text-center mb-1">{result.artistName}</p>
-        <p className="text-sm text-center mb-1">{result.shopName}</p>
-        <div className="flex items-center mb-1">
-          <MapPin size={12} className="mr-1" />
-          <span className="text-xs">{result.location}</span>
-        </div>
-        <div className="flex items-center mb-2">
-          <DollarSign size={12} className="mr-1" />
-          <span className="text-xs">{result.priceRange}</span>
-        </div>
-        <div className="flex items-center">
-          <span className="mr-2">❤️</span> {result.likes}
-        </div>
-      </div>
-    </Link>
-  </div>
-);
-
-// Component for a single search result in feed view
-const SearchResultFeed = ({ result }) => (
-  <div className="bg-white border border-gray-200 rounded-md mb-6">
-    {/* Result Header */}
-    <div className="flex items-center p-3">
-      <Link to={`/artist/${result.artistId}`} className="flex items-center">
-        <div className="ml-3">
-          <p className="font-semibold">{result.artistName}</p>
-          <div className="flex items-center text-sm text-gray-500">
-            <MapPin size={12} className="mr-1" />
-            <span>{result.location}</span>
-            <span className="mx-1">•</span>
-            <DollarSign size={12} className="mr-1" />
-            <span>{result.priceRange}</span>
-          </div>
-        </div>
-      </Link>
-    </div>
-    
-    {/* Result Image */}
-    <Link to={`/artist/${result.artistId}`}>
-      <img 
-        src={result.image} 
-        alt={result.caption} 
-        className="w-full object-cover"
-      />
-    </Link>
-    
-    {/* Result Actions */}
-    <div className="p-3">
-      <div className="flex items-center mb-3">
-        <button className="mr-4">❤️</button>
-        <button className="mr-4">💬</button>
-        <button>🔖</button>
-      </div>
-      <p className="font-semibold mb-1">{result.likes} likes</p>
-      <p>
-        <Link to={`/artist/${result.artistId}`} className="font-semibold">{result.artistName}</Link> {result.caption}
-      </p>
-      <p className="text-gray-500 text-sm mt-1">View all comments</p>
-      <div className="mt-2">
-        <span className="text-sm text-gray-500">Styles: </span>
-        {result.styles.map((style, index) => (
-          <span key={index} className="text-sm text-blue-500 mr-2">#{style.toLowerCase()}</span>
-        ))}
-      </div>
-    </div>
-  </div>
-);
+import { MapPin, DollarSign, Filter, BarChart2, LayoutGrid, Grid } from 'lucide-react';
 
 const SearchPage = () => {
   const [viewMode, setViewMode] = useState('grid3');
   const [showFilters, setShowFilters] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const [filters, setFilters] = useState({
     location: '',
     priceRange: [],
     styles: [],
     distance: 50,
   });
+  const [searchResults, setSearchResults] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  // Available tattoo styles for filtering
+  const tattooStyles = [
+    'Geometric', 'Blackwork', 'Minimalist', 'Watercolor', 'Illustrative', 
+    'Traditional', 'Neo-Traditional', 'Japanese', 'Irezumi', 'Realism', 
+    'Portrait', 'Tribal', 'Dotwork', 'Linework', 'Mandala', 'Sci-Fi',
+    'Abstract', 'Floral', 'American Traditional', 'Black and Grey'
+  ];
+  
+  // Fetch search results based on filters
+  useEffect(() => {
+    const fetchSearchResults = async () => {
+      try {
+        setLoading(true);
+        
+        // Build query parameters
+        const params = new URLSearchParams();
+        
+        if (searchQuery) {
+          params.append('query', searchQuery);
+        }
+        
+        if (filters.location) {
+          params.append('location', filters.location);
+        }
+        
+        if (filters.priceRange.length > 0) {
+          filters.priceRange.forEach(price => params.append('priceRange', price));
+        }
+        
+        if (filters.styles.length > 0) {
+          params.append('styles', filters.styles.join(','));
+        }
+        
+        // Fetch featured posts first (if no specific search)
+        const endpoint = searchQuery ? '/api/search/artists' : '/api/search/featured';
+        const response = await fetch(`http://localhost:5000${endpoint}?${params.toString()}`);
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch search results');
+        }
+        
+        const data = await response.json();
+        setSearchResults(data);
+      } catch (error) {
+        console.error('Error fetching search results:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    // Fetch initial results or when filters change
+    fetchSearchResults();
+  }, [searchQuery, filters]);
   
   // Toggle price range filter
   const togglePriceFilter = (price) => {
@@ -230,6 +90,162 @@ const SearchPage = () => {
     });
   };
   
+  // Handle search input
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+  };
+  
+  // Reset filters
+  const resetFilters = () => {
+    setFilters({
+      location: '',
+      priceRange: [],
+      styles: [],
+      distance: 50,
+    });
+    setSearchQuery('');
+  };
+  
+  // Render grid and feed items
+  const renderSearchItem = (item, isGrid) => {
+    // Check if item is a post or artist
+    const isPost = item.image !== undefined;
+    
+    if (isGrid) {
+      return (
+        <div key={item._id} className="relative group cursor-pointer">
+          <Link to={`/artist/${isPost ? item.user._id : item._id}`}>
+            <img 
+              src={isPost ? `http://localhost:5000/${item.image}` : `http://localhost:5000/${item.profilePic}`} 
+              alt={isPost ? item.caption : item.username} 
+              className="w-full aspect-square object-cover"
+            />
+            <div className="absolute inset-0 bg-black bg-opacity-40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white p-2">
+              <p className="font-bold text-center mb-1">
+                {isPost ? item.user.username : item.username}
+              </p>
+              {item.location && (
+                <div className="flex items-center mb-1">
+                  <MapPin size={12} className="mr-1" />
+                  <span className="text-xs">{item.location}</span>
+                </div>
+              )}
+              {item.priceRange && (
+                <div className="flex items-center mb-2">
+                  <DollarSign size={12} className="mr-1" />
+                  <span className="text-xs">{item.priceRange}</span>
+                </div>
+              )}
+              {isPost && (
+                <div className="flex items-center">
+                  <span className="mr-2">❤️</span> {item.likes.length}
+                </div>
+              )}
+            </div>
+          </Link>
+        </div>
+      );
+    }
+    
+    // Feed view
+    if (isPost) {
+      return (
+        <div key={item._id} className="bg-white border border-gray-200 rounded-md mb-6">
+          <div className="flex items-center p-3">
+            <Link to={`/artist/${item.user._id}`} className="flex items-center">
+              <img 
+                src={`http://localhost:5000/${item.user.profilePic}`} 
+                alt={item.user.username} 
+                className="w-10 h-10 rounded-full object-cover"
+              />
+              <div className="ml-3">
+                <p className="font-semibold">{item.user.username}</p>
+                {item.user.location && (
+                  <div className="flex items-center text-sm text-gray-500">
+                    <MapPin size={12} className="mr-1" />
+                    <span>{item.user.location}</span>
+                  </div>
+                )}
+              </div>
+            </Link>
+          </div>
+          
+          <Link to={`/artist/${item.user._id}`}>
+            <img 
+              src={`http://localhost:5000/${item.image}`} 
+              alt={item.caption} 
+              className="w-full object-cover"
+            />
+          </Link>
+          
+          <div className="p-3">
+            <div className="flex items-center mb-3">
+              <button className="mr-4">❤️</button>
+              <button className="mr-4">💬</button>
+              <button>🔖</button>
+            </div>
+            <p className="font-semibold mb-1">{item.likes.length} likes</p>
+            <p>
+              <Link to={`/artist/${item.user._id}`} className="font-semibold">{item.user.username}</Link> {item.caption}
+            </p>
+            <p className="text-gray-500 text-sm mt-1">View all {item.comments.length} comments</p>
+            <p className="text-gray-400 text-xs mt-2">
+              {new Date(item.createdAt).toLocaleDateString()}
+            </p>
+          </div>
+        </div>
+      );
+    } else {
+      // Artist feed view
+      return (
+        <div key={item._id} className="bg-white border border-gray-200 rounded-md mb-6">
+          <div className="flex items-center p-3">
+            <Link to={`/artist/${item._id}`} className="flex items-center">
+              <img 
+                src={`http://localhost:5000/${item.profilePic}`} 
+                alt={item.username} 
+                className="w-16 h-16 rounded-full object-cover"
+              />
+              <div className="ml-3">
+                <p className="font-semibold text-lg">{item.username}</p>
+                {item.username && <p className="text-gray-500">@{item.username}</p>}
+                {item.location && (
+                  <div className="flex items-center text-sm text-gray-500 mt-1">
+                    <MapPin size={12} className="mr-1" />
+                    <span>{item.location}</span>
+                  </div>
+                )}
+              </div>
+            </Link>
+          </div>
+          
+          <div className="p-3 border-t">
+            {item.styles && item.styles.length > 0 && (
+              <div className="mb-2">
+                <p className="text-sm text-gray-500 mb-1">Styles:</p>
+                <div className="flex flex-wrap gap-1">
+                  {item.styles.map(style => (
+                    <span key={style} className="px-2 py-1 bg-gray-100 rounded-full text-xs">{style}</span>
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            <div className="flex justify-between mt-2">
+              <div className="text-sm">
+                <span className="font-semibold">{item.postCount || 0}</span> posts
+              </div>
+              <div className="text-sm">
+                <span className="font-semibold">{item.followersCount || 0}</span> followers
+              </div>
+              <Link to={`/artist/${item._id}`} className="text-blue-500 text-sm">View Profile</Link>
+            </div>
+          </div>
+        </div>
+      );
+    }
+  };
+  
   return (
     <div className="max-w-screen-xl mx-auto px-4 py-8">
       {/* Search Bar */}
@@ -239,8 +255,10 @@ const SearchPage = () => {
             type="text"
             placeholder="Search tattoo artists, styles, locations..."
             className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            value={searchQuery}
+            onChange={handleSearchChange}
           />
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+          <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
         </div>
         
         <button
@@ -349,12 +367,7 @@ const SearchPage = () => {
           <div className="flex justify-end mt-4">
             <button 
               className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md mr-2"
-              onClick={() => setFilters({
-                location: '',
-                priceRange: [],
-                styles: [],
-                distance: 50,
-              })}
+              onClick={resetFilters}
             >
               Reset Filters
             </button>
@@ -368,19 +381,32 @@ const SearchPage = () => {
         </div>
       )}
       
+      {/* Loading indicator */}
+      {loading && (
+        <div className="flex justify-center py-20">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+        </div>
+      )}
+      
+      {/* Empty state */}
+      {!loading && searchResults.length === 0 && (
+        <div className="text-center py-20">
+          <p className="text-xl text-gray-500">No results found</p>
+          <p className="text-gray-400 mt-2">Try adjusting your search or filters</p>
+        </div>
+      )}
+      
       {/* Search Results */}
-      {viewMode === 'feed' ? (
-        <div className="max-w-xl mx-auto">
-          {mockSearchResults.map(result => (
-            <SearchResultFeed key={result.id} result={result} />
-          ))}
-        </div>
-      ) : (
-        <div className={`grid ${viewMode === 'grid3' ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3' : 'grid-cols-2 sm:grid-cols-3 md:grid-cols-5'} gap-4`}>
-          {mockSearchResults.map(result => (
-            <SearchResultGrid key={result.id} result={result} viewMode={viewMode} />
-          ))}
-        </div>
+      {!loading && searchResults.length > 0 && (
+        viewMode === 'feed' ? (
+          <div className="max-w-xl mx-auto">
+            {searchResults.map(result => renderSearchItem(result, false))}
+          </div>
+        ) : (
+          <div className={`grid ${viewMode === 'grid3' ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3' : 'grid-cols-2 sm:grid-cols-3 md:grid-cols-5'} gap-4`}>
+            {searchResults.map(result => renderSearchItem(result, true))}
+          </div>
+        )
       )}
     </div>
   );

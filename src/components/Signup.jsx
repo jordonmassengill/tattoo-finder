@@ -7,10 +7,9 @@ const Signup = () => {
   const [userType, setUserType] = useState('');
   const [formData, setFormData] = useState({
     email: '',
+    username: '',
     password: '',
     confirmPassword: '',
-    name: '',
-    username: '',
     bio: '',
     location: '',
     styles: []
@@ -55,8 +54,22 @@ const Signup = () => {
   };
   
   const validateStep2 = () => {
-    if (!formData.email || !formData.password || !formData.confirmPassword) {
+    if (!formData.username || !formData.email || !formData.password || !formData.confirmPassword) {
       setFormError('Please fill in all required fields');
+      return false;
+    }
+    
+    // Username validation (only letters, numbers, underscores, no spaces)
+    const usernameRegex = /^[a-zA-Z0-9_]+$/;
+    if (!usernameRegex.test(formData.username)) {
+      setFormError('Username can only contain letters, numbers, and underscores (no spaces)');
+      return false;
+    }
+    
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      setFormError('Please enter a valid email address');
       return false;
     }
     
@@ -75,14 +88,9 @@ const Signup = () => {
   };
   
   const validateStep3 = () => {
-    if (!formData.name) {
-      setFormError('Please enter your name or shop name');
-      return false;
-    }
     
-    if ((userType === 'artist' || userType === 'shop') && !formData.username) {
-      setFormError('Please enter a username');
-      return false;
+    if (userType === 'artist' || userType === 'shop') {
+
     }
     
     setFormError('');
@@ -131,7 +139,7 @@ const Signup = () => {
       const userData = {
         email: formData.email,
         password: formData.password,
-        name: formData.name,
+        name: formData.username,
         userType,
         profilePic: '/api/placeholder/150/150', // Default profile pic
       };
@@ -208,6 +216,26 @@ const Signup = () => {
       
       <div className="space-y-4">
         <div>
+          <label htmlFor="username" className="block text-sm font-medium text-gray-700">
+            Username
+          </label>
+          <div className="mt-1 flex rounded-md shadow-sm">
+            <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 sm:text-sm">
+              @
+            </span>
+            <input
+              type="text"
+              id="username"
+              name="username"
+              value={formData.username}
+              onChange={handleChange}
+              className="flex-1 min-w-0 block w-full px-3 py-2 rounded-none rounded-r-md border border-gray-300 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              required
+            />
+          </div>
+        </div>
+        
+        <div>
           <label htmlFor="email" className="block text-sm font-medium text-gray-700">
             Email address
           </label>
@@ -261,42 +289,8 @@ const Signup = () => {
       <h2 className="text-xl font-semibold mb-4">Profile Details</h2>
       
       <div className="space-y-4">
-        <div>
-          <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-            {userType === 'shop' ? 'Shop Name' : 'Full Name'}
-          </label>
-          <input
-            type="text"
-            id="name"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-            required
-          />
-        </div>
-        
         {(userType === 'artist' || userType === 'shop') && (
           <>
-            <div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-700">
-                Username
-              </label>
-              <div className="mt-1 flex rounded-md shadow-sm">
-                <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 sm:text-sm">
-                  @
-                </span>
-                <input
-                  type="text"
-                  id="username"
-                  name="username"
-                  value={formData.username}
-                  onChange={handleChange}
-                  className="flex-1 min-w-0 block w-full px-3 py-2 rounded-none rounded-r-md border border-gray-300 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                />
-              </div>
-            </div>
-            
             <div>
               <label htmlFor="bio" className="block text-sm font-medium text-gray-700">
                 Bio

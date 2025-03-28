@@ -33,14 +33,17 @@ export const AuthProvider = ({ children }) => {
   };
   
   // Login
-  const login = async (email, password) => {
+  const login = async (username, password) => {
     setError('');
     try {
-      const res = await api.login(email, password);
+      console.log('Attempting login with username:', username);
+      const res = await api.login(username, password);
+      console.log('Login response:', res);
       localStorage.setItem('token', res.data.token);
       setCurrentUser(res.data.user);
       return true;
     } catch (err) {
+      console.error('Login error:', err);
       setError(err.response?.data?.message || 'Login failed. Please try again.');
       return false;
     }

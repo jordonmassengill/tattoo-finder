@@ -73,7 +73,7 @@ const ShopProfile = () => {
       <div className="relative h-56 md:h-80 bg-gray-200">
         <img 
           src={mockShopData.coverPhoto} 
-          alt={`${mockShopData.name} cover`} 
+          alt={`${mockShopData.username} cover`} 
           className="w-full h-full object-cover"
         />
       </div>
@@ -85,7 +85,7 @@ const ShopProfile = () => {
           <div className="w-28 h-28 md:w-36 md:h-36 rounded-full overflow-hidden flex-shrink-0 mb-4 md:mb-0 md:mr-8 border-4 border-white bg-white relative -mt-16 md:-mt-20">
             <img 
               src={mockShopData.profilePic} 
-              alt={mockShopData.name} 
+              alt={mockShopData.username} 
               className="w-full h-full object-cover"
             />
           </div>
@@ -93,7 +93,7 @@ const ShopProfile = () => {
           {/* Profile Info */}
           <div className="flex-grow text-center md:text-left">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
-              <h1 className="text-2xl font-bold mr-4">{mockShopData.name}</h1>
+              <h1 className="text-2xl font-bold mr-4">{mockShopData.username}</h1>
               <button className="bg-blue-500 text-white px-4 py-2 rounded-md font-medium mt-2 md:mt-0">
                 Follow
               </button>
@@ -142,11 +142,11 @@ const ShopProfile = () => {
                 <div className="w-20 h-20 rounded-full overflow-hidden mb-2">
                   <img 
                     src={artist.profilePic} 
-                    alt={artist.name} 
+                    alt={artist.username} 
                     className="w-full h-full object-cover"
                   />
                 </div>
-                <p className="text-sm font-medium text-center">{artist.name.split(' ')[0]}</p>
+                <p className="text-sm font-medium text-center">{artist.username.split(' ')[0]}</p>
                 <p className="text-xs text-gray-500 text-center">{artist.specialty}</p>
               </div>
             </Link>
@@ -198,7 +198,7 @@ const ShopProfile = () => {
                 <span className="mr-2">❤️</span> {item.likes}
               </div>
               <Link to={`/artist/${item.artistId}`} className="absolute bottom-2 left-2 text-xs font-medium hover:underline">
-                By: {mockShopData.artists.find(a => a.id === item.artistId)?.name.split(' ')[0]}
+                By: {mockShopData.artists.find(a => a.id === item.artistId)?.username.split(' ')[0]}
               </Link>
             </div>
           </div>

@@ -18,7 +18,7 @@ api.interceptors.request.use(config => {
 
 export default {
   // Auth endpoints
-  login: (email, password) => api.post('/auth/login', { email, password }),
+  login: (username, password) => api.post('/auth/login', { username, password }),
   register: (userData) => api.post('/auth/register', userData),
   
   // User endpoints
