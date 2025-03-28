@@ -25,6 +25,13 @@ export default {
   getCurrentUser: () => api.get('/users/me'),
   getUserById: (id) => api.get(`/users/${id}`),
   getUserPosts: (id) => api.get(`/users/${id}/posts`),
+
+  //Profile Pic
+  updateProfilePicture: (file) => {
+    const formData = new FormData();
+    formData.append('profilePic', file);
+    return api.put('/users/profile-picture', formData);
+  },
   
   // Post endpoints
   getPosts: () => api.get('/posts'),

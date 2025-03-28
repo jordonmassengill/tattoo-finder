@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { LayoutGrid, Grid, BarChart2, MapPin, DollarSign, Tag, Trash2, AlertTriangle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
+import ProfileImage from './ProfileImage';
 
 const ArtistProfile = () => {
   const [viewMode, setViewMode] = useState('grid3');
@@ -170,13 +171,13 @@ setPosts(postsData);
       <div className="p-4 border-b">
         <div className="flex flex-col md:flex-row items-center md:items-start">
           {/* Profile Picture */}
-          <div className="w-28 h-28 md:w-36 md:h-36 rounded-full overflow-hidden flex-shrink-0 mb-4 md:mb-0 md:mr-8">
-            <img 
-              src={`http://localhost:5000/${artistData.profilePic}` || '/api/placeholder/150/150'} 
-              alt={artistData.username} 
-              className="w-full h-full object-cover"
-            />
-          </div>
+          <div className="w-28 h-28 md:w-36 md:h-36 flex-shrink-0 mb-4 md:mb-0 md:mr-8">
+  <ProfileImage 
+    user={artistData} 
+    size="xl" 
+    className="w-full h-full"
+  />
+</div>
           
           {/* Profile Info */}
           <div className="flex-grow text-center md:text-left">
@@ -238,8 +239,9 @@ setPosts(postsData);
       </div>
       
       {/* View Mode Selector */}
-      <div className="flex justify-end p-4 border-b">
-        <div className="flex bg-gray-100 rounded-lg p-1">
+      <div className="flex justify-between items-center p-4 border-b">
+  <h2 className="text-lg font-medium">Portfolio</h2>
+  <div className="flex bg-gray-100 rounded-lg p-1 mr-2">
           <button 
             onClick={() => setViewMode('feed')}
             className={`p-2 rounded ${viewMode === 'feed' ? 'bg-white shadow' : ''}`}

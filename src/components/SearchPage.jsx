@@ -1,7 +1,7 @@
-// src/components/SearchPage.jsx
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { MapPin, DollarSign, Filter, BarChart2, LayoutGrid, Grid } from 'lucide-react';
+import ProfileImage from './ProfileImage';
 
 const SearchPage = () => {
   const [viewMode, setViewMode] = useState('grid3');
@@ -107,149 +107,149 @@ const SearchPage = () => {
   };
   
   // Render grid and feed items
-const renderSearchItem = (item, isGrid) => {
-  // Check if item is a post or artist
-  const isPost = item.image !== undefined;
-  
-  if (isGrid) {
-    return (
-      <div key={item._id} className="relative group cursor-pointer">
-        <Link to={isPost ? `/artist/${item.user.username}` : `/artist/${item.username}`}>
-          <img 
-            src={isPost ? `http://localhost:5000/${item.image}` : `http://localhost:5000/${item.profilePic}`} 
-            alt={isPost ? item.caption : item.username} 
-            className="w-full aspect-square object-cover"
-          />
-          <div className="absolute inset-0 bg-black bg-opacity-40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white p-2">
-            <p className="font-bold text-center mb-1">
-              {isPost ? item.user.username : item.username}
-            </p>
-            {item.location && (
-              <div className="flex items-center mb-1">
-                <MapPin size={12} className="mr-1" />
-                <span className="text-xs">{item.location}</span>
-              </div>
+  const renderSearchItem = (item, isGrid) => {
+    // Check if item is a post or artist
+    const isPost = item.image !== undefined;
+    
+    if (isGrid) {
+      return (
+        <div key={item._id} className="relative group cursor-pointer">
+          <Link to={isPost ? `/artist/${item.user.username}` : `/artist/${item.username}`}>
+            {isPost ? (
+              <img 
+                src={`http://localhost:5000/${item.image}`} 
+                alt={item.caption} 
+                className="w-full aspect-square object-cover"
+              />
+            ) : (
+              <ProfileImage 
+                user={item} 
+                size="xl" 
+                className="w-full aspect-square"
+              />
             )}
-            {item.priceRange && (
-              <div className="flex items-center mb-2">
-                <DollarSign size={12} className="mr-1" />
-                <span className="text-xs">{item.priceRange}</span>
-              </div>
-            )}
-            {isPost && (
-              <div className="flex items-center">
-                <span className="mr-2">❤️</span> {item.likes.length}
-              </div>
-            )}
-          </div>
-        </Link>
-      </div>
-    );
-  }
-  
-  // Feed view
-  if (isPost) {
-    return (
-      <div key={item._id} className="bg-white border border-gray-200 rounded-md mb-6">
-        <div className="flex items-center p-3">
-          <Link to={`/artist/${item.user.username}`} className="flex items-center">
-            <img 
-              src={`http://localhost:5000/${item.user.profilePic}`} 
-              alt={item.user.username} 
-              className="w-10 h-10 rounded-full object-cover"
-            />
-            <div className="ml-3">
-              <p className="font-semibold">{item.user.username}</p>
-              {item.user.location && (
-                <div className="flex items-center text-sm text-gray-500">
-                  <MapPin size={12} className="mr-1" />
-                  <span>{item.user.location}</span>
-                </div>
-              )}
-            </div>
-          </Link>
-        </div>
-        
-        <Link to={`/artist/${item.user.username}`}>
-          <img 
-            src={`http://localhost:5000/${item.image}`} 
-            alt={item.caption} 
-            className="w-full object-cover"
-          />
-        </Link>
-        
-        <div className="p-3">
-          <div className="flex items-center mb-3">
-            <button className="mr-4">❤️</button>
-            <button className="mr-4">💬</button>
-            <button>🔖</button>
-          </div>
-          <p className="font-semibold mb-1">{item.likes.length} likes</p>
-          <p>
-            <Link to={`/artist/${item.user.username}`} className="font-semibold">{item.user.username}</Link> {item.caption}
-          </p>
-          <p className="text-gray-500 text-sm mt-1">View all {item.comments.length} comments</p>
-          <p className="text-gray-400 text-xs mt-2">
-            {new Date(item.createdAt).toLocaleDateString()}
-          </p>
-        </div>
-      </div>
-    );
-  } else {
-    // Artist feed view
-    return (
-      <div key={item._id} className="bg-white border border-gray-200 rounded-md mb-6">
-        <div className="flex items-center p-3">
-          <Link to={`/artist/${item.username}`} className="flex items-center">
-            <img 
-              src={`http://localhost:5000/${item.profilePic}`} 
-              alt={item.username} 
-              className="w-16 h-16 rounded-full object-cover"
-            />
-            <div className="ml-3">
-              <p className="font-semibold text-lg">{item.username}</p>
-              {item.username && <p className="text-gray-500">@{item.username}</p>}
+            <div className="absolute inset-0 bg-black bg-opacity-40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white p-2">
+              <p className="font-bold text-center mb-1">
+                {isPost ? item.user.username : item.username}
+              </p>
               {item.location && (
-                <div className="flex items-center text-sm text-gray-500 mt-1">
+                <div className="flex items-center mb-1">
                   <MapPin size={12} className="mr-1" />
-                  <span>{item.location}</span>
+                  <span className="text-xs">{item.location}</span>
+                </div>
+              )}
+              {item.priceRange && (
+                <div className="flex items-center mb-2">
+                  <DollarSign size={12} className="mr-1" />
+                  <span className="text-xs">{item.priceRange}</span>
+                </div>
+              )}
+              {isPost && (
+                <div className="flex items-center">
+                  <span className="mr-2">❤️</span> {item.likes.length}
                 </div>
               )}
             </div>
           </Link>
         </div>
-        
-        <div className="p-3 border-t">
-          {item.styles && item.styles.length > 0 && (
-            <div className="mb-2">
-              <p className="text-sm text-gray-500 mb-1">Styles:</p>
-              <div className="flex flex-wrap gap-1">
-                {item.styles.map(style => (
-                  <span key={style} className="px-2 py-1 bg-gray-100 rounded-full text-xs">{style}</span>
-                ))}
+      );
+    }
+    
+    // Feed view
+    if (isPost) {
+      return (
+        <div key={item._id} className="bg-white border border-gray-200 rounded-md mb-6">
+          <div className="flex items-center p-3">
+            <Link to={`/artist/${item.user.username}`} className="flex items-center">
+              <ProfileImage user={item.user} size="md" />
+              <div className="ml-3">
+                <p className="font-semibold">{item.user.username}</p>
+                {item.user.location && (
+                  <div className="flex items-center text-sm text-gray-500">
+                    <MapPin size={12} className="mr-1" />
+                    <span>{item.user.location}</span>
+                  </div>
+                )}
               </div>
-            </div>
-          )}
+            </Link>
+          </div>
           
-          <div className="flex justify-between mt-2">
-            <div className="text-sm">
-              <span className="font-semibold">{item.postCount || 0}</span> posts
+          <Link to={`/artist/${item.user.username}`}>
+            <img 
+              src={`http://localhost:5000/${item.image}`} 
+              alt={item.caption} 
+              className="w-full object-cover"
+            />
+          </Link>
+          
+          <div className="p-3">
+            <div className="flex items-center mb-3">
+              <button className="mr-4">❤️</button>
+              <button className="mr-4">💬</button>
+              <button>🔖</button>
             </div>
-            <div className="text-sm">
-              <span className="font-semibold">{item.followersCount || 0}</span> followers
-            </div>
-            <Link to={`/artist/${item.username}`} className="text-blue-500 text-sm">View Profile</Link>
+            <p className="font-semibold mb-1">{item.likes.length} likes</p>
+            <p>
+              <Link to={`/artist/${item.user.username}`} className="font-semibold">{item.user.username}</Link> {item.caption}
+            </p>
+            <p className="text-gray-500 text-sm mt-1">View all {item.comments.length} comments</p>
+            <p className="text-gray-400 text-xs mt-2">
+              {new Date(item.createdAt).toLocaleDateString()}
+            </p>
           </div>
         </div>
-      </div>
-    );
-  }
-};
+      );
+    } else {
+      // Artist feed view
+      return (
+        <div key={item._id} className="bg-white border border-gray-200 rounded-md mb-6">
+          <div className="flex items-center p-3">
+            <Link to={`/artist/${item.username}`} className="flex items-center">
+              <ProfileImage user={item} size="lg" />
+              <div className="ml-3">
+                <p className="font-semibold text-lg">{item.username}</p>
+                {item.username && <p className="text-gray-500">@{item.username}</p>}
+                {item.location && (
+                  <div className="flex items-center text-sm text-gray-500 mt-1">
+                    <MapPin size={12} className="mr-1" />
+                    <span>{item.location}</span>
+                  </div>
+                )}
+              </div>
+            </Link>
+          </div>
+          
+          <div className="p-3 border-t">
+            {item.styles && item.styles.length > 0 && (
+              <div className="mb-2">
+                <p className="text-sm text-gray-500 mb-1">Styles:</p>
+                <div className="flex flex-wrap gap-1">
+                  {item.styles.map(style => (
+                    <span key={style} className="px-2 py-1 bg-gray-100 rounded-full text-xs">{style}</span>
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            <div className="flex justify-between mt-2">
+              <div className="text-sm">
+                <span className="font-semibold">{item.postCount || 0}</span> posts
+              </div>
+              <div className="text-sm">
+                <span className="font-semibold">{item.followersCount || 0}</span> followers
+              </div>
+              <Link to={`/artist/${item.username}`} className="text-blue-500 text-sm">View Profile</Link>
+            </div>
+          </div>
+        </div>
+      );
+    }
+  };
   
   return (
     <div className="max-w-screen-xl mx-auto px-4 py-8">
       {/* Search Bar */}
-      <div className="flex flex-col md:flex-row items-center mb-6">
+      <div className="flex flex-col md:flex-row items-center mb-6 pr-13">
         <div className="relative flex-grow mb-4 md:mb-0 md:mr-4 w-full md:w-auto">
           <input
             type="text"
@@ -270,7 +270,7 @@ const renderSearchItem = (item, isGrid) => {
         </button>
         
         <div className="flex ml-0 md:ml-4 mt-4 md:mt-0">
-          <div className="flex bg-gray-100 rounded-lg p-1">
+          <div className="flex bg-gray-100 rounded-lg p-1" style={{ marginRight: '80px' }}>
             <button 
               onClick={() => setViewMode('feed')}
               className={`p-2 rounded ${viewMode === 'feed' ? 'bg-white shadow' : ''}`}

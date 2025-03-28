@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Save, Trash2, AlertTriangle } from 'lucide-react';
+import { Save, Trash2, AlertTriangle, Camera, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import api from '../services/api';
 
 const ProfilePage = () => {
   const { currentUser, userType, logout, updateCurrentUser } = useAuth();
@@ -11,6 +10,10 @@ const ProfilePage = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+  const [profileImagePreview, setProfileImagePreview] = useState(null);
+  const [profileImageFile, setProfileImageFile] = useState(null);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const fileInputRef = useRef(null);
   const navigate = useNavigate();
 
   // Form state
@@ -28,7 +31,7 @@ const ProfilePage = () => {
     'Abstract', 'Floral', 'American Traditional', 'Black and Grey'
   ];
 
-  // Initialize form with current user data
+  // Initialize form and profile image with current user data
   useEffect(() => {
     if (currentUser) {
       setFormData({
@@ -36,8 +39,15 @@ const ProfilePage = () => {
         location: currentUser.location || '',
         styles: currentUser.styles || []
       });
+      
+      // Set profile pic preview if exists
+      if (currentUser.profilePic && currentUser.profilePic !== '/default-profile.png') {
+        setProfileImagePreview(`http://localhost:5000/${currentUser.profilePic}`);
+      } else {
+        setProfileImagePreview(null);
+      }
     }
-  }, [currentUser]); // Add currentUser as a dependency
+  }, [currentUser]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -53,6 +63,86 @@ const ProfilePage = () => {
         return { ...prev, styles: [...currentStyles, style] };
       }
     });
+  };
+  
+  // Trigger file input click
+  const handleProfilePicClick = () => {
+    fileInputRef.current.click();
+  };
+  
+  // Handle file selection for profile picture
+  const handleFileChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setProfileImageFile(file);
+      
+      // Create a preview
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProfileImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+  
+  // Cancel profile picture update
+  const handleCancelProfilePic = () => {
+    setProfileImageFile(null);
+    if (currentUser?.profilePic && currentUser.profilePic !== '/default-profile.png') {
+      setProfileImagePreview(`http://localhost:5000/${currentUser.profilePic}`);
+    } else {
+      setProfileImagePreview(null);
+    }
+  };
+  
+  // Upload profile picture
+  const handleUploadProfilePic = async () => {
+    if (!profileImageFile) return;
+    
+    setIsUploadingImage(true);
+    setError('');
+    
+    try {
+      const formData = new FormData();
+      formData.append('profilePic', profileImageFile);
+      
+      const response = await fetch('http://localhost:5000/api/users/profile-picture', {
+        method: 'PUT',
+        headers: {
+          'x-auth-token': localStorage.getItem('token')
+        },
+        body: formData
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to update profile picture');
+      }
+      
+      const data = await response.json();
+      
+      // Update user in context
+      updateCurrentUser({
+        ...currentUser,
+        profilePic: data.profilePic
+      });
+      
+      setSuccessMessage('Profile picture updated successfully!');
+      
+      // Clear file state since it's been uploaded
+      setProfileImageFile(null);
+      
+      // Show success message for 3 seconds
+      setTimeout(() => {
+        setSuccessMessage('');
+      }, 3000);
+      
+    } catch (err) {
+      console.error('Error updating profile picture:', err);
+      setError(err.message || 'Failed to update profile picture');
+    } finally {
+      setIsUploadingImage(false);
+    }
   };
 
   const handleSaveProfile = async () => {
@@ -131,12 +221,63 @@ const ProfilePage = () => {
     <div className="max-w-screen-xl mx-auto p-8">
       <div className="bg-white shadow rounded-lg overflow-hidden">
         <div className="bg-blue-500 h-32 flex items-center justify-center">
-          <div className="w-24 h-24 bg-white rounded-full overflow-hidden border-4 border-white">
-            <img 
-              src={currentUser?.profilePic || '/api/placeholder/150/150'} 
-              alt={currentUser?.username} 
-              className="w-full h-full object-cover"
-            />
+          <div className="relative">
+            {/* Profile Picture with upload overlay */}
+            <div className="w-24 h-24 bg-white rounded-full overflow-hidden border-4 border-white relative">
+              {profileImagePreview ? (
+                <img 
+                  src={profileImagePreview} 
+                  alt={currentUser?.username || "Profile"} 
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full bg-gray-300 flex items-center justify-center">
+                  <span className="text-3xl text-gray-500">
+                    {currentUser?.username ? currentUser.username.charAt(0).toUpperCase() : '?'}
+                  </span>
+                </div>
+              )}
+              
+              {/* Hidden file input */}
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileChange}
+                className="hidden"
+                accept="image/*"
+              />
+              
+              {/* Camera icon overlay */}
+              <div 
+                onClick={handleProfilePicClick}
+                className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity cursor-pointer"
+              >
+                <Camera size={24} className="text-white" />
+              </div>
+            </div>
+            
+            {/* Profile picture actions if a new image is selected */}
+            {profileImageFile && (
+              <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-2">
+                <button
+                  onClick={handleUploadProfilePic}
+                  disabled={isUploadingImage}
+                  className="bg-blue-500 text-white p-1 rounded-full shadow hover:bg-blue-600 transition-colors"
+                >
+                  {isUploadingImage ? (
+                    <div className="w-6 h-6 animate-spin border-2 border-white border-t-transparent rounded-full"></div>
+                  ) : (
+                    <Save size={16} />
+                  )}
+                </button>
+                <button
+                  onClick={handleCancelProfilePic}
+                  className="bg-gray-500 text-white p-1 rounded-full shadow hover:bg-gray-600 transition-colors"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+            )}
           </div>
         </div>
         
