@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { MapPin, DollarSign, Filter, BarChart2, LayoutGrid, Grid } from 'lucide-react';
+import { MapPin, DollarSign, Filter, BarChart2, LayoutGrid, Grid, Users, Image } from 'lucide-react';
 import ProfileImage from './ProfileImage';
 
 const SearchPage = () => {
   const [viewMode, setViewMode] = useState('grid3');
   const [showFilters, setShowFilters] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [searchType, setSearchType] = useState('posts'); // Default to posts
   const [filters, setFilters] = useState({
     location: '',
     priceRange: [],
@@ -24,7 +25,7 @@ const SearchPage = () => {
     'Abstract', 'Floral', 'American Traditional', 'Black and Grey'
   ];
   
-  // Fetch search results based on filters
+  // Fetch search results based on filters and search type
   useEffect(() => {
     const fetchSearchResults = async () => {
       try {
@@ -45,20 +46,53 @@ const SearchPage = () => {
           filters.priceRange.forEach(price => params.append('priceRange', price));
         }
         
+        // Handle styles filtering
         if (filters.styles.length > 0) {
-          params.append('styles', filters.styles.join(','));
+          // Important: Make sure to use original style names with correct casing
+          const stylesParam = filters.styles.join(',');
+          console.log('Sending styles for search:', stylesParam);
+          params.append('styles', stylesParam);
         }
         
-        // Fetch featured posts first (if no specific search)
-        const endpoint = searchQuery ? '/api/search/artists' : '/api/search/featured';
+        // Determine endpoint based on search type
+        let endpoint;
+        if (searchType === 'artists') {
+          endpoint = '/api/search/artists';
+        } else {
+          // For posts, always use posts-by-style endpoint if styles are selected,
+          // otherwise use featured posts
+          endpoint = filters.styles.length > 0 
+            ? '/api/search/posts-by-style' 
+            : '/api/search/featured';
+        }
+        
+        console.log(`Fetching from ${endpoint} with params:`, params.toString());
+        
         const response = await fetch(`http://localhost:5000${endpoint}?${params.toString()}`);
         
         if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          console.error('Error response:', errorData);
           throw new Error('Failed to fetch search results');
         }
         
         const data = await response.json();
+        console.log(`Received ${data.length} search results`);
         setSearchResults(data);
+        
+        // Log the first few results to see what styles they have
+        if (data.length > 0 && filters.styles.length > 0) {
+          console.log('Sample results:');
+          data.slice(0, 3).forEach((item, index) => {
+            if (item.styles) {
+              console.log(`Result ${index + 1} styles:`, item.styles);
+            } else if (item.user && item.user.styles) {
+              console.log(`Result ${index + 1} user styles:`, item.user.styles);
+            } else {
+              console.log(`Result ${index + 1} has no styles field`);
+            }
+          });
+        }
       } catch (error) {
         console.error('Error fetching search results:', error);
       } finally {
@@ -68,7 +102,7 @@ const SearchPage = () => {
     
     // Fetch initial results or when filters change
     fetchSearchResults();
-  }, [searchQuery, filters]);
+  }, [searchQuery, filters, searchType]);
   
   // Toggle price range filter
   const togglePriceFilter = (price) => {
@@ -95,6 +129,13 @@ const SearchPage = () => {
     setSearchQuery(e.target.value);
   };
   
+  // Toggle search type between artists and posts
+  const handleSearchTypeToggle = (type) => {
+    setSearchType(type);
+    // Reset search results when switching types
+    setSearchResults([]);
+  };
+  
   // Reset filters
   const resetFilters = () => {
     setFilters({
@@ -111,42 +152,80 @@ const SearchPage = () => {
     // Check if item is a post or artist
     const isPost = item.image !== undefined;
     
-    if (isGrid) {
+    // Grid view for artists
+    if (!isPost && isGrid) {
+      return (
+        <div key={item._id} className="relative group">
+          <Link to={`/artist/${item.username}`} className="block">
+            <div className="aspect-square relative overflow-hidden rounded-lg border border-gray-200">
+              {/* Artist Profile Picture */}
+              <div className="w-full h-full">
+                <ProfileImage 
+                  user={item} 
+                  size="xl" 
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              
+              {/* Artist Info Overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent flex flex-col justify-end p-3 opacity-100 transition-opacity">
+                <h3 className="font-bold text-white text-lg">{item.username}</h3>
+                
+                {item.location && (
+                  <div className="flex items-center text-white/90 text-sm">
+                    <MapPin size={12} className="mr-1 flex-shrink-0" />
+                    <span className="truncate">{item.location}</span>
+                  </div>
+                )}
+                
+                {item.styles && item.styles.length > 0 && (
+                  <div className="mt-1 flex flex-wrap gap-1">
+                    {item.styles.slice(0, 2).map(style => (
+                      <span key={style} className="px-2 py-0.5 bg-black/30 backdrop-blur-sm text-white rounded-full text-xs">
+                        {style}
+                      </span>
+                    ))}
+                    {item.styles.length > 2 && (
+                      <span className="px-2 py-0.5 bg-black/30 backdrop-blur-sm text-white rounded-full text-xs">
+                        +{item.styles.length - 2}
+                      </span>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          </Link>
+        </div>
+      );
+    }
+    
+    // Post grid view (keep existing code)
+    if (isPost && isGrid) {
       return (
         <div key={item._id} className="relative group cursor-pointer">
-          <Link to={isPost ? `/artist/${item.user.username}` : `/artist/${item.username}`}>
-            {isPost ? (
-              <img 
-                src={`http://localhost:5000/${item.image}`} 
-                alt={item.caption} 
-                className="w-full aspect-square object-cover"
-              />
-            ) : (
-              <ProfileImage 
-                user={item} 
-                size="xl" 
-                className="w-full aspect-square"
-              />
-            )}
-            <div className="absolute inset-0 bg-black bg-opacity-40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white p-2">
+          <Link to={`/artist/${item.user.username}`}>
+            <img 
+              src={`http://localhost:5000/${item.image}`} 
+              alt={item.caption} 
+              className="w-full aspect-square object-cover rounded-lg"
+            />
+            <div className="absolute inset-0 bg-black bg-opacity-40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white p-2 rounded-lg">
               <p className="font-bold text-center mb-1">
-                {isPost ? item.user.username : item.username}
+                {item.user.username}
               </p>
-              {item.location && (
+              {item.user.location && (
                 <div className="flex items-center mb-1">
                   <MapPin size={12} className="mr-1" />
-                  <span className="text-xs">{item.location}</span>
+                  <span className="text-xs">{item.user.location}</span>
                 </div>
               )}
-              {item.priceRange && (
-                <div className="flex items-center mb-2">
-                  <DollarSign size={12} className="mr-1" />
-                  <span className="text-xs">{item.priceRange}</span>
-                </div>
-              )}
-              {isPost && (
-                <div className="flex items-center">
-                  <span className="mr-2">❤️</span> {item.likes.length}
+              <div className="flex items-center">
+                <span className="mr-2">❤️</span> {item.likes.length}
+              </div>
+              {item.styles && item.styles.length > 0 && (
+                <div className="mt-2 text-xs">
+                  <span className="font-semibold">Styles: </span>
+                  {item.styles.join(', ')}
                 </div>
               )}
             </div>
@@ -155,10 +234,13 @@ const SearchPage = () => {
       );
     }
     
-    // Feed view
+    // Feed view (keep existing implementations)
     if (isPost) {
+      // Post feed view code (unchanged)
+      // ...existing post feed view implementation...
       return (
         <div key={item._id} className="bg-white border border-gray-200 rounded-md mb-6">
+          {/* Post header */}
           <div className="flex items-center p-3">
             <Link to={`/artist/${item.user.username}`} className="flex items-center">
               <ProfileImage user={item.user} size="md" />
@@ -174,6 +256,7 @@ const SearchPage = () => {
             </Link>
           </div>
           
+          {/* Post image */}
           <Link to={`/artist/${item.user.username}`}>
             <img 
               src={`http://localhost:5000/${item.image}`} 
@@ -182,6 +265,7 @@ const SearchPage = () => {
             />
           </Link>
           
+          {/* Post details */}
           <div className="p-3">
             <div className="flex items-center mb-3">
               <button className="mr-4">❤️</button>
@@ -193,6 +277,15 @@ const SearchPage = () => {
               <Link to={`/artist/${item.user.username}`} className="font-semibold">{item.user.username}</Link> {item.caption}
             </p>
             <p className="text-gray-500 text-sm mt-1">View all {item.comments.length} comments</p>
+            {item.styles && item.styles.length > 0 && (
+              <div className="flex flex-wrap gap-1 mt-2">
+                {item.styles.map(style => (
+                  <span key={style} className="px-2 py-1 bg-indigo-100 text-indigo-800 rounded-full text-xs">
+                    {style}
+                  </span>
+                ))}
+              </div>
+            )}
             <p className="text-gray-400 text-xs mt-2">
               {new Date(item.createdAt).toLocaleDateString()}
             </p>
@@ -200,45 +293,56 @@ const SearchPage = () => {
         </div>
       );
     } else {
-      // Artist feed view
+      // Artist feed view - updated to a card format
       return (
-        <div key={item._id} className="bg-white border border-gray-200 rounded-md mb-6">
-          <div className="flex items-center p-3">
-            <Link to={`/artist/${item.username}`} className="flex items-center">
-              <ProfileImage user={item} size="lg" />
-              <div className="ml-3">
-                <p className="font-semibold text-lg">{item.username}</p>
-                {item.username && <p className="text-gray-500">@{item.username}</p>}
-                {item.location && (
-                  <div className="flex items-center text-sm text-gray-500 mt-1">
-                    <MapPin size={12} className="mr-1" />
-                    <span>{item.location}</span>
-                  </div>
-                )}
-              </div>
-            </Link>
-          </div>
-          
-          <div className="p-3 border-t">
-            {item.styles && item.styles.length > 0 && (
-              <div className="mb-2">
-                <p className="text-sm text-gray-500 mb-1">Styles:</p>
-                <div className="flex flex-wrap gap-1">
-                  {item.styles.map(style => (
-                    <span key={style} className="px-2 py-1 bg-gray-100 rounded-full text-xs">{style}</span>
-                  ))}
-                </div>
-              </div>
-            )}
+        <div key={item._id} className="bg-white border border-gray-200 rounded-lg overflow-hidden mb-6">
+          <div className="flex">
+            {/* Artist image */}
+            <div className="w-24 h-24 sm:w-32 sm:h-32 flex-shrink-0">
+              <ProfileImage 
+                user={item} 
+                size="xl" 
+                className="w-full h-full object-cover"
+              />
+            </div>
             
-            <div className="flex justify-between mt-2">
-              <div className="text-sm">
-                <span className="font-semibold">{item.postCount || 0}</span> posts
+            {/* Artist details */}
+            <div className="p-4 flex-grow">
+              <Link to={`/artist/${item.username}`} className="font-semibold text-lg hover:text-blue-600">
+                {item.username}
+              </Link>
+              
+              {item.location && (
+                <div className="flex items-center text-sm text-gray-600 mt-1">
+                  <MapPin size={14} className="mr-1" />
+                  <span>{item.location}</span>
+                </div>
+              )}
+              
+              {item.styles && item.styles.length > 0 && (
+                <div className="mt-2">
+                  <p className="text-sm text-gray-500 mb-1">Styles:</p>
+                  <div className="flex flex-wrap gap-1">
+                    {item.styles.map(style => (
+                      <span key={style} className="px-2 py-1 bg-indigo-100 text-indigo-800 rounded-full text-xs">
+                        {style}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
+              <div className="flex items-center justify-between mt-3">
+                <div className="text-sm">
+                  <span className="font-medium">{item.postCount || 0}</span> posts
+                </div>
+                <div className="text-sm">
+                  <span className="font-medium">{item.followersCount || 0}</span> followers
+                </div>
+                <Link to={`/artist/${item.username}`} className="text-blue-500 text-sm font-medium">
+                  View Profile
+                </Link>
               </div>
-              <div className="text-sm">
-                <span className="font-semibold">{item.followersCount || 0}</span> followers
-              </div>
-              <Link to={`/artist/${item.username}`} className="text-blue-500 text-sm">View Profile</Link>
             </div>
           </div>
         </div>
@@ -248,12 +352,42 @@ const SearchPage = () => {
   
   return (
     <div className="max-w-screen-xl mx-auto px-4 py-8">
+      {/* Search Type Toggle */}
+      <div className="flex justify-center mb-6">
+        <div className="inline-flex rounded-md shadow-sm" role="group">
+          <button
+            type="button"
+            onClick={() => handleSearchTypeToggle('posts')}
+            className={`flex items-center px-4 py-2 text-sm font-medium rounded-l-lg ${
+              searchType === 'posts' 
+                ? 'bg-blue-500 text-white' 
+                : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-100'
+            }`}
+          >
+            <Image size={16} className="mr-2" />
+            Posts
+          </button>
+          <button
+            type="button"
+            onClick={() => handleSearchTypeToggle('artists')}
+            className={`flex items-center px-4 py-2 text-sm font-medium rounded-r-lg ${
+              searchType === 'artists' 
+                ? 'bg-blue-500 text-white' 
+                : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-100'
+            }`}
+          >
+            <Users size={16} className="mr-2" />
+            Artists
+          </button>
+        </div>
+      </div>
+
       {/* Search Bar */}
       <div className="flex flex-col md:flex-row items-center mb-6 pr-13">
         <div className="relative flex-grow mb-4 md:mb-0 md:mr-4 w-full md:w-auto">
           <input
             type="text"
-            placeholder="Search tattoo artists, styles, locations..."
+            placeholder={searchType === 'artists' ? "Search for tattoo artists..." : "Search for tattoo styles, designs..."}
             className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={searchQuery}
             onChange={handleSearchChange}
@@ -270,7 +404,7 @@ const SearchPage = () => {
         </button>
         
         <div className="flex ml-0 md:ml-4 mt-4 md:mt-0">
-          <div className="flex bg-gray-100 rounded-lg p-1" style={{ marginRight: '80px' }}>
+          <div className="flex bg-gray-100 rounded-lg p-1 mr-2">
             <button 
               onClick={() => setViewMode('feed')}
               className={`p-2 rounded ${viewMode === 'feed' ? 'bg-white shadow' : ''}`}
@@ -295,91 +429,110 @@ const SearchPage = () => {
       
       {/* Filter Panel */}
       {showFilters && (
-        <div className="bg-gray-50 rounded-lg p-4 mb-6">
-          <h3 className="font-semibold mb-4">Filter Options</h3>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Location Filter */}
-            <div>
-              <label className="block mb-2 font-medium">Location</label>
-              <input
-                type="text"
-                placeholder="City, State, or Zip"
-                className="w-full p-2 border rounded"
-                value={filters.location}
-                onChange={(e) => setFilters({...filters, location: e.target.value})}
-              />
-              
-              <div className="mt-3">
-                <label className="block mb-2 font-medium">Distance</label>
-                <div className="flex items-center">
-                  <input
-                    type="range"
-                    min="5"
-                    max="100"
-                    step="5"
-                    value={filters.distance}
-                    onChange={(e) => setFilters({...filters, distance: parseInt(e.target.value)})}
-                    className="w-full mr-2"
-                  />
-                  <span>{filters.distance} miles</span>
-                </div>
-              </div>
-            </div>
-            
-            {/* Price Range Filter */}
-            <div>
-              <label className="block mb-2 font-medium">Price Range</label>
-              <div className="space-y-2">
-                {['$', '$$', '$$$', '$$$$'].map((price) => (
-                  <label key={price} className="flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={filters.priceRange.includes(price)}
-                      onChange={() => togglePriceFilter(price)}
-                      className="mr-2"
-                    />
-                    {price}
-                  </label>
-                ))}
-              </div>
-            </div>
-            
-            {/* Tattoo Style Filter */}
-            <div>
-              <label className="block mb-2 font-medium">Tattoo Style</label>
-              <div className="h-40 overflow-y-auto pr-2 space-y-1">
-                {tattooStyles.map((style) => (
-                  <label key={style} className="flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={filters.styles.includes(style)}
-                      onChange={() => toggleStyleFilter(style)}
-                      className="mr-2"
-                    />
-                    {style}
-                  </label>
-                ))}
-              </div>
-            </div>
-          </div>
-          
-          <div className="flex justify-end mt-4">
-            <button 
-              className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md mr-2"
-              onClick={resetFilters}
-            >
-              Reset Filters
-            </button>
-            <button 
-              className="bg-blue-500 text-white px-4 py-2 rounded-md"
-              onClick={() => setShowFilters(false)}
-            >
-              Apply Filters
-            </button>
+  <div className="bg-gray-50 rounded-lg p-4 mb-6">
+    <h3 className="font-semibold mb-4">Filter Options</h3>
+    
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {/* Left Column - Location and Price Range */}
+      <div>
+        {/* Location Filter */}
+        <div className="mb-5">
+          <label className="block mb-2 font-medium">Location</label>
+          <input
+            type="text"
+            placeholder="City, State, or Zip"
+            className="w-full p-2 border rounded"
+            value={filters.location}
+            onChange={(e) => setFilters({...filters, location: e.target.value})}
+          />
+        </div>
+        
+        {/* Distance Filter */}
+        <div className="mb-5">
+          <label className="block mb-2 font-medium">Distance</label>
+          <div className="flex items-center">
+            <input
+              type="range"
+              min="5"
+              max="100"
+              step="5"
+              value={filters.distance}
+              onChange={(e) => setFilters({...filters, distance: parseInt(e.target.value)})}
+              className="w-full mr-2"
+            />
+            <span className="min-w-[60px] text-right">{filters.distance} miles</span>
           </div>
         </div>
-      )}
+        
+        {/* Price Range Filter - Only show for artists search */}
+        {searchType === 'artists' && (
+  <div className="mb-5">
+    <label className="block mb-2 font-medium">Price Range</label>
+    <div className="flex justify-center flex-wrap gap-2 mt-1">
+      {['$', '$$', '$$$', '$$$$'].map((price) => (
+        <button
+          key={price}
+          onClick={() => togglePriceFilter(price)}
+          className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+            filters.priceRange.includes(price)
+              ? 'bg-blue-500 text-white'
+              : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+          }`}
+        >
+          {price}
+        </button>
+      ))}
+    </div>
+  </div>
+)}
+      </div>
+      
+      {/* Right Column - Tattoo Styles */}
+      <div>
+        <label className="block mb-2 font-medium">Tattoo Style</label>
+        <div className="pr-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-1">
+            {tattooStyles.map((style) => (
+              <label key={style} className="flex items-center text-sm py-0.5 px-1 hover:bg-gray-100 rounded">
+                <input
+                  type="checkbox"
+                  checked={filters.styles.includes(style)}
+                  onChange={() => toggleStyleFilter(style)}
+                  className="mr-2"
+                />
+                {style}
+              </label>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div className="flex justify-end mt-4">
+      <button 
+        className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md mr-2"
+        onClick={resetFilters}
+      >
+        Reset Filters
+      </button>
+      <button 
+        className="bg-blue-500 text-white px-4 py-2 rounded-md"
+        onClick={() => setShowFilters(false)}
+      >
+        Apply Filters
+      </button>
+    </div>
+  </div>
+)}
+      
+      {/* Search Type Label */}
+      <div className="mb-4">
+        <h2 className="text-xl font-semibold">
+          {searchType === 'artists' ? 'Tattoo Artists' : 'Tattoo Designs'}
+          {filters.styles.length > 0 && ` - ${filters.styles.join(', ')}`}
+          {filters.location && ` near ${filters.location}`}
+        </h2>
+      </div>
       
       {/* Loading indicator */}
       {loading && (

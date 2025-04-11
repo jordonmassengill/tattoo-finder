@@ -1,6 +1,6 @@
 // src/components/UploadPost.jsx
 import React, { useState, useRef } from 'react';
-import { X, Upload, Camera, Hash } from 'lucide-react';
+import { X, Upload, Camera, Hash, Tags } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 
@@ -12,11 +12,20 @@ const UploadPost = ({ onClose, onPostCreated }) => {
   const [caption, setCaption] = useState('');
   const [tags, setTags] = useState([]);
   const [currentTag, setCurrentTag] = useState('');
+  const [selectedStyles, setSelectedStyles] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [step, setStep] = useState(1); // 1: Select image, 2: Add details
   const [error, setError] = useState('');
   
   const fileInputRef = useRef(null);
+  
+  // Available tattoo styles for selection
+  const availableStyles = [
+    'Geometric', 'Blackwork', 'Minimalist', 'Watercolor', 'Illustrative', 
+    'Traditional', 'Neo-Traditional', 'Japanese', 'Irezumi', 'Realism', 
+    'Portrait', 'Tribal', 'Dotwork', 'Linework', 'Mandala', 'Sci-Fi',
+    'Abstract', 'Floral', 'American Traditional', 'Black and Grey'
+  ];
   
   // Handle file selection
   const handleFileChange = (e) => {
@@ -57,6 +66,24 @@ const UploadPost = ({ onClose, onPostCreated }) => {
     }
   };
   
+  // Toggle tattoo style selection
+  const toggleStyle = (style) => {
+    // Check if style is already selected
+    if (selectedStyles.includes(style)) {
+      // Remove style
+      setSelectedStyles(selectedStyles.filter(s => s !== style));
+    } else {
+      // Add style if less than 3 styles are selected
+      if (selectedStyles.length < 3) {
+        setSelectedStyles([...selectedStyles, style]);
+      } else {
+        // Show error if trying to add more than 3 styles
+        setError('You can only select up to 3 styles per post');
+        setTimeout(() => setError(''), 3000);
+      }
+    }
+  };
+  
   // Submit the post
   const handleSubmit = async () => {
     if (!selectedImage) {
@@ -71,8 +98,15 @@ const UploadPost = ({ onClose, onPostCreated }) => {
       const formData = new FormData();
       formData.append('image', selectedImage);
       formData.append('caption', caption);
+      
+      // Append tags to form data
       if (tags.length > 0) {
         formData.append('tags', tags.join(','));
+      }
+      
+      // Append selected styles to form data
+      if (selectedStyles.length > 0) {
+        formData.append('styles', selectedStyles.join(','));
       }
       
       const response = await fetch('http://localhost:5000/api/posts', {
@@ -200,11 +234,45 @@ const UploadPost = ({ onClose, onPostCreated }) => {
                   value={caption}
                   onChange={(e) => setCaption(e.target.value)}
                   className="w-full p-2 border rounded-md resize-none focus:ring-blue-500 focus:border-blue-500"
-                  rows={4}
+                  rows={3}
                   placeholder="Write a caption..."
                 ></textarea>
               </div>
               
+              {/* Tattoo Styles Selection */}
+              <div className="mb-4">
+                <label className="flex items-center text-sm font-medium text-gray-700 mb-1">
+                  <Tags size={16} className="mr-1" />
+                  Tattoo Styles (Select up to 3)
+                </label>
+                <div className="grid grid-cols-2 gap-1 max-h-32 overflow-y-auto p-1 border rounded-md">
+                  {availableStyles.map(style => (
+                    <label key={style} className="flex items-center text-sm px-1 py-0.5 hover:bg-gray-50 rounded">
+                      <input
+                        type="checkbox"
+                        checked={selectedStyles.includes(style)}
+                        onChange={() => toggleStyle(style)}
+                        className="mr-1.5 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        disabled={!selectedStyles.includes(style) && selectedStyles.length >= 3}
+                      />
+                      {style}
+                    </label>
+                  ))}
+                </div>
+                <div className="mt-1 text-xs text-gray-500 flex items-center justify-between">
+                  <span>Selected: {selectedStyles.length}/3</span>
+                  {selectedStyles.length > 0 && (
+                    <button
+                      onClick={() => setSelectedStyles([])}
+                      className="text-xs text-red-500 hover:text-red-700"
+                    >
+                      Clear all
+                    </button>
+                  )}
+                </div>
+              </div>
+              
+              {/* Tags Input */}
               <div className="mb-6">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Tags
@@ -244,6 +312,25 @@ const UploadPost = ({ onClose, onPostCreated }) => {
                   ))}
                 </div>
               </div>
+              
+              {/* Selected styles display */}
+              {selectedStyles.length > 0 && (
+                <div className="mb-4">
+                  <div className="flex flex-wrap gap-2">
+                    {selectedStyles.map(style => (
+                      <div key={style} className="flex items-center bg-indigo-100 text-indigo-800 px-2 py-1 rounded-full text-sm">
+                        {style}
+                        <button
+                          onClick={() => toggleStyle(style)}
+                          className="ml-1 text-indigo-600 hover:text-indigo-800"
+                        >
+                          <X size={14} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
               
               <div className="flex justify-between">
                 <button

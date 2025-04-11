@@ -20,6 +20,7 @@ const ProfilePage = () => {
   const [formData, setFormData] = useState({
     bio: '',
     location: '',
+    priceRange: '',
     styles: []
   });
 
@@ -37,6 +38,7 @@ const ProfilePage = () => {
       setFormData({
         bio: currentUser.bio || '',
         location: currentUser.location || '',
+        priceRange: currentUser.priceRange || '',
         styles: currentUser.styles || []
       });
       
@@ -160,6 +162,7 @@ const ProfilePage = () => {
         body: JSON.stringify({
           bio: formData.bio,
           location: formData.location,
+          priceRange: formData.priceRange,
           ...(userType === 'artist' && { styles: formData.styles })
         })
       });
@@ -345,6 +348,35 @@ const ProfilePage = () => {
                   />
                 </div>
               </>
+            )}
+            
+            {/* Price Range - only for artists */}
+            {userType === 'artist' && (
+              <div className="pb-4 border-b">
+                <label className="font-semibold block mb-2">Price Range:</label>
+                <div className="flex justify-center flex-wrap gap-2">
+                  {['$', '$$', '$$$', '$$$$'].map((price) => (
+                    <button
+                      key={price}
+                      type="button"
+                      onClick={() => setFormData({...formData, priceRange: price})}
+                      className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                        formData.priceRange === price
+                          ? 'bg-blue-500 text-white'
+                          : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                      }`}
+                    >
+                      {price}
+                    </button>
+                  ))}
+                </div>
+                <div className="mt-2 text-xs text-gray-500">
+                  <p><strong>$</strong> - Budget (Under $100)</p>
+                  <p><strong>$$</strong> - Mid-range ($100-$300)</p>
+                  <p><strong>$$$</strong> - High-end ($300-$800)</p>
+                  <p><strong>$$$$</strong> - Premium ($800+)</p>
+                </div>
+              </div>
             )}
             
             {/* Tattoo Styles - only for artists */}

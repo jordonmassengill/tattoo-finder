@@ -1,4 +1,4 @@
-// src/components/HomeFeed.jsx
+// src/components/HomeFeed.jsx - Updated view mode selector section
 import React, { useState, useEffect } from 'react';
 import { BarChart2, LayoutGrid, Grid } from 'lucide-react';
 import api from '../services/api';
@@ -38,8 +38,7 @@ const HomeFeed = () => {
     }
   };
 
-  // In src/components/HomeFeed.jsx, update the Post component:
-
+  // Post component
   const Post = ({ post, isGrid }) => {
     if (isGrid) {
       return (
@@ -68,13 +67,13 @@ const HomeFeed = () => {
       <div className="bg-white border border-gray-200 rounded-md mb-6">
         {/* Post Header - Make this clickable */}
         <div className="flex items-center p-3">
-  <Link to={`/artist/${post.user.username}`} className="flex items-center">
-    <ProfileImage user={post.user} size="md" />
-    <div className="ml-3">
-      <p className="font-semibold">{post.user.username}</p>
-    </div>
-  </Link>
-</div>
+          <Link to={`/artist/${post.user.username}`} className="flex items-center">
+            <ProfileImage user={post.user} size="md" />
+            <div className="ml-3">
+              <p className="font-semibold">{post.user.username}</p>
+            </div>
+          </Link>
+        </div>
         
         {/* Post Image */}
         <img 
@@ -107,30 +106,30 @@ const HomeFeed = () => {
   
   return (
     <div className="max-w-screen-xl mx-auto px-4 py-8">
-      {/* View Mode Selector */}
+      {/* View Mode Selector - Updated positioning */}
       <div className="flex justify-between items-center mb-6">
-  <h2 className="text-xl font-semibold">Your Feed</h2>
-  <div className="flex bg-gray-100 rounded-lg p-1 mr-2"> {/* Added mr-2 for right margin */}
-    <button 
-      onClick={() => setViewMode('feed')}
-      className={`p-2 rounded ${viewMode === 'feed' ? 'bg-white shadow' : ''}`}
-    >
-      <BarChart2 size={20} />
-    </button>
-    <button 
-      onClick={() => setViewMode('grid3')}
-      className={`p-2 rounded mx-1 ${viewMode === 'grid3' ? 'bg-white shadow' : ''}`}
-    >
-      <LayoutGrid size={20} />
-    </button>
-    <button 
-      onClick={() => setViewMode('grid5')}
-      className={`p-2 rounded ${viewMode === 'grid5' ? 'bg-white shadow' : ''}`}
-    >
-      <Grid size={20} />
-    </button>
-  </div>
-</div>
+        <h2 className="text-xl font-semibold">Your Feed</h2>
+        <div className="flex bg-gray-100 rounded-lg p-1 mr-20">
+          <button 
+            onClick={() => setViewMode('feed')}
+            className={`p-2 rounded ${viewMode === 'feed' ? 'bg-white shadow' : ''}`}
+          >
+            <BarChart2 size={20} />
+          </button>
+          <button 
+            onClick={() => setViewMode('grid3')}
+            className={`p-2 rounded mx-1 ${viewMode === 'grid3' ? 'bg-white shadow' : ''}`}
+          >
+            <LayoutGrid size={20} />
+          </button>
+          <button 
+            onClick={() => setViewMode('grid5')}
+            className={`p-2 rounded ${viewMode === 'grid5' ? 'bg-white shadow' : ''}`}
+          >
+            <Grid size={20} />
+          </button>
+        </div>
+      </div>
       
       {/* Loading indicator */}
       {loading && (
