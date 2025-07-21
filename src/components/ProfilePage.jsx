@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Save, Trash2, AlertTriangle, Camera, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { BAY_AREA_CITIES } from '../constants/locations'; // Import the new locations list
 
 const ProfilePage = () => {
   const { currentUser, userType, logout, updateCurrentUser } = useAuth();
@@ -337,15 +338,20 @@ const ProfilePage = () => {
                 
                 <div className="pb-4 border-b">
                   <label htmlFor="location" className="font-semibold block mb-2">Location:</label>
-                  <input
-                    type="text"
+                  <select
                     id="location"
                     name="location"
                     value={formData.location}
                     onChange={handleChange}
                     className="w-full p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="City, State"
-                  />
+                  >
+                    <option value="">Select a Location</option>
+                    {BAY_AREA_CITIES.map((city) => (
+                      <option key={city} value={city}>
+                        {city}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </>
             )}
