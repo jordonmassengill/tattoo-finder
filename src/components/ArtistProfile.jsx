@@ -12,6 +12,7 @@ const ArtistProfile = () => {
   const [loading, setLoading] = useState(true);
   const [following, setFollowing] = useState(false);
   const [followersCount, setFollowersCount] = useState(0);
+  const [isFollowLoading, setIsFollowLoading] = useState(false);
   const [selectedPost, setSelectedPost] = useState(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -20,63 +21,29 @@ const ArtistProfile = () => {
   const { id } = useParams();
   const { currentUser } = useAuth();
   
-  // Check if current user is viewing their own profile
   const isOwnProfile = currentUser && (currentUser.id === artistData?._id || currentUser.username === artistData?.username);
   
   useEffect(() => {
-    console.log('ArtistProfile rendered with id parameter:', id);
-  }, [id]);
-
-  // Fetch artist data
-useEffect(() => {
-  const fetchArtistData = async () => {
-    try {
-      setLoading(true);
-      console.log(`Fetching artist profile for: ${id}`);
-      
-      // Fetch artist profile
-      const profileResponse = await fetch(`http://localhost:5000/api/users/${id}`, {
-        headers: {
-          'x-auth-token': localStorage.getItem('token')
-        }
-      });
-      
-      console.log('Profile response status:', profileResponse.status);
-      
-      if (!profileResponse.ok) {
-        const errorData = await profileResponse.json();
-        console.error('Error response:', errorData);
-        throw new Error(`Failed to fetch artist profile: ${errorData.message || profileResponse.statusText}`);
-      }
-      
-      const artistData = await profileResponse.json();
-      console.log('Artist data received:', artistData.username);
-      setArtistData(artistData);
-      setFollowersCount(artistData.followers?.length || 0);
+    const fetchArtistData = async () => {
+      if (!id) return;
+      try {
+        setLoading(true);
+        const profileResponse = await api.getUserById(id);
+        const artistData = profileResponse.data;
         
-        // Check if current user is following this artist
+        setArtistData(artistData);
+        setFollowersCount(artistData.followers?.length || 0);
+        
+        // This is the critical section for setting the initial follow state
         if (currentUser && artistData.followers) {
-          setFollowing(artistData.followers.includes(currentUser.id));
+          
+          const isUserFollowing = artistData.followers.some(followerId => followerId.toString() === currentUser.id);
+          
+          setFollowing(isUserFollowing);
         }
         
-        // Fetch artist posts
-console.log(`Attempting to fetch posts for: ${id}`);
-const postsResponse = await fetch(`http://localhost:5000/api/users/${id}/posts`, {
-  headers: {
-    'x-auth-token': localStorage.getItem('token')
-  }
-});
-
-console.log('Posts response status:', postsResponse.status);
-if (!postsResponse.ok) {
-  const errorData = await postsResponse.json().catch(() => ({}));
-  console.error('Error response:', errorData);
-  throw new Error('Failed to fetch artist posts');
-}
-
-const postsData = await postsResponse.json();
-console.log(`Received ${postsData.length} posts for artist ${id}`);
-setPosts(postsData);
+        const postsResponse = await api.getUserPosts(id);
+        setPosts(postsResponse.data);
         
       } catch (error) {
         console.error('Error fetching artist data:', error);
@@ -84,47 +51,33 @@ setPosts(postsData);
         setLoading(false);
       }
     };
-    if (id) {
+    
     fetchArtistData();
-    }
   }, [id, currentUser]);
   
-  // Handle follow/unfollow
   const handleFollowToggle = async () => {
-    if (!currentUser) {
-      // Redirect to login if not authenticated
-      return;
-    }
+    if (!currentUser) return;
+    
+    setIsFollowLoading(true);
     
     try {
-      const endpoint = following ? 'unfollow' : 'follow';
-      
-      const response = await fetch(`http://localhost:5000/api/users/${endpoint}/${id}`, {
-        method: 'PUT',
-        headers: {
-          'x-auth-token': localStorage.getItem('token')
-        }
-      });
-      
-      if (!response.ok) {
-        throw new Error(`Failed to ${endpoint} artist`);
-      }
-      
-      // Update state based on action
       if (following) {
+        await api.unfollowUser(artistData._id);
         setFollowersCount(prev => prev - 1);
+        setFollowing(false);
       } else {
+        await api.followUser(artistData._id);
         setFollowersCount(prev => prev + 1);
+        setFollowing(true);
       }
-      
-      setFollowing(!following);
-      
     } catch (error) {
-      console.error(`Error ${following ? 'unfollowing' : 'following'} artist:`, error);
+      console.error(`Error toggling follow:`, error);
+      alert('Something went wrong. Please try again.');
+    } finally {
+      setIsFollowLoading(false);
     }
   };
   
-  // Handle delete post
   const handleDeletePost = async () => {
     if (!selectedPost) return;
     
@@ -134,7 +87,6 @@ setPosts(postsData);
     try {
       await api.deletePost(selectedPost._id);
       
-      // Update posts list after deletion
       setPosts(posts.filter(post => post._id !== selectedPost._id));
       setSelectedPost(null);
       setShowDeleteConfirm(false);
@@ -170,40 +122,30 @@ setPosts(postsData);
       {/* Profile Header */}
       <div className="p-4 border-b">
         <div className="flex flex-col md:flex-row items-center md:items-start">
-          {/* Profile Picture */}
           <div className="w-28 h-28 md:w-36 md:h-36 flex-shrink-0 mb-4 md:mb-0 md:mr-8">
-  <ProfileImage 
-    user={artistData} 
-    size="xl" 
-    className="w-full h-full"
-  />
-</div>
-          
-          {/* Profile Info */}
+            <ProfileImage user={artistData} size="xl" className="w-full h-full" />
+          </div>
           <div className="flex-grow text-center md:text-left">
             <div className="flex flex-col md:flex-row md:items-center mb-4">
               <h1 className="text-2xl font-bold mr-4">{artistData.username}</h1>
-              {/* Follow button */}
-              {currentUser && currentUser.id !== artistData._id && (
+              {currentUser && !isOwnProfile && (
                 <button 
-                  className={`${following ? 'bg-gray-200 text-gray-800' : 'bg-blue-500 text-white'} px-4 py-2 rounded-md font-medium mt-2 md:mt-0`}
+                  className={`${following ? 'bg-gray-200 text-gray-800' : 'bg-blue-500 text-white'} px-4 py-2 rounded-md font-medium mt-2 md:mt-0 disabled:opacity-50`}
                   onClick={handleFollowToggle}
+                  disabled={isFollowLoading}
                 >
-                  {following ? 'Following' : 'Follow Artist'}
+                  {isFollowLoading ? '...' : (following ? 'Following' : 'Follow Artist')}
                 </button>
               )}
             </div>
-            
             <div className="flex justify-center md:justify-start space-x-6 mb-4">
               <span><b>{posts.length}</b> posts</span>
               <span><b>{followersCount}</b> followers</span>
               <span><b>{artistData.following?.length || 0}</b> following</span>
             </div>
-            
             <div className="mb-2">
               <p>{artistData.bio}</p>
             </div>
-            
             <div className="flex flex-col space-y-1">
               {artistData.location && (
                 <div className="flex items-center">
@@ -211,21 +153,18 @@ setPosts(postsData);
                   <span>{artistData.location}</span>
                 </div>
               )}
-              
               {artistData.priceRange && (
                 <div className="flex items-center">
                   <DollarSign size={16} className="mr-2" />
                   <span>Price Range: {artistData.priceRange}</span>
                 </div>
               )}
-              
               {artistData.styles && artistData.styles.length > 0 && (
                 <div className="flex items-center">
                   <Tag size={16} className="mr-2" />
                   <span>Styles: {artistData.styles.join(', ')}</span>
                 </div>
               )}
-              
               {artistData.shop && (
                 <div className="flex items-center">
                   <Link to={`/shop/${artistData.shop}`} className="text-blue-500">
@@ -240,26 +179,26 @@ setPosts(postsData);
       
       {/* View Mode Selector */}
       <div className="flex justify-between items-center p-4 border-b">
-  <h2 className="text-lg font-medium">Portfolio</h2>
-  <div className="flex bg-gray-100 rounded-lg p-1 mr-2">
-          <button 
-            onClick={() => setViewMode('feed')}
-            className={`p-2 rounded ${viewMode === 'feed' ? 'bg-white shadow' : ''}`}
-          >
-            <BarChart2 size={20} />
-          </button>
-          <button 
-            onClick={() => setViewMode('grid3')}
-            className={`p-2 rounded mx-1 ${viewMode === 'grid3' ? 'bg-white shadow' : ''}`}
-          >
-            <LayoutGrid size={20} />
-          </button>
-          <button 
-            onClick={() => setViewMode('grid5')}
-            className={`p-2 rounded ${viewMode === 'grid5' ? 'bg-white shadow' : ''}`}
-          >
-            <Grid size={20} />
-          </button>
+        <h2 className="text-lg font-medium">Portfolio</h2>
+        <div className="flex bg-gray-100 rounded-lg p-1 mr-2">
+            <button 
+                onClick={() => setViewMode('feed')}
+                className={`p-2 rounded ${viewMode === 'feed' ? 'bg-white shadow' : ''}`}
+            >
+                <BarChart2 size={20} />
+            </button>
+            <button 
+                onClick={() => setViewMode('grid3')}
+                className={`p-2 rounded mx-1 ${viewMode === 'grid3' ? 'bg-white shadow' : ''}`}
+            >
+                <LayoutGrid size={20} />
+            </button>
+            <button 
+                onClick={() => setViewMode('grid5')}
+                className={`p-2 rounded ${viewMode === 'grid5' ? 'bg-white shadow' : ''}`}
+            >
+                <Grid size={20} />
+            </button>
         </div>
       </div>
       

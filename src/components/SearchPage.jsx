@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { MapPin, DollarSign, Filter, BarChart2, LayoutGrid, Grid, Users, Image } from 'lucide-react';
+import { MapPin, DollarSign, Filter, Users, Image } from 'lucide-react';
 import ProfileImage from './ProfileImage';
 import { BAY_AREA_CITIES } from '../constants/locations';
 
@@ -8,7 +8,7 @@ const SearchPage = () => {
   const [viewMode, setViewMode] = useState('grid3');
   const [showFilters, setShowFilters] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchType, setSearchType] = useState('artists');
+  const [searchType, setSearchType] = useState('posts'); // MODIFIED: Default to 'posts'
   const [filters, setFilters] = useState({
     location: [],
     priceRange: [],
@@ -214,10 +214,8 @@ const SearchPage = () => {
       {showFilters && (
         <div className="bg-gray-50 rounded-lg p-4 mb-6">
           <h3 className="font-semibold mb-4 text-center">Filter Options</h3>
-          {/* Main grid for filters - back to 2 columns */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             
-            {/* Column 1: Tattoo Style & Price Range */}
             <div>
               <div className="mb-5">
                 <label className="block mb-2 font-medium">Tattoo Style</label>
@@ -247,7 +245,6 @@ const SearchPage = () => {
               )}
             </div>
 
-            {/* Column 2: Location & Action Buttons */}
             <div className="flex flex-col justify-between">
               <div>
                 <label className="block mb-2 font-medium">Location</label>

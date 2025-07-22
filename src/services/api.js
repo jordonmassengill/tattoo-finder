@@ -25,6 +25,10 @@ export default {
   getCurrentUser: () => api.get('/users/me'),
   getUserById: (id) => api.get(`/users/${id}`),
   getUserPosts: (id) => api.get(`/users/${id}/posts`),
+  updateProfile: (userData) => api.put('/users/update', userData),
+  deleteUser: (id) => api.delete(`/users/${id}`),
+  followUser: (id) => api.put(`/users/follow/${id}`),     // ADDED
+  unfollowUser: (id) => api.put(`/users/unfollow/${id}`), // ADDED
 
   //Profile Pic
   updateProfilePicture: (file) => {
@@ -46,7 +50,5 @@ export default {
   likePost: (id) => api.put(`/posts/like/${id}`),
   unlikePost: (id) => api.put(`/posts/unlike/${id}`),
   addComment: (id, text) => api.post(`/posts/comment/${id}`, { text }),
-  updateProfile: (userData) => api.put('/users/update', userData),
-  deleteUser: (id) => api.delete(`/users/${id}`),
   deletePost: (id) => api.delete(`/posts/${id}`)
 };
