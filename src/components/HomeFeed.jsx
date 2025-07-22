@@ -1,12 +1,15 @@
+// File: src/components/HomeFeed.jsx
+
 import React, { useState, useEffect } from 'react';
-import { BarChart2, LayoutGrid, Grid, Heart } from 'lucide-react';
+import { BarChart2, LayoutGrid, Grid, Heart, MessageCircle } from 'lucide-react';
 import api from '../services/api';
 import { Link } from 'react-router-dom';
 import ProfileImage from './ProfileImage';
 import { useAuth } from '../context/AuthContext';
+import CommentModal from './CommentModal'; // Import the new modal component
 
 // --- Post Component (Now manages its own "like" state) ---
-const Post = ({ post: initialPost, isGrid }) => {
+const Post = ({ post: initialPost, isGrid, onCommentClick }) => {
   const { currentUser } = useAuth();
   
   // Each Post now has its own state for its like status and count
@@ -62,9 +65,9 @@ const Post = ({ post: initialPost, isGrid }) => {
           <div className="flex items-center mr-4">
             <Heart size={20} className="mr-1 text-white" fill="white" /> {likeCount}
           </div>
-          <div className="flex items-center">
-            <span className="mr-2">💬</span> {post.comments.length}
-          </div>
+          <button onClick={() => onCommentClick(post)} className="flex items-center">
+            <MessageCircle size={20} className="mr-1 text-white" fill="white" /> {post.comments.length}
+          </button>
         </div>
         <Link to={`/artist/${post.user.username}`} className="absolute top-2 left-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded-full text-xs opacity-0 group-hover:opacity-100">
           {post.user.username}
@@ -98,16 +101,18 @@ const Post = ({ post: initialPost, isGrid }) => {
               fill={isLiked ? 'currentColor' : 'none'}
             />
           </button>
-          <button>💬</button>
+          <button onClick={() => onCommentClick(post)}>
+              <MessageCircle className="text-gray-500" />
+          </button>
           <button>🔖</button>
         </div>
         <p className="font-semibold mb-1">{likeCount} likes</p>
         <p>
           <Link to={`/artist/${post.user.username}`} className="font-semibold">{post.user.username}</Link> {post.caption}
         </p>
-        <p className="text-gray-500 text-sm mt-1">
+        <button onClick={() => onCommentClick(post)} className="text-gray-500 text-sm mt-1 hover:underline">
           View all {post.comments.length} comments
-        </p>
+        </button>
         <p className="text-gray-400 text-xs mt-2">
           {new Date(post.createdAt).toLocaleDateString()}
         </p>
@@ -122,6 +127,7 @@ const HomeFeed = () => {
   const [viewMode, setViewMode] = useState('feed');
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedPost, setSelectedPost] = useState(null);
   
   useEffect(() => {
     const fetchPosts = async () => {
@@ -179,7 +185,12 @@ const HomeFeed = () => {
       {!loading && viewMode === 'feed' && (
         <div className="max-w-xl mx-auto">
           {posts.map(post => (
-            <Post key={post._id} post={post} isGrid={false} />
+            <Post 
+                key={post._id} 
+                post={post} 
+                isGrid={false} 
+                onCommentClick={(p) => setSelectedPost(p)}
+            />
           ))}
         </div>
       )}
@@ -187,9 +198,21 @@ const HomeFeed = () => {
       {!loading && viewMode !== 'feed' && (
         <div className={`grid ${viewMode === 'grid3' ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3' : 'grid-cols-2 sm:grid-cols-3 md:grid-cols-5'} gap-1`}>
           {posts.map(post => (
-            <Post key={post._id} post={post} isGrid={true} />
+            <Post 
+                key={post._id} 
+                post={post} 
+                isGrid={true} 
+                onCommentClick={(p) => setSelectedPost(p)}
+            />
           ))}
         </div>
+      )}
+
+      {selectedPost && (
+        <CommentModal 
+            post={selectedPost} 
+            onClose={() => setSelectedPost(null)}
+        />
       )}
     </div>
   );

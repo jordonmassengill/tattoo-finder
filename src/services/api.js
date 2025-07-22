@@ -50,5 +50,9 @@ export default {
   likePost: (id) => api.put(`/posts/like/${id}`),
   unlikePost: (id) => api.put(`/posts/unlike/${id}`),
   addComment: (id, text) => api.post(`/posts/comment/${id}`, { text }),
-  deletePost: (id) => api.delete(`/posts/${id}`)
+  deletePost: (id) => api.delete(`/posts/${id}`),
+
+  deleteComment: (postId, commentId) => api.delete(`/posts/comment/${postId}/${commentId}`),
+  likeComment: (postId, commentId) => api.put(`/posts/comment/like/${postId}/${commentId}`),
+  unlikeComment: (postId, commentId) => api.put(`/posts/comment/unlike/${postId}/${commentId}`),
 };
