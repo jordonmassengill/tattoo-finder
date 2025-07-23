@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { MapPin, DollarSign, Filter, Users, Image } from 'lucide-react';
 import ProfileImage from './ProfileImage';
 import { BAY_AREA_CITIES } from '../constants/locations';
+import CommentModal from './CommentModal';
 
 const SearchPage = () => {
   const [viewMode, setViewMode] = useState('grid3');
@@ -16,6 +17,7 @@ const SearchPage = () => {
   });
   const [searchResults, setSearchResults] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [selectedPost, setSelectedPost] = useState(null);
 
   const tattooStyles = [
     'Geometric', 'Blackwork', 'Minimalist', 'Watercolor', 'Illustrative',
@@ -136,18 +138,18 @@ const SearchPage = () => {
       );
     }
 
-    if (isPost && isGrid) {
-      return (
-        <div key={item._id} className="relative group cursor-pointer">
-          <Link to={`/artist/${item.user.username}`}>
-            <img src={`http://localhost:5000/${item.image}`} alt={item.caption} className="w-full aspect-square object-cover rounded-lg" />
-            <div className="absolute inset-0 bg-black bg-opacity-40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white p-2 rounded-lg">
-              <p className="font-bold text-center mb-1">{item.user.username}</p>
-            </div>
+if (isPost && isGrid) {
+    return (
+      <div key={item._id} className="relative group cursor-pointer" onClick={() => setSelectedPost(item)}>
+        <img src={`http://localhost:5000/${item.image}`} alt={item.caption} className="w-full aspect-square object-cover rounded-lg" />
+        <div className="absolute inset-0 bg-black bg-opacity-40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white p-2 rounded-lg">
+          <Link to={`/artist/${item.user.username}`} onClick={(e) => e.stopPropagation()} className="font-bold text-center mb-1 hover:underline">
+            {item.user.username}
           </Link>
         </div>
-      );
-    }
+      </div>
+    );
+  }
 
     if (isPost) {
       return (
@@ -279,6 +281,12 @@ const SearchPage = () => {
           ? <div className="max-w-xl mx-auto">{searchResults.map(result => renderSearchItem(result, false))}</div>
           : <div className={`grid ${viewMode === 'grid3' ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3' : 'grid-cols-2 sm:grid-cols-3 md:grid-cols-5'} gap-4`}>{searchResults.map(result => renderSearchItem(result, true))}</div>
       )}
+    {selectedPost && (
+        <CommentModal
+            post={selectedPost}
+            onClose={() => setSelectedPost(null)}
+        />
+    )}
     </div>
   );
 };

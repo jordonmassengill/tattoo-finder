@@ -4,19 +4,21 @@ import { LayoutGrid, Grid, BarChart2, MapPin, DollarSign, Tag, Trash2, AlertTria
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import ProfileImage from './ProfileImage';
+import CommentModal from './CommentModal';
 
 const ArtistProfile = () => {
-  const [viewMode, setViewMode] = useState('grid3');
-  const [artistData, setArtistData] = useState(null);
-  const [posts, setPosts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [following, setFollowing] = useState(false);
-  const [followersCount, setFollowersCount] = useState(0);
-  const [isFollowLoading, setIsFollowLoading] = useState(false);
-  const [selectedPost, setSelectedPost] = useState(null);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [deleteError, setDeleteError] = useState('');
+  const [viewMode, setViewMode] = useState('grid3');
+  const [artistData, setArtistData] = useState(null);
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [following, setFollowing] = useState(false);
+  const [followersCount, setFollowersCount] = useState(0);
+  const [isFollowLoading, setIsFollowLoading] = useState(false);
+  const [selectedPost, setSelectedPost] = useState(null);      // For opening the comment modal
+  const [postToDelete, setPostToDelete] = useState(null);      // For tracking which post to delete
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState('');
   
   const { id } = useParams();
   const { currentUser } = useAuth();
@@ -79,16 +81,16 @@ const ArtistProfile = () => {
   };
   
   const handleDeletePost = async () => {
-    if (!selectedPost) return;
-    
+    if (!postToDelete) return;
+  
     setIsDeleting(true);
     setDeleteError('');
-    
+  
     try {
-      await api.deletePost(selectedPost._id);
-      
-      setPosts(posts.filter(post => post._id !== selectedPost._id));
-      setSelectedPost(null);
+      await api.deletePost(postToDelete._id);
+    
+      setPosts(posts.filter(post => post._id !== postToDelete._id));
+      setPostToDelete(null);
       setShowDeleteConfirm(false);
     } catch (error) {
       console.error('Error deleting post:', error);
@@ -219,7 +221,7 @@ const ArtistProfile = () => {
               : 'grid-cols-5 gap-1'
         }`}>
           {posts.map(post => (
-            <div key={post._id} className="relative group cursor-pointer">
+            <div key={post._id} className="relative group cursor-pointer" onClick={() => setSelectedPost(post)}>
               <img 
                 src={`http://localhost:5000/${post.image}`} 
                 alt={post.caption} 
@@ -237,10 +239,10 @@ const ArtistProfile = () => {
                 {isOwnProfile && (
                   <button 
                     onClick={(e) => {
-                      e.stopPropagation();
-                      setSelectedPost(post);
-                      setShowDeleteConfirm(true);
-                    }}
+  			e.stopPropagation(); // This is the important part
+  			setPostToDelete(post);
+  			setShowDeleteConfirm(true);
+			}}
                     className="absolute top-2 right-2 p-2 bg-red-600 rounded-full hover:bg-red-700"
                   >
                     <Trash2 size={16} />
@@ -253,61 +255,67 @@ const ArtistProfile = () => {
       )}
       
       {/* Delete Post Confirmation Modal */}
-      {showDeleteConfirm && selectedPost && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg max-w-md w-full p-6">
-            <div className="flex items-center text-red-600 mb-4">
-              <AlertTriangle size={24} className="mr-2" />
-              <h2 className="text-xl font-bold">Delete Post</h2>
-            </div>
-            
-            <p className="mb-4">
-              Are you sure you want to delete this post? This action cannot be undone.
-            </p>
-            
-            <div className="mb-4 border rounded overflow-hidden">
-              <img 
-                src={`http://localhost:5000/${selectedPost.image}`}
-                alt="Post to delete"
-                className="w-full h-40 object-cover"
-              />
-            </div>
-            
-            {deleteError && (
-              <div className="bg-red-50 text-red-700 p-3 rounded mb-4">
-                {deleteError}
-              </div>
-            )}
-            
-            <div className="flex justify-end gap-3">
-              <button
-                onClick={() => {
-                  setShowDeleteConfirm(false);
-                  setSelectedPost(null);
-                }}
-                className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
-                disabled={isDeleting}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleDeletePost}
-                className="flex items-center px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:bg-red-300"
-                disabled={isDeleting}
-              >
-                {isDeleting ? (
-                  <>
-                    <span className="mr-2">Deleting...</span>
-                    <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
-                  </>
-                ) : (
-                  'Delete Post'
-                )}
-              </button>
-            </div>
-          </div>
+  {showDeleteConfirm && postToDelete && (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-lg max-w-md w-full p-6">
+        <div className="flex items-center text-red-600 mb-4">
+          <AlertTriangle size={24} className="mr-2" />
+          <h2 className="text-xl font-bold">Delete Post</h2>
         </div>
-      )}
+        
+        <p className="mb-4">
+          Are you sure you want to delete this post? This action cannot be undone.
+        </p>
+        
+        <div className="mb-4 border rounded overflow-hidden">
+          <img 
+            src={`http://localhost:5000/${postToDelete.image}`}
+            alt="Post to delete"
+            className="w-full h-40 object-cover"
+          />
+        </div>
+        
+        {deleteError && (
+          <div className="bg-red-50 text-red-700 p-3 rounded mb-4">
+            {deleteError}
+          </div>
+        )}
+        
+        <div className="flex justify-end gap-3">
+          <button
+            onClick={() => {
+              setShowDeleteConfirm(false);
+              setPostToDelete(null);
+            }}
+            className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
+            disabled={isDeleting}
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleDeletePost}
+            className="flex items-center px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:bg-red-300"
+            disabled={isDeleting}
+          >
+            {isDeleting ? (
+              <>
+                <span className="mr-2">Deleting...</span>
+                <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
+              </>
+            ) : (
+              'Delete Post'
+            )}
+          </button>
+        </div>
+      </div>
+    </div>
+  )}
+    {selectedPost && (
+      <CommentModal
+          post={selectedPost}
+          onClose={() => setSelectedPost(null)}
+      />
+    )}
     </div>
   );
 };
