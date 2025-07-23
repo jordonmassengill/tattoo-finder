@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { MapPin, DollarSign, Filter, Users, Image, Heart, MessageCircle } from 'lucide-react';
+import { MapPin, DollarSign, Filter, Users, Image, Heart, MessageCircle, Search } from 'lucide-react';
 import ProfileImage from './ProfileImage';
 import { BAY_AREA_CITIES } from '../constants/locations';
 import CommentModal from './CommentModal';
@@ -9,6 +9,7 @@ const SearchPage = () => {
   const [viewMode, setViewMode] = useState('grid3');
   const [showFilters, setShowFilters] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [submittedQuery, setSubmittedQuery] = useState('');
   const [searchType, setSearchType] = useState('posts'); // MODIFIED: Default to 'posts'
   const [filters, setFilters] = useState({
     location: [],
@@ -34,8 +35,8 @@ const SearchPage = () => {
         setLoading(true);
         const params = new URLSearchParams();
 
-        if (searchQuery) {
-          params.append('query', searchQuery);
+        if (submittedQuery) {
+          params.append('query', submittedQuery);
         }
         if (filters.location.length > 0) {
           filters.location.forEach(loc => params.append('location', loc));
@@ -49,15 +50,7 @@ const SearchPage = () => {
 	  params.append('sort', sortOption);
 
 
-        let endpoint;
-        if (searchType === 'artists') {
-          endpoint = '/api/search/artists';
-        } else {
-          const hasPostFilters = filters.location.length > 0 || filters.priceRange.length > 0 || filters.styles.length > 0;
-          endpoint = hasPostFilters
-            ? '/api/search/posts-by-style'
-            : '/api/search/featured';
-        }
+        const endpoint = searchType === 'artists' ? '/api/search/artists' : '/api/search/posts';
 
         const response = await fetch(`http://localhost:5000${endpoint}?${params.toString()}`);
         if (!response.ok) {
@@ -73,7 +66,7 @@ const SearchPage = () => {
     };
 
     fetchSearchResults();
-  }, [searchQuery, filters, searchType, sortOption]);
+  }, [submittedQuery, filters, searchType, sortOption]);
 
   const togglePriceFilter = (price) => {
     setFilters(prev => ({
@@ -115,9 +108,20 @@ const SearchPage = () => {
     setSearchResults([]);
   };
 
+  const handleSearchSubmit = () => {
+    setSubmittedQuery(searchQuery.trim());
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      handleSearchSubmit();
+    }
+  };
+
   const resetFilters = () => {
     setFilters({ location: [], priceRange: [], styles: [] });
     setSearchQuery('');
+    setSubmittedQuery('');
   };
 
   const renderSearchItem = (item, isGrid) => {
@@ -222,8 +226,22 @@ if (isPost && isGrid) {
 
       <div className="flex flex-col md:flex-row items-center mb-6">
   <div className="relative flex-grow mb-4 md:mb-0 md:mr-4 w-full">
-    <input type="text" placeholder={searchType === 'artists' ? "Search for tattoo artists..." : "Search for tattoo styles, designs..."} className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" value={searchQuery} onChange={handleSearchChange} />
-    <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+    <input
+    type="text"
+    placeholder={searchType === 'artists' ? "Search artists by username..." : "Search posts by tags or username..."}
+    className="w-full pl-10 pr-24 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+    value={searchQuery}
+    onChange={(e) => setSearchQuery(e.target.value)}
+    onKeyDown={handleKeyDown}
+/>
+<Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+
+<button
+    onClick={handleSearchSubmit}
+    className="absolute right-1 top-1/2 transform -translate-y-1/2 bg-blue-500 text-white px-4 py-1 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
+>
+    Go
+</button>
   </div>
 
   {/* Container for the buttons */}
