@@ -27,8 +27,8 @@ export default {
   getUserPosts: (id) => api.get(`/users/${id}/posts`),
   updateProfile: (userData) => api.put('/users/update', userData),
   deleteUser: (id) => api.delete(`/users/${id}`),
-  followUser: (id) => api.put(`/users/follow/${id}`),     // ADDED
-  unfollowUser: (id) => api.put(`/users/unfollow/${id}`), // ADDED
+  followUser: (id) => api.put(`/users/follow/${id}`),
+  unfollowUser: (id) => api.put(`/users/unfollow/${id}`),
 
   //Profile Pic
   updateProfilePicture: (file) => {
@@ -55,4 +55,8 @@ export default {
   deleteComment: (postId, commentId) => api.delete(`/posts/comment/${postId}/${commentId}`),
   likeComment: (postId, commentId) => api.put(`/posts/comment/like/${postId}/${commentId}`),
   unlikeComment: (postId, commentId) => api.put(`/posts/comment/unlike/${postId}/${commentId}`),
+  
+  // These are the functions for the dislike feature
+  dislikeComment: (postId, commentId) => api.put(`/posts/comment/dislike/${postId}/${commentId}`),
+  undislikeComment: (postId, commentId) => api.put(`/posts/comment/undislike/${postId}/${commentId}`),
 };

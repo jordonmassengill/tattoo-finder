@@ -1,5 +1,3 @@
-// File: src/components/CommentModal.jsx
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { X, Send, Trash2, Heart } from 'lucide-react';
@@ -12,7 +10,7 @@ const CommentModal = ({ post, onClose }) => {
   const [newComment, setNewComment] = useState('');
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [localDislikes, setLocalDislikes] = useState(new Set());
+  const [interactionLoading, setInteractionLoading] = useState(null);
   const { currentUser } = useAuth();
   const commentsEndRef = useRef(null);
 
@@ -23,7 +21,6 @@ const CommentModal = ({ post, onClose }) => {
         setLoading(true);
         const response = await api.getPostById(post._id);
         setComments(response.data.comments || []);
-        setLocalDislikes(new Set());
       } catch (error) {
         console.error("Failed to fetch comments", error);
       } finally {
@@ -33,11 +30,11 @@ const CommentModal = ({ post, onClose }) => {
     fetchPostDetails();
   }, [post?._id]);
 
-  // **THE FIX IS HERE**
-  // Scroll to the bottom only when the NUMBER of comments changes.
   useEffect(() => {
-    commentsEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [comments.length]);
+    if(!loading) {
+      commentsEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [comments.length, loading]);
 
   const handleCommentSubmit = async (e) => {
     e.preventDefault();
@@ -67,54 +64,43 @@ const CommentModal = ({ post, onClose }) => {
   };
 
   const handleInteraction = async (commentId, type) => {
-    if (!currentUser) return alert("Please log in to interact.");
+    if (!currentUser || interactionLoading === commentId) return;
 
-    const originalComments = [...comments];
-    const newDislikes = new Set(localDislikes);
+    setInteractionLoading(commentId);
+    
     const comment = comments.find(c => c._id === commentId);
-    const isLiked = comment.likes.includes(currentUser.id);
-    const isDisliked = newDislikes.has(commentId);
+    if (!comment) return;
 
-    if (type === 'like') {
-      if (isDisliked) newDislikes.delete(commentId);
-      
-      const newLikes = isLiked
-        ? comment.likes.filter(id => id !== currentUser.id)
-        : [...comment.likes, currentUser.id];
+    try {
+      let response;
+      const isLiked = comment.likes.includes(currentUser.id);
+      const isDisliked = comment.dislikes?.includes(currentUser.id);
 
-      setComments(comments.map(c => c._id === commentId ? { ...c, likes: newLikes } : c));
-      apiCall(isLiked ? 'unlike' : 'like', post._id, commentId, originalComments);
-
-    } else if (type === 'dislike') {
-      let newLikes = [...comment.likes];
-      if (isLiked) {
-        newLikes = newLikes.filter(id => id !== currentUser.id);
-        apiCall('unlike', post._id, commentId, originalComments);
+      if (type === 'like') {
+        response = isLiked 
+          ? await api.unlikeComment(post._id, commentId) 
+          : await api.likeComment(post._id, commentId);
+      } else {
+        response = isDisliked 
+          ? await api.undislikeComment(post._id, commentId) 
+          : await api.dislikeComment(post._id, commentId);
       }
       
-      isDisliked ? newDislikes.delete(commentId) : newDislikes.add(commentId);
-      setComments(comments.map(c => c._id === commentId ? { ...c, likes: newLikes } : c));
-    }
-    setLocalDislikes(newDislikes);
-  };
+      setComments(response.data);
 
-  const apiCall = async (action, postId, commentId, originalState) => {
-    try {
-      if (action === 'like') await api.likeComment(postId, commentId);
-      if (action === 'unlike') await api.unlikeComment(postId, commentId);
     } catch (error) {
-      console.error(`Failed to ${action} comment`, error);
-      setComments(originalState);
+      console.error(`Failed to ${type} comment`, error);
+      alert('Something went wrong. Please try again.');
+    } finally {
+      setInteractionLoading(null);
     }
   };
-
 
   if (!post) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4" onClick={onClose}>
       <div className="bg-white rounded-lg w-full max-w-4xl h-full max-h-[90vh] flex overflow-hidden" onClick={(e) => e.stopPropagation()}>
-        {/* Left Side: Image */}
         <div className="hidden md:block md:w-3/5 bg-black flex-shrink-0">
           <img
             src={`http://localhost:5000/${post.image}`}
@@ -123,9 +109,7 @@ const CommentModal = ({ post, onClose }) => {
           />
         </div>
 
-        {/* Right Side: Comments */}
         <div className="w-full md:w-2/5 flex flex-col">
-          {/* Header */}
           <div className="p-3 border-b flex items-center justify-between">
             <Link to={`/artist/${post.user.username}`} className="flex items-center font-semibold">
               <ProfileImage user={post.user} size="sm" />
@@ -136,7 +120,6 @@ const CommentModal = ({ post, onClose }) => {
             </button>
           </div>
 
-          {/* Comments Section */}
           <div className="flex-grow p-3 overflow-y-auto">
             {post.caption && (
               <>
@@ -145,18 +128,18 @@ const CommentModal = ({ post, onClose }) => {
               </>
             )}
 
-            {/* Comments List */}
             {loading ? (
               <div className="text-center text-gray-500">Loading comments...</div>
             ) : (
               <div className="space-y-4">
                 {comments.map(comment => {
                   const isLiked = currentUser && comment.likes.includes(currentUser.id);
-                  const isDisliked = localDislikes.has(comment._id);
+                  const isDisliked = currentUser && comment.dislikes?.includes(currentUser.id);
 
-                  let displayLikes = comment.likes.length;
-                  if (isDisliked) displayLikes--;
-                  
+                  // ## 1. CALCULATE THE SCORE ##
+                  // Get the total score by subtracting dislikes from likes.
+                  const score = (comment.likes?.length || 0) - (comment.dislikes?.length || 0);
+
                   return (
                     <div key={comment._id} className="flex items-start group relative w-full justify-between">
                       <div className="flex items-start flex-grow min-w-0">
@@ -167,20 +150,30 @@ const CommentModal = ({ post, onClose }) => {
                             <span className="ml-1">{comment.text}</span>
                           </p>
                           <div className="flex items-center text-xs text-gray-400 mt-1 space-x-3">
-                             <p>{new Date(comment.date).toLocaleDateString()}</p>
-                             <button onClick={() => handleInteraction(comment._id, 'like')} className={`font-semibold ${isLiked ? 'text-blue-500' : 'hover:text-gray-600'}`}>
-                               Like
-                             </button>
-                             <button onClick={() => handleInteraction(comment._id, 'dislike')} className={`font-semibold ${isDisliked ? 'text-red-500' : 'hover:text-gray-600'}`}>
-                               Dislike
-                             </button>
+                              <p>{new Date(comment.date).toLocaleDateString()}</p>
+                              <button 
+                                onClick={() => handleInteraction(comment._id, 'like')} 
+                                className={`font-semibold ${isLiked ? 'text-blue-500' : 'hover:text-gray-600'}`}
+                                disabled={interactionLoading === comment._id}
+                              >
+                                Like
+                              </button>
+                              <button 
+                                onClick={() => handleInteraction(comment._id, 'dislike')} 
+                                className={`font-semibold ${isDisliked ? 'text-red-500' : 'hover:text-gray-600'}`}
+                                disabled={interactionLoading === comment._id}
+                              >
+                                Dislike
+                              </button>
                           </div>
                         </div>
                       </div>
                       <div className="flex items-center space-x-2 pl-2 flex-shrink-0">
                           <div className={`flex items-center ${isLiked ? 'text-red-500' : isDisliked ? 'text-black' : 'text-gray-400'}`}>
-                               <Heart size={12} className="mr-1" fill={isLiked || isDisliked ? 'currentColor' : 'none'} />
-                               <span>{displayLikes}</span>
+                              <Heart size={12} className="mr-1" fill={isLiked || isDisliked ? 'currentColor' : 'none'} />
+                              
+                              {/* ## 2. DISPLAY THE SCORE ## */}
+                              <span>{score}</span>
                           </div>
                           {currentUser?.id === comment.user?._id && (
                             <button onClick={() => handleDeleteComment(comment._id)} className="text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -199,7 +192,6 @@ const CommentModal = ({ post, onClose }) => {
             )}
           </div>
 
-          {/* Footer: Add Comment form */}
           <div className="p-3 border-t">
             <form onSubmit={handleCommentSubmit} className="flex items-center space-x-2">
               <ProfileImage user={currentUser} size="sm" />
