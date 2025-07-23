@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { MapPin, DollarSign, Filter, Users, Image } from 'lucide-react';
+import { MapPin, DollarSign, Filter, Users, Image, Heart, MessageCircle } from 'lucide-react';
 import ProfileImage from './ProfileImage';
 import { BAY_AREA_CITIES } from '../constants/locations';
 import CommentModal from './CommentModal';
@@ -18,6 +18,8 @@ const SearchPage = () => {
   const [searchResults, setSearchResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedPost, setSelectedPost] = useState(null);
+  const [sortOption, setSortOption] = useState('newest');
+
 
   const tattooStyles = [
     'Geometric', 'Blackwork', 'Minimalist', 'Watercolor', 'Illustrative',
@@ -44,6 +46,8 @@ const SearchPage = () => {
         if (filters.styles.length > 0) {
           params.append('styles', filters.styles.join(','));
         }
+	  params.append('sort', sortOption);
+
 
         let endpoint;
         if (searchType === 'artists') {
@@ -69,7 +73,7 @@ const SearchPage = () => {
     };
 
     fetchSearchResults();
-  }, [searchQuery, filters, searchType]);
+  }, [searchQuery, filters, searchType, sortOption]);
 
   const togglePriceFilter = (price) => {
     setFilters(prev => ({
@@ -100,6 +104,10 @@ const SearchPage = () => {
 
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value);
+  };
+
+  const handleSortToggle = () => {
+    setSortOption(prevOption => (prevOption === 'newest' ? 'likes' : 'newest'));
   };
 
   const handleSearchTypeToggle = (type) => {
@@ -142,11 +150,20 @@ if (isPost && isGrid) {
     return (
       <div key={item._id} className="relative group cursor-pointer" onClick={() => setSelectedPost(item)}>
         <img src={`http://localhost:5000/${item.image}`} alt={item.caption} className="w-full aspect-square object-cover rounded-lg" />
-        <div className="absolute inset-0 bg-black bg-opacity-40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white p-2 rounded-lg">
-          <Link to={`/artist/${item.user.username}`} onClick={(e) => e.stopPropagation()} className="font-bold text-center mb-1 hover:underline">
-            {item.user.username}
-          </Link>
-        </div>
+<div className="absolute inset-0 bg-black bg-opacity-40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white p-2 rounded-lg">
+    {/* Like and Comment counts */}
+    <div className="flex items-center text-lg font-bold">
+        <Heart size={22} fill="red" className="mr-1.5" />
+        <span className="mr-5">{item.likes.length}</span>
+        <MessageCircle size={22} fill="white" className="mr-1.5" />
+        <span>{item.comments.length}</span>
+    </div>
+
+    {/* Artist username link at the bottom */}
+    <Link to={`/artist/${item.user.username}`} onClick={(e) => e.stopPropagation()} className="absolute bottom-2 left-2 text-sm font-medium hover:underline bg-black/50 px-2 py-1 rounded">
+        by {item.user.username}
+    </Link>
+</div>
       </div>
     );
   }
@@ -204,14 +221,26 @@ if (isPost && isGrid) {
       </div>
 
       <div className="flex flex-col md:flex-row items-center mb-6">
-        <div className="relative flex-grow mb-4 md:mb-0 md:mr-4 w-full">
-          <input type="text" placeholder={searchType === 'artists' ? "Search for tattoo artists..." : "Search for tattoo styles, designs..."} className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" value={searchQuery} onChange={handleSearchChange} />
-          <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-        </div>
-        <button onClick={() => setShowFilters(!showFilters)} className="flex items-center px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition">
-          <Filter size={18} className="mr-2" /> Filters
-        </button>
-      </div>
+  <div className="relative flex-grow mb-4 md:mb-0 md:mr-4 w-full">
+    <input type="text" placeholder={searchType === 'artists' ? "Search for tattoo artists..." : "Search for tattoo styles, designs..."} className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" value={searchQuery} onChange={handleSearchChange} />
+    <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+  </div>
+
+  {/* Container for the buttons */}
+  <div className="flex items-center space-x-2">
+    <button 
+      onClick={() => setShowFilters(!showFilters)} 
+      className="flex items-center px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition">
+      <Filter size={18} className="mr-2" /> Filters
+    </button>
+    <button 
+  onClick={handleSortToggle} 
+  className="px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition font-medium whitespace-nowrap"
+>
+  {sortOption === 'newest' ? 'Sort - New' : 'Sort - Likes'}
+</button>
+  </div>
+</div>
 
       {showFilters && (
         <div className="bg-gray-50 rounded-lg p-4 mb-6">
