@@ -60,7 +60,7 @@ const PostItem = ({ post, onPostClick }) => {
       <img
         src={`http://localhost:5000/${post.image}`}
         alt={post.caption}
-        className="w-full aspect-square object-cover"
+        className="w-full aspect-portrait object-cover"
       />
       <div className="absolute inset-0 bg-black bg-opacity-40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white">
         <div className="flex items-center text-lg font-bold">

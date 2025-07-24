@@ -64,7 +64,7 @@ const PostItem = ({ post, onCommentClick }) => {
 
   return (
     <div key={post._id} className="relative group cursor-pointer" onClick={() => onCommentClick(post)}>
-      <img src={`http://localhost:5000/${post.image}`} alt={post.caption} className="w-full aspect-square object-cover rounded-lg" />
+      <img src={`http://localhost:5000/${post.image}`} alt={post.caption} className="w-full aspect-portrait object-cover rounded-lg" />
       <div className="absolute inset-0 bg-black bg-opacity-40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white p-2 rounded-lg">
         <div className="flex items-center text-lg font-bold">
           <button onClick={handleLikeToggle} className="flex items-center mr-5">
