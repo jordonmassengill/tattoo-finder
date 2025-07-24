@@ -11,18 +11,18 @@ import NavBar from './components/NavBar';
 import PublicNavBar from './components/PublicNavBar';
 import Login from './components/Login';
 import Signup from './components/Signup';
-import UploadPost from './components/UploadPost';
+import SavedPage from './components/SavedPage';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import './styles.css';
 
-// Layout component that conditionally renders the appropriate NavBar
+// Layout component conditionally renders the appropriate NavBar
 const Layout = ({ children }) => {
-  const { currentUser, userType } = useAuth();
+  const { currentUser } = useAuth();
   
   return (
     <>
       {currentUser ? (
-        <NavBar userType={userType} />
+        <NavBar />
       ) : (
         <Routes>
           <Route path="/search" element={<PublicNavBar />} />
@@ -94,9 +94,7 @@ function AppContent() {
         
         <Route 
           path="/saved" 
-          element={renderProtectedRoute(
-            <div className="p-8 text-center">Saved items coming soon</div>
-          )} 
+          element={renderProtectedRoute(<SavedPage />)} 
         />
         
         {/* Profile route - only accessible to logged in users */}

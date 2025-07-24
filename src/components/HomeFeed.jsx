@@ -1,84 +1,118 @@
 // File: src/components/HomeFeed.jsx
 
 import React, { useState, useEffect } from 'react';
-import { BarChart2, LayoutGrid, Grid, Heart, MessageCircle } from 'lucide-react';
+import { BarChart2, LayoutGrid, Grid, Heart, MessageCircle, Bookmark } from 'lucide-react';
 import api from '../services/api';
 import { Link } from 'react-router-dom';
 import ProfileImage from './ProfileImage';
 import { useAuth } from '../context/AuthContext';
-import CommentModal from './CommentModal'; // Import the new modal component
+import CommentModal from './CommentModal';
 
-// --- Post Component (Now manages its own "like" state) ---
 const Post = ({ post: initialPost, isGrid, onCommentClick }) => {
-  const { currentUser } = useAuth();
+  const { currentUser, updateCurrentUser } = useAuth();
   
-  // Each Post now has its own state for its like status and count
   const [post, setPost] = useState(initialPost);
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(initialPost.likes.length);
+  const [isSaved, setIsSaved] = useState(false);
 
-  // This effect ensures the like button is correct when the component first loads or data changes
   useEffect(() => {
     if (currentUser) {
       setIsLiked(post.likes.some(likeId => likeId === currentUser.id));
+      setIsSaved(currentUser.savedPosts?.includes(post._id));
     }
     setLikeCount(post.likes.length);
-  }, [post.likes, currentUser]);
+  }, [post, currentUser]);
 
-  const handleLikeToggle = async () => {
+  const handleLikeToggle = async (e) => {
+    e.stopPropagation(); // Prevent modal from opening
     if (!currentUser) {
       alert("Please log in to like posts.");
       return;
     }
 
-    // Optimistically update UI for a snappy feel
+    const originalIsLiked = isLiked;
     setIsLiked(!isLiked);
     setLikeCount(prevCount => isLiked ? prevCount - 1 : prevCount + 1);
 
     try {
-      // Send the request to the backend
       const updatedPostData = isLiked 
         ? await api.unlikePost(post._id) 
         : await api.likePost(post._id);
-      
-      // Sync with the backend's response to ensure data is accurate
       setPost({ ...post, likes: updatedPostData.data });
-
     } catch (error) {
       console.error('Error toggling like:', error);
-      // If the API call fails, revert the optimistic update
-      setIsLiked(isLiked);
+      setIsLiked(originalIsLiked);
       setLikeCount(likeCount);
       alert("Failed to update like status. Please try again.");
     }
   };
 
+  const handleSaveToggle = async (e) => {
+    e.stopPropagation(); // Prevent modal from opening
+    if (!currentUser) return;
+
+    const originalSavedState = isSaved;
+    setIsSaved(!originalSavedState);
+
+    try {
+      const apiCall = originalSavedState ? api.unsavePost : api.savePost;
+      const response = await apiCall(post._id);
+      updateCurrentUser({ ...currentUser, savedPosts: response.data.savedPosts });
+    } catch (error) {
+      console.error('Error toggling save:', error);
+      setIsSaved(originalSavedState);
+      alert("Failed to update saved status. Please try again.");
+    }
+  };
+
   if (isGrid) {
     return (
-      <div className="relative group cursor-pointer">
+      <div className="relative group cursor-pointer" onClick={() => onCommentClick(post)}>
         <img 
           src={`http://localhost:5000/${post.image}`} 
           alt={post.caption} 
           className="w-full aspect-square object-cover"
         />
-        <div className="absolute inset-0 bg-black bg-opacity-40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white">
-          <div className="flex items-center mr-4">
-            <Heart size={20} className="mr-1 text-white" fill="white" /> {likeCount}
-          </div>
-          <button onClick={() => onCommentClick(post)} className="flex items-center">
-            <MessageCircle size={20} className="mr-1 text-white" fill="white" /> {post.comments.length}
+        <div className="absolute inset-0 bg-black bg-opacity-40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-lg font-bold">
+          <button onClick={handleLikeToggle} className="flex items-center mr-5">
+            <Heart 
+              size={22} 
+              className={`mr-1.5 transition-colors ${isLiked ? 'text-red-500' : 'text-white'}`}
+              fill={isLiked ? 'currentColor' : 'none'}
+            />
+            <span>{likeCount}</span>
           </button>
+          <div className="flex items-center">
+            <MessageCircle size={22} fill="currentColor" className="mr-1.5 text-white" />
+            <span>{post.comments.length}</span>
+          </div>
+
+          {currentUser && (
+            <button
+              onClick={handleSaveToggle}
+              className="absolute bottom-2 right-2 p-2 bg-black bg-opacity-50 rounded-full hover:bg-opacity-75 transition"
+              aria-label="Save post"
+            >
+              <Bookmark
+                className={`transition-colors ${isSaved ? 'text-blue-400' : 'text-white'}`}
+                fill={isSaved ? 'currentColor' : 'none'}
+                size={20}
+              />
+            </button>
+          )}
+          
+          <Link to={`/artist/${post.user.username}`} onClick={(e) => e.stopPropagation()} className="absolute bottom-2 left-2 text-sm font-medium hover:underline bg-black/50 px-2 py-1 rounded">
+            {post.user.username}
+          </Link>
         </div>
-        <Link to={`/artist/${post.user.username}`} className="absolute top-2 left-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded-full text-xs opacity-0 group-hover:opacity-100">
-          {post.user.username}
-        </Link>
       </div>
     );
   }
 
   return (
     <div className="bg-white border border-gray-200 rounded-md mb-6">
-      <div className="flex items-center p-3">
+      <div className="flex items-center p-2">
         <Link to={`/artist/${post.user.username}`} className="flex items-center">
           <ProfileImage user={post.user} size="md" />
           <div className="ml-3">
@@ -90,11 +124,11 @@ const Post = ({ post: initialPost, isGrid, onCommentClick }) => {
       <img 
         src={`http://localhost:5000/${post.image}`} 
         alt={post.caption} 
-        className="w-full object-cover"
+        className="w-full aspect-square object-cover"
       />
       
-      <div className="p-3">
-        <div className="flex items-center mb-3 space-x-4">
+      <div className="px-2 py-1">
+        <div className="flex items-center my-1 space-x-4 h-10">
           <button onClick={handleLikeToggle}>
             <Heart 
               className={`transition-colors ${isLiked ? 'text-red-500' : 'text-gray-500'}`}
@@ -104,7 +138,12 @@ const Post = ({ post: initialPost, isGrid, onCommentClick }) => {
           <button onClick={() => onCommentClick(post)}>
               <MessageCircle className="text-gray-500" />
           </button>
-          <button>🔖</button>
+          <button onClick={handleSaveToggle}>
+            <Bookmark
+              className={`transition-colors ${isSaved ? 'text-blue-500' : 'text-gray-500'}`}
+              fill={isSaved ? 'currentColor' : 'none'}
+            />
+          </button>
         </div>
         <p className="font-semibold mb-1">{likeCount} likes</p>
         <p>
@@ -121,8 +160,6 @@ const Post = ({ post: initialPost, isGrid, onCommentClick }) => {
   );
 };
 
-
-// --- HomeFeed Component (Now much simpler) ---
 const HomeFeed = () => {
   const [viewMode, setViewMode] = useState('feed');
   const [posts, setPosts] = useState([]);
@@ -186,10 +223,10 @@ const HomeFeed = () => {
         <div className="max-w-xl mx-auto">
           {posts.map(post => (
             <Post 
-                key={post._id} 
-                post={post} 
-                isGrid={false} 
-                onCommentClick={(p) => setSelectedPost(p)}
+              key={post._id} 
+              post={post} 
+              isGrid={false} 
+              onCommentClick={(p) => setSelectedPost(p)}
             />
           ))}
         </div>
@@ -199,10 +236,10 @@ const HomeFeed = () => {
         <div className={`grid ${viewMode === 'grid3' ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3' : 'grid-cols-2 sm:grid-cols-3 md:grid-cols-5'} gap-1`}>
           {posts.map(post => (
             <Post 
-                key={post._id} 
-                post={post} 
-                isGrid={true} 
-                onCommentClick={(p) => setSelectedPost(p)}
+              key={post._id} 
+              post={post} 
+              isGrid={true} 
+              onCommentClick={(p) => setSelectedPost(p)}
             />
           ))}
         </div>
@@ -210,8 +247,8 @@ const HomeFeed = () => {
 
       {selectedPost && (
         <CommentModal 
-            post={selectedPost} 
-            onClose={() => setSelectedPost(null)}
+          post={selectedPost} 
+          onClose={() => setSelectedPost(null)}
         />
       )}
     </div>

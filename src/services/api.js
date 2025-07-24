@@ -30,6 +30,11 @@ export default {
   followUser: (id) => api.put(`/users/follow/${id}`),
   unfollowUser: (id) => api.put(`/users/unfollow/${id}`),
 
+  // Save fucntions
+  savePost: (postId) => api.put(`/users/save/${postId}`),
+  unsavePost: (postId) => api.put(`/users/unsave/${postId}`),
+  getSavedPosts: () => api.get('/users/me/saved'),
+
   //Profile Pic
   updateProfilePicture: (file) => {
     const formData = new FormData();
