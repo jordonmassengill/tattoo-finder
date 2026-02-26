@@ -24,7 +24,10 @@ export default {
   // User endpoints
   getCurrentUser: () => api.get('/users/me'),
   getUserById: (id) => api.get(`/users/${id}`),
-  getUserPosts: (id) => api.get(`/users/${id}/posts`),
+  getUserPosts: (id, options = {}) => {
+    const params = options.includeArtists ? '?includeArtists=true' : '';
+    return api.get(`/users/${id}/posts${params}`);
+  },
   updateProfile: (userData) => api.put('/users/update', userData),
   deleteUser: (id) => api.delete(`/users/${id}`),
   followUser: (id) => api.put(`/users/follow/${id}`),
@@ -64,4 +67,12 @@ export default {
   // These are the functions for the dislike feature
   dislikeComment: (postId, commentId) => api.put(`/posts/comment/dislike/${postId}/${commentId}`),
   undislikeComment: (postId, commentId) => api.put(`/posts/comment/undislike/${postId}/${commentId}`),
+
+  // Affiliation endpoints
+  sendAffiliationRequest: (targetId) => api.post(`/affiliations/request/${targetId}`),
+  acceptAffiliationRequest: (requestId) => api.put(`/affiliations/accept/${requestId}`),
+  declineAffiliationRequest: (requestId) => api.delete(`/affiliations/request/${requestId}`),
+  removeAffiliation: (targetId) => api.delete(`/affiliations/remove/${targetId}`),
+  getPendingAffiliationRequests: () => api.get('/affiliations/pending'),
+  getAffiliationStatus: (targetId) => api.get(`/affiliations/status/${targetId}`),
 };
