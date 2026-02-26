@@ -379,26 +379,25 @@ const SearchPage = () => {
                   </div>
                 </div>
 
-                <ChipFilterGroup label="Foundational Style" options={FOUNDATIONAL_STYLES} filterKey="foundationalStyles" />
-              </div>
-
-              {/* Right column */}
-              <div>
-                <ChipFilterGroup label="Technique / Finish" options={TECHNIQUES} filterKey="techniques" />
-                <ChipFilterGroup label="Subject" options={SUBJECTS} filterKey="subjects" />
-
-                {/* Location */}
+                {/* Location - 2-column grid */}
                 <div className="mb-4">
                   <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Location</p>
-                  <div className="max-h-36 overflow-y-auto border rounded p-2 bg-white">
+                  <div className="grid grid-cols-2 gap-x-2">
                     {BAY_AREA_CITIES.map(city => (
-                      <label key={city} className="flex items-center text-sm py-0.5 px-1 hover:bg-gray-100 rounded">
+                      <label key={city} className="flex items-center text-sm py-0.5 px-1 hover:bg-gray-100 rounded cursor-pointer">
                         <input type="checkbox" checked={filters.location.includes(city)} onChange={() => toggleArrayFilter('location', city)} className="mr-2 h-4 w-4 rounded border-gray-300 text-blue-600" />
                         {city}
                       </label>
                     ))}
                   </div>
                 </div>
+              </div>
+
+              {/* Right column */}
+              <div>
+                <ChipFilterGroup label="Foundational Style" options={FOUNDATIONAL_STYLES} filterKey="foundationalStyles" />
+                <ChipFilterGroup label="Technique / Finish" options={TECHNIQUES} filterKey="techniques" />
+                <ChipFilterGroup label="Subject" options={SUBJECTS} filterKey="subjects" />
               </div>
             </div>
           ) : (
