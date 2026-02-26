@@ -7,6 +7,12 @@ export const FLASH_OR_CUSTOM = ['Flash', 'Custom'];
 // Size - single select
 export const SIZES = ['Small', 'Medium', 'Large'];
 
+// Artist ink specialty - single select (required for artists)
+export const INK_SPECIALTIES = ['Black/Grey', 'Color', 'I Do Both Equally'];
+
+// Artist design specialty - single select (required for artists)
+export const DESIGN_SPECIALTIES = ['Flash Specialty', 'Custom Specialty', 'I Do Both Equally'];
+
 // Foundational styles - up to 2
 export const FOUNDATIONAL_STYLES = [
   'Traditional',
@@ -42,3 +48,4 @@ export const SUBJECTS = [
   'Abstract',
   'Sci-Fi',
 ];
+

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { LayoutGrid, Grid, BarChart2, MapPin, DollarSign, Tag, Trash2, AlertTriangle, Heart, MessageCircle, Bookmark, UserPlus, UserCheck, Clock as ClockIcon } from 'lucide-react';
+import { LayoutGrid, Grid, BarChart2, MapPin, DollarSign, Star, Trash2, AlertTriangle, Heart, MessageCircle, Bookmark, UserPlus, UserCheck, Clock as ClockIcon } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import ProfileImage from './ProfileImage';
@@ -468,12 +468,47 @@ const ArtistProfile = () => {
                   <span>Price Range: {artistData.priceRange}</span>
                 </div>
               )}
-              {artistData.styles && artistData.styles.length > 0 && (
-                <div className="flex items-center">
-                  <Tag size={16} className="mr-2" />
-                  <span>Styles: {artistData.styles.join(', ')}</span>
+
+              {/* Specialty badges */}
+              {(artistData.inkSpecialty || artistData.designSpecialty) && (
+                <div className="flex flex-wrap gap-1.5 mt-1">
+                  {artistData.inkSpecialty && (
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-indigo-100 text-indigo-700 text-xs rounded-full font-medium">
+                      <Star size={10} fill="currentColor" /> {artistData.inkSpecialty}
+                    </span>
+                  )}
+                  {artistData.designSpecialty && (
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-indigo-100 text-indigo-700 text-xs rounded-full font-medium">
+                      <Star size={10} fill="currentColor" /> {artistData.designSpecialty}
+                    </span>
+                  )}
                 </div>
               )}
+
+              {/* Style chips — specialties highlighted in amber */}
+              {[
+                { specialties: artistData.foundationalStyleSpecialties, all: artistData.foundationalStyles, label: 'Style' },
+                { specialties: artistData.techniqueSpecialties, all: artistData.techniques, label: 'Technique' },
+                { specialties: artistData.subjectSpecialties, all: artistData.subjects, label: 'Subject' },
+              ].map(({ specialties = [], all = [], label }) => {
+                if (!all || all.length === 0) return null;
+                return (
+                  <div key={label} className="mt-1">
+                    <span className="text-xs text-gray-400 uppercase tracking-wide mr-1">{label}:</span>
+                    <span className="inline-flex flex-wrap gap-1">
+                      {all.map(item => {
+                        const isStar = specialties.includes(item);
+                        return (
+                          <span key={item} className={`inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-xs font-medium ${isStar ? 'bg-amber-100 text-amber-700' : 'bg-gray-100 text-gray-600'}`}>
+                            {isStar && <Star size={9} fill="currentColor" />}
+                            {item}
+                          </span>
+                        );
+                      })}
+                    </span>
+                  </div>
+                );
+              })}
 
               {/* Affiliated shop — displayed for everyone */}
               {shopId && (
