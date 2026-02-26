@@ -123,7 +123,7 @@ const ShopProfile = () => {
   const [affiliationLoading, setAffiliationLoading] = useState(false);
 
   const { id } = useParams();
-  const { currentUser } = useAuth();
+  const { currentUser, userType } = useAuth();
 
   const isOwnProfile = currentUser && (currentUser.id === shopData?._id || currentUser.username === shopData?.username);
 
@@ -353,76 +353,6 @@ const ShopProfile = () => {
   const incomingRequests = pendingRequests.filter(r => r.to._id === currentUser?.id || r.to === currentUser?.id);
   const outgoingRequests = pendingRequests.filter(r => r.from._id === currentUser?.id || r.from === currentUser?.id);
 
-  // Affiliation button for an artist viewing this shop
-  const renderAffiliationButton = () => {
-    if (!currentUser || currentUser.userType !== 'artist' || isOwnProfile) return null;
-
-    if (affiliationStatus === 'affiliated') {
-      return (
-        <button
-          onClick={handleLeaveShop}
-          disabled={affiliationLoading}
-          className="flex items-center px-4 py-2 bg-gray-200 text-gray-700 rounded-md font-medium mt-2 md:mt-0 hover:bg-red-100 hover:text-red-700 transition-colors disabled:opacity-50"
-        >
-          <UserCheck size={16} className="mr-2" />
-          {affiliationLoading ? '...' : 'Leave Shop'}
-        </button>
-      );
-    }
-
-    if (affiliationStatus === 'pending_sent') {
-      return (
-        <div className="flex items-center gap-2 mt-2 md:mt-0">
-          <span className="flex items-center px-4 py-2 bg-yellow-100 text-yellow-700 rounded-md font-medium text-sm">
-            <Clock size={14} className="mr-1.5" />
-            Request Pending
-          </span>
-          <button
-            onClick={handleCancelAffiliationRequest}
-            disabled={affiliationLoading}
-            className="px-3 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-50 disabled:opacity-50"
-          >
-            Cancel
-          </button>
-        </div>
-      );
-    }
-
-    if (affiliationStatus === 'pending_received') {
-      return (
-        <div className="flex items-center gap-2 mt-2 md:mt-0">
-          <span className="text-sm text-gray-600">Shop invited you:</span>
-          <button
-            onClick={handleAcceptAffiliationRequest}
-            disabled={affiliationLoading}
-            className="px-3 py-2 bg-blue-500 text-white rounded-md text-sm hover:bg-blue-600 disabled:opacity-50"
-          >
-            Accept
-          </button>
-          <button
-            onClick={handleDeclineAffiliationRequest}
-            disabled={affiliationLoading}
-            className="px-3 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-50 disabled:opacity-50"
-          >
-            Decline
-          </button>
-        </div>
-      );
-    }
-
-    // status === 'none'
-    return (
-      <button
-        onClick={handleSendAffiliationRequest}
-        disabled={affiliationLoading}
-        className="flex items-center px-4 py-2 bg-green-500 text-white rounded-md font-medium mt-2 md:mt-0 hover:bg-green-600 disabled:opacity-50"
-      >
-        <UserPlus size={16} className="mr-2" />
-        {affiliationLoading ? '...' : 'Request to Join'}
-      </button>
-    );
-  };
-
   const hasArtistsSection = isOwnProfile || (shopData.artists && shopData.artists.length > 0) || incomingRequests.length > 0 || outgoingRequests.length > 0;
 
   return (
@@ -444,7 +374,6 @@ const ShopProfile = () => {
                   {isFollowLoading ? '...' : (following ? 'Following' : 'Follow Shop')}
                 </button>
               )}
-              {renderAffiliationButton()}
             </div>
             <div className="flex justify-center md:justify-start space-x-6 mb-4">
               <span><b>{posts.length}</b> posts</span>
@@ -483,6 +412,72 @@ const ShopProfile = () => {
           </div>
         </div>
       </div>
+
+      {/* Affiliation section — visible to any logged-in artist visiting a shop */}
+      {userType === 'artist' && !isOwnProfile && (
+        <div className="p-4 border-b bg-gray-50">
+          <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Shop Affiliation</h2>
+          {affiliationStatus === 'affiliated' ? (
+            <div className="flex flex-wrap items-center gap-3">
+              <span className="flex items-center text-green-700 bg-green-100 px-3 py-2 rounded-md text-sm font-medium">
+                <UserCheck size={16} className="mr-2" />
+                You are affiliated with this shop
+              </span>
+              <button
+                onClick={handleLeaveShop}
+                disabled={affiliationLoading}
+                className="px-4 py-2 border border-red-300 text-red-600 rounded-md text-sm hover:bg-red-50 disabled:opacity-50"
+              >
+                {affiliationLoading ? '...' : 'Leave Shop'}
+              </button>
+            </div>
+          ) : affiliationStatus === 'pending_sent' ? (
+            <div className="flex flex-wrap items-center gap-3">
+              <span className="flex items-center text-yellow-700 bg-yellow-100 px-3 py-2 rounded-md text-sm font-medium">
+                <Clock size={16} className="mr-2" />
+                Your request to join is pending
+              </span>
+              <button
+                onClick={handleCancelAffiliationRequest}
+                disabled={affiliationLoading}
+                className="px-4 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-100 disabled:opacity-50"
+              >
+                {affiliationLoading ? '...' : 'Cancel Request'}
+              </button>
+            </div>
+          ) : affiliationStatus === 'pending_received' ? (
+            <div className="flex flex-wrap items-center gap-3">
+              <span className="text-sm text-gray-700 font-medium">This shop has invited you to join:</span>
+              <button
+                onClick={handleAcceptAffiliationRequest}
+                disabled={affiliationLoading}
+                className="px-4 py-2 bg-blue-500 text-white rounded-md text-sm hover:bg-blue-600 disabled:opacity-50"
+              >
+                {affiliationLoading ? '...' : 'Accept'}
+              </button>
+              <button
+                onClick={handleDeclineAffiliationRequest}
+                disabled={affiliationLoading}
+                className="px-4 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-100 disabled:opacity-50"
+              >
+                {affiliationLoading ? '...' : 'Decline'}
+              </button>
+            </div>
+          ) : (
+            <div className="flex flex-wrap items-center gap-3">
+              <p className="text-sm text-gray-600">Want to be listed as an artist at this shop?</p>
+              <button
+                onClick={handleSendAffiliationRequest}
+                disabled={affiliationLoading}
+                className="flex items-center px-4 py-2 bg-green-500 text-white rounded-md text-sm font-medium hover:bg-green-600 disabled:opacity-50"
+              >
+                <UserPlus size={16} className="mr-2" />
+                {affiliationLoading ? '...' : 'Request to Join'}
+              </button>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Our Artists section */}
       {hasArtistsSection && (
