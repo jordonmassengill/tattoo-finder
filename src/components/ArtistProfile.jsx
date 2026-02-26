@@ -468,13 +468,8 @@ const ArtistProfile = () => {
                   </span>
                 );
               })}
-              {isOwnProfile && shopId && (
-                <button onClick={handleLeaveShop} className="px-3 py-1.5 text-xs text-red-600 border border-red-200 rounded-full hover:bg-red-50">
-                  Leave Shop
-                </button>
-              )}
             </div>
-            <div className="flex justify-center md:justify-start space-x-6 mb-4">
+            <div className="flex justify-center md:justify-start space-x-6 mb-1">
               <span><b>{posts.length}</b> posts</span>
               <span><b>{followersCount}</b> followers</span>
               <span><b>{artistData.following?.length || 0}</b> following</span>
@@ -513,21 +508,24 @@ const ArtistProfile = () => {
                 </div>
               )}
 
-              {/* Style chips — specialties highlighted in amber */}
+              {/* Style chips — specialties first (amber), then others (light blue) */}
               {[
                 { specialties: artistData.foundationalStyleSpecialties, all: artistData.foundationalStyles, label: 'Style' },
                 { specialties: artistData.techniqueSpecialties, all: artistData.techniques, label: 'Technique' },
                 { specialties: artistData.subjectSpecialties, all: artistData.subjects, label: 'Subject' },
               ].map(({ specialties = [], all = [], label }) => {
                 if (!all || all.length === 0) return null;
+                const stars = all.filter(item => specialties.includes(item));
+                const rest = all.filter(item => !specialties.includes(item));
+                const ordered = [...stars, ...rest];
                 return (
                   <div key={label} className="mt-1">
                     <span className="text-xs text-gray-400 uppercase tracking-wide mr-1">{label}:</span>
                     <span className="inline-flex flex-wrap gap-1">
-                      {all.map(item => {
+                      {ordered.map(item => {
                         const isStar = specialties.includes(item);
                         return (
-                          <span key={item} className={`inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-xs font-medium ${isStar ? 'bg-amber-100 text-amber-700' : 'bg-gray-100 text-gray-600'}`}>
+                          <span key={item} className={`inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-xs font-medium ${isStar ? 'bg-amber-100 text-amber-700' : 'bg-blue-50 text-blue-600'}`}>
                             {isStar && <Star size={9} fill="currentColor" />}
                             {item}
                           </span>
@@ -538,14 +536,6 @@ const ArtistProfile = () => {
                 );
               })}
 
-              {/* Affiliated shop — displayed for everyone */}
-              {shopId && (
-                <div className="flex items-center gap-2">
-                  <Link to={`/shop/${shopId}`} className="text-blue-500 hover:text-blue-600">
-                    Working at: {shopName || 'Tattoo Shop'}
-                  </Link>
-                </div>
-              )}
             </div>
 
           </div>

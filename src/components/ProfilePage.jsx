@@ -261,12 +261,6 @@ const ProfilePage = () => {
                     </button>
                   ))}
                 </div>
-                <div className="mt-2 text-xs text-gray-500">
-                  <p><strong>$</strong> - Budget (Under $100)</p>
-                  <p><strong>$$</strong> - Mid-range ($100-$300)</p>
-                  <p><strong>$$$</strong> - High-end ($300-$800)</p>
-                  <p><strong>$$$$</strong> - Premium ($800+)</p>
-                </div>
               </div>
             )}
 
@@ -274,7 +268,7 @@ const ProfilePage = () => {
             {userType === 'artist' && (
               <div className="pb-4 border-b">
                 <h3 className="font-semibold mb-1">Specialties &amp; Styles:</h3>
-                <p className="text-xs text-gray-500 mb-4">Tap once = can do (blue) &nbsp;·&nbsp; Tap again = ★ specialty (gold, max 2 per group) &nbsp;·&nbsp; Tap gold to remove</p>
+                <p className="text-xs text-gray-500 mb-4">Tap once = can do (blue) &nbsp;·&nbsp; Tap again = ★ specialty (gold, max 2 per group)</p>
                 <ArtistStylesForm value={artistStyles} onChange={setArtistStyles} />
               </div>
             )}

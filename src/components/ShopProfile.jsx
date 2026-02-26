@@ -353,8 +353,6 @@ const ShopProfile = () => {
   const incomingRequests = pendingRequests.filter(r => r.to._id === currentUser?.id || r.to === currentUser?.id);
   const outgoingRequests = pendingRequests.filter(r => r.from._id === currentUser?.id || r.from === currentUser?.id);
 
-  const hasArtistsSection = isOwnProfile || (shopData.artists && shopData.artists.length > 0) || incomingRequests.length > 0 || outgoingRequests.length > 0;
-
   return (
     <div className="max-w-screen-xl mx-auto pb-16">
       <div className="p-4 border-b">
@@ -374,8 +372,57 @@ const ShopProfile = () => {
                   {isFollowLoading ? '...' : (following ? 'Following' : 'Follow Shop')}
                 </button>
               )}
+
+              {/* Compact affiliation buttons for artists viewing this shop */}
+              {userType === 'artist' && !isOwnProfile && affiliationStatus === 'affiliated' && (
+                <button onClick={handleLeaveShop} disabled={affiliationLoading} className="px-3 py-1.5 text-xs text-red-600 border border-red-200 rounded-full hover:bg-red-50 disabled:opacity-50">
+                  {affiliationLoading ? '...' : 'Leave Shop'}
+                </button>
+              )}
+              {userType === 'artist' && !isOwnProfile && affiliationStatus === 'pending_sent' && (
+                <span className="flex items-center gap-1.5 px-2 py-1 bg-yellow-50 border border-yellow-200 rounded-full text-xs">
+                  <Clock size={12} className="text-yellow-600" />
+                  <span className="text-yellow-700">Request Pending</span>
+                  <button onClick={handleCancelAffiliationRequest} disabled={affiliationLoading} className="px-2 py-0.5 border border-gray-300 rounded-full hover:bg-gray-100">Cancel</button>
+                </span>
+              )}
+              {userType === 'artist' && !isOwnProfile && affiliationStatus === 'pending_received' && (
+                <span className="flex items-center gap-1.5 px-2 py-1 bg-blue-50 border border-blue-200 rounded-full text-xs">
+                  <span className="text-blue-700 font-medium">Shop invited you</span>
+                  <button onClick={handleAcceptAffiliationRequest} disabled={affiliationLoading} className="px-2 py-0.5 bg-blue-500 text-white rounded-full hover:bg-blue-600">Accept</button>
+                  <button onClick={handleDeclineAffiliationRequest} disabled={affiliationLoading} className="px-2 py-0.5 border border-gray-300 rounded-full hover:bg-gray-100">Decline</button>
+                </span>
+              )}
+              {userType === 'artist' && !isOwnProfile && affiliationStatus === 'none' && (
+                <button onClick={handleSendAffiliationRequest} disabled={affiliationLoading} className="flex items-center px-3 py-1.5 text-xs bg-green-500 text-white rounded-full hover:bg-green-600 disabled:opacity-50">
+                  <UserPlus size={12} className="mr-1" />
+                  {affiliationLoading ? '...' : 'Request to Join'}
+                </button>
+              )}
+
+              {/* Shop own-profile: compact incoming artist requests */}
+              {isOwnProfile && incomingRequests.map(req => {
+                const artistUser = req.from.userType === 'artist' ? req.from : req.to;
+                return (
+                  <span key={req._id} className="flex items-center gap-1.5 px-2 py-1 bg-blue-50 border border-blue-200 rounded-full text-xs">
+                    <span className="text-blue-700 font-medium">{artistUser.username} wants to join</span>
+                    <button onClick={() => handleAcceptIncoming(req._id, artistUser)} className="px-2 py-0.5 bg-blue-500 text-white rounded-full hover:bg-blue-600">Accept</button>
+                    <button onClick={() => handleDeclineIncoming(req._id)} className="px-2 py-0.5 border border-gray-300 rounded-full hover:bg-gray-100">Decline</button>
+                  </span>
+                );
+              })}
+              {isOwnProfile && outgoingRequests.map(req => {
+                const artistUser = req.to.userType === 'artist' ? req.to : req.from;
+                return (
+                  <span key={req._id} className="flex items-center gap-1.5 px-2 py-1 bg-yellow-50 border border-yellow-200 rounded-full text-xs">
+                    <Clock size={12} className="text-yellow-600" />
+                    <span className="text-yellow-700">{artistUser.username} invited</span>
+                    <button onClick={() => handleCancelOutgoing(req._id)} className="px-2 py-0.5 border border-gray-300 rounded-full hover:bg-gray-100">Cancel</button>
+                  </span>
+                );
+              })}
             </div>
-            <div className="flex justify-center md:justify-start space-x-6 mb-4">
+            <div className="flex justify-center md:justify-start space-x-6 mb-1">
               <span><b>{posts.length}</b> posts</span>
               <span><b>{followersCount}</b> followers</span>
               <span><b>{shopData.artists?.length || 0}</b> artists</span>
@@ -413,182 +460,15 @@ const ShopProfile = () => {
         </div>
       </div>
 
-      {/* Affiliation section — visible to any logged-in artist visiting a shop */}
-      {userType === 'artist' && !isOwnProfile && (
-        <div className="p-4 border-b bg-gray-50">
-          <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Shop Affiliation</h2>
-          {affiliationStatus === 'affiliated' ? (
-            <div className="flex flex-wrap items-center gap-3">
-              <span className="flex items-center text-green-700 bg-green-100 px-3 py-2 rounded-md text-sm font-medium">
-                <UserCheck size={16} className="mr-2" />
-                You are affiliated with this shop
-              </span>
-              <button
-                onClick={handleLeaveShop}
-                disabled={affiliationLoading}
-                className="px-4 py-2 border border-red-300 text-red-600 rounded-md text-sm hover:bg-red-50 disabled:opacity-50"
-              >
-                {affiliationLoading ? '...' : 'Leave Shop'}
-              </button>
-            </div>
-          ) : affiliationStatus === 'pending_sent' ? (
-            <div className="flex flex-wrap items-center gap-3">
-              <span className="flex items-center text-yellow-700 bg-yellow-100 px-3 py-2 rounded-md text-sm font-medium">
-                <Clock size={16} className="mr-2" />
-                Your request to join is pending
-              </span>
-              <button
-                onClick={handleCancelAffiliationRequest}
-                disabled={affiliationLoading}
-                className="px-4 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-100 disabled:opacity-50"
-              >
-                {affiliationLoading ? '...' : 'Cancel Request'}
-              </button>
-            </div>
-          ) : affiliationStatus === 'pending_received' ? (
-            <div className="flex flex-wrap items-center gap-3">
-              <span className="text-sm text-gray-700 font-medium">This shop has invited you to join:</span>
-              <button
-                onClick={handleAcceptAffiliationRequest}
-                disabled={affiliationLoading}
-                className="px-4 py-2 bg-blue-500 text-white rounded-md text-sm hover:bg-blue-600 disabled:opacity-50"
-              >
-                {affiliationLoading ? '...' : 'Accept'}
-              </button>
-              <button
-                onClick={handleDeclineAffiliationRequest}
-                disabled={affiliationLoading}
-                className="px-4 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-100 disabled:opacity-50"
-              >
-                {affiliationLoading ? '...' : 'Decline'}
-              </button>
-            </div>
-          ) : (
-            <div className="flex flex-wrap items-center gap-3">
-              <p className="text-sm text-gray-600">Want to be listed as an artist at this shop?</p>
-              <button
-                onClick={handleSendAffiliationRequest}
-                disabled={affiliationLoading}
-                className="flex items-center px-4 py-2 bg-green-500 text-white rounded-md text-sm font-medium hover:bg-green-600 disabled:opacity-50"
-              >
-                <UserPlus size={16} className="mr-2" />
-                {affiliationLoading ? '...' : 'Request to Join'}
-              </button>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Our Artists section */}
-      {hasArtistsSection && (
-        <div className="p-4 border-b">
-          <h2 className="text-lg font-medium mb-4">Our Artists</h2>
-
-          {/* Affiliated artists carousel */}
-          {shopData.artists && shopData.artists.length > 0 && (
-            <div className="flex overflow-x-auto space-x-4 pb-2 mb-4">
-              {shopData.artists.map(artist => (
-                <div key={artist._id} className="flex-shrink-0 relative">
-                  <Link to={`/artist/${artist.username}`}>
-                    <div className="w-24 flex flex-col items-center">
-                      <div className="w-20 h-20 rounded-full overflow-hidden mb-2">
-                        <ProfileImage user={artist} size="lg" className="w-full h-full" />
-                      </div>
-                      <p className="text-sm font-medium text-center">{artist.username}</p>
-                    </div>
-                  </Link>
-                  {isOwnProfile && (
-                    <button
-                      onClick={() => handleRemoveArtist(artist._id)}
-                      className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center hover:bg-red-600"
-                      title="Remove from shop"
-                    >
-                      <X size={12} className="text-white" />
-                    </button>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
-
-          {shopData.artists && shopData.artists.length === 0 && isOwnProfile && (
-            <p className="text-sm text-gray-400 mb-4">No affiliated artists yet.</p>
-          )}
-
-          {/* Pending requests — own profile only */}
-          {isOwnProfile && incomingRequests.length > 0 && (
-            <div className="mt-2">
-              <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">Pending Requests</h3>
-              <div className="flex flex-col gap-2">
-                {incomingRequests.map(req => {
-                  const artistUser = req.from.userType === 'artist' ? req.from : req.to;
-                  return (
-                    <div key={req._id} className="flex items-center justify-between bg-gray-50 rounded-lg px-3 py-2">
-                      <Link to={`/artist/${artistUser.username}`} className="flex items-center gap-2 hover:underline">
-                        <div className="w-8 h-8 rounded-full overflow-hidden">
-                          <ProfileImage user={artistUser} size="sm" />
-                        </div>
-                        <span className="text-sm font-medium">{artistUser.username}</span>
-                        <span className="text-xs text-gray-400">wants to join</span>
-                      </Link>
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => handleAcceptIncoming(req._id, artistUser)}
-                          className="px-3 py-1 bg-blue-500 text-white text-sm rounded-md hover:bg-blue-600"
-                        >
-                          Accept
-                        </button>
-                        <button
-                          onClick={() => handleDeclineIncoming(req._id)}
-                          className="px-3 py-1 border border-gray-300 text-sm rounded-md hover:bg-gray-100"
-                        >
-                          Decline
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-
-          {/* Outgoing invites the shop sent — own profile only */}
-          {isOwnProfile && outgoingRequests.length > 0 && (
-            <div className="mt-3">
-              <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">Sent Invitations</h3>
-              <div className="flex flex-col gap-2">
-                {outgoingRequests.map(req => {
-                  const artistUser = req.to.userType === 'artist' ? req.to : req.from;
-                  return (
-                    <div key={req._id} className="flex items-center justify-between bg-yellow-50 rounded-lg px-3 py-2">
-                      <Link to={`/artist/${artistUser.username}`} className="flex items-center gap-2 hover:underline">
-                        <div className="w-8 h-8 rounded-full overflow-hidden">
-                          <ProfileImage user={artistUser} size="sm" />
-                        </div>
-                        <span className="text-sm font-medium">{artistUser.username}</span>
-                        <span className="text-xs text-yellow-600">invitation pending</span>
-                      </Link>
-                      <button
-                        onClick={() => handleCancelOutgoing(req._id)}
-                        className="px-3 py-1 border border-gray-300 text-sm rounded-md hover:bg-gray-100"
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-
       <div className="flex justify-between items-center p-4 border-b">
-        <div className="flex items-center gap-3 overflow-x-auto max-w-xs md:max-w-sm">
+        <div className="flex items-center gap-3 overflow-x-auto">
+          {shopData.artists && shopData.artists.length > 0 && (
+            <span className="text-sm font-semibold text-gray-500 flex-shrink-0">Our Artists</span>
+          )}
           {shopData.artists && shopData.artists.map(artist => (
             <Link key={artist._id} to={`/artist/${artist.username}`} className="flex flex-col items-center flex-shrink-0 hover:opacity-80 transition-opacity">
-              <div className="w-8 h-8 rounded-full overflow-hidden mb-0.5">
-                <ProfileImage user={artist} size="sm" />
+              <div className="w-12 h-12 rounded-full overflow-hidden mb-0.5">
+                <ProfileImage user={artist} size="md" />
               </div>
               <span className="text-xs text-gray-600 max-w-[3.5rem] truncate">{artist.username}</span>
             </Link>
