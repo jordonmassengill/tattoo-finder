@@ -125,6 +125,9 @@ const ShopProfile = () => {
   const { id } = useParams();
   const { currentUser, userType } = useAuth();
 
+  // TEMP DEBUG — remove once affiliation section is confirmed working
+  console.log('ShopProfile auth debug:', { userType, currentUserType: currentUser?.userType, currentUserId: currentUser?.id });
+
   const isOwnProfile = currentUser && (currentUser.id === shopData?._id || currentUser.username === shopData?.username);
 
   useEffect(() => {
@@ -412,6 +415,13 @@ const ShopProfile = () => {
           </div>
         </div>
       </div>
+
+      {/* TEMP DEBUG — remove once confirmed */}
+      {currentUser && !isOwnProfile && (
+        <div className="px-4 py-2 bg-yellow-50 border-b text-xs text-gray-500">
+          debug: userType="{userType}" | currentUser.userType="{currentUser?.userType}" | isOwn={String(isOwnProfile)}
+        </div>
+      )}
 
       {/* Affiliation section — visible to any logged-in artist visiting a shop */}
       {userType === 'artist' && !isOwnProfile && (
