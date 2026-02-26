@@ -5,6 +5,11 @@ import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import ProfileImage from './ProfileImage';
 
+const profileUrl = (user) => {
+  if (!user?.username) return '/';
+  return user.userType === 'shop' ? `/shop/${user.username}` : `/artist/${user.username}`;
+};
+
 const CommentModal = ({ post, onClose }) => {
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState('');
@@ -135,7 +140,7 @@ const CommentModal = ({ post, onClose }) => {
 
         <div className="w-full md:w-2/5 flex flex-col">
           <header className="p-3 border-b flex items-center justify-between">
-            <Link to={`/artist/${post.user.username}`} className="flex items-center font-semibold">
+            <Link to={profileUrl(post.user)} className="flex items-center font-semibold">
               <ProfileImage user={post.user} size="sm" />
               <span className="ml-2">{post.user.username}</span>
             </Link>
@@ -167,7 +172,7 @@ const CommentModal = ({ post, onClose }) => {
                         <ProfileImage user={comment.user} size="sm" />
                         <div className="ml-3 text-sm flex-grow min-w-0">
                           <p className="break-words">
-                            <Link to={`/artist/${comment.user.username}`} className="font-semibold">{comment.user.username || 'User'}</Link>
+                            <Link to={profileUrl(comment.user)} className="font-semibold">{comment.user.username || 'User'}</Link>
                             <span className="ml-1">{comment.text}</span>
                           </p>
                           <div className="flex items-center text-xs text-gray-400 mt-1 space-x-3">

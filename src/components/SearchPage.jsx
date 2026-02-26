@@ -7,6 +7,11 @@ import CommentModal from './CommentModal';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 
+const profileUrl = (user) => {
+  if (!user?.username) return '/';
+  return user.userType === 'shop' ? `/shop/${user.username}` : `/artist/${user.username}`;
+};
+
 // Sub-component to handle each post's state and actions
 const PostItem = ({ post, onCommentClick }) => {
   const { currentUser, updateCurrentUser } = useAuth();
@@ -95,7 +100,7 @@ const PostItem = ({ post, onCommentClick }) => {
           </button>
         )}
 
-        <Link to={`/artist/${post.user.username}`} onClick={(e) => e.stopPropagation()} className="absolute bottom-2 left-2 text-sm font-medium hover:underline bg-black/50 px-2 py-1 rounded">
+        <Link to={profileUrl(post.user)} onClick={(e) => e.stopPropagation()} className="absolute bottom-2 left-2 text-sm font-medium hover:underline bg-black/50 px-2 py-1 rounded">
           by {post.user.username}
         </Link>
       </div>
@@ -227,7 +232,7 @@ const SearchPage = () => {
     if (!isPost && isGrid) {
       return (
         <div key={item._id} className="relative group">
-          <Link to={`/artist/${item.username}`} className="block">
+          <Link to={profileUrl(item)} className="block">
             <div className="aspect-square relative overflow-hidden rounded-lg border border-gray-200">
               <div className="w-full h-full">
                 <ProfileImage user={item} size="xl" className="w-full h-full object-cover" />
@@ -251,7 +256,7 @@ const SearchPage = () => {
       return (
         <div key={item._id} className="bg-white border border-gray-200 rounded-md mb-6">
           <div className="flex items-center p-3">
-            <Link to={`/artist/${item.user.username}`} className="flex items-center">
+            <Link to={profileUrl(item.user)} className="flex items-center">
               <ProfileImage user={item.user} size="md" />
               <div className="ml-3">
                 <p className="font-semibold">{item.user.username}</p>
@@ -260,7 +265,7 @@ const SearchPage = () => {
           </div>
           <img src={`http://localhost:5000/${item.image}`} alt={item.caption} className="w-full object-cover" />
           <div className="p-3">
-            <p><Link to={`/artist/${item.user.username}`} className="font-semibold">{item.user.username}</Link> {item.caption}</p>
+            <p><Link to={profileUrl(item.user)} className="font-semibold">{item.user.username}</Link> {item.caption}</p>
           </div>
         </div>
       );
@@ -272,7 +277,7 @@ const SearchPage = () => {
               <ProfileImage user={item} size="xl" className="w-full h-full object-cover" />
             </div>
             <div className="p-4 flex-grow">
-              <Link to={`/artist/${item.username}`} className="font-semibold text-lg hover:text-blue-600">{item.username}</Link>
+              <Link to={profileUrl(item)} className="font-semibold text-lg hover:text-blue-600">{item.username}</Link>
               {item.location && (
                 <div className="flex items-center text-sm text-gray-600 mt-1">
                   <MapPin size={14} className="mr-1" />
