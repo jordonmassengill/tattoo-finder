@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { LayoutGrid, Grid, BarChart2, MapPin, Phone, Clock, Tag, Trash2, AlertTriangle, Heart, MessageCircle, Bookmark, X, UserCheck, UserPlus, Clock as ClockIcon } from 'lucide-react';
+import { LayoutGrid, Grid, BarChart2, MapPin, Phone, Clock, Tag, Trash2, AlertTriangle, Heart, MessageCircle, Bookmark, X, UserCheck, UserPlus } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import ProfileImage from './ProfileImage';
@@ -374,7 +374,7 @@ const ShopProfile = () => {
       return (
         <div className="flex items-center gap-2 mt-2 md:mt-0">
           <span className="flex items-center px-4 py-2 bg-yellow-100 text-yellow-700 rounded-md font-medium text-sm">
-            <ClockIcon size={14} className="mr-1.5" />
+            <Clock size={14} className="mr-1.5" />
             Request Pending
           </span>
           <button
