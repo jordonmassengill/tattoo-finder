@@ -584,7 +584,16 @@ const ShopProfile = () => {
       )}
 
       <div className="flex justify-between items-center p-4 border-b">
-        <h2 className="text-lg font-medium">Portfolio</h2>
+        <div className="flex items-center gap-3 overflow-x-auto max-w-xs md:max-w-sm">
+          {shopData.artists && shopData.artists.map(artist => (
+            <Link key={artist._id} to={`/artist/${artist.username}`} className="flex flex-col items-center flex-shrink-0 hover:opacity-80 transition-opacity">
+              <div className="w-8 h-8 rounded-full overflow-hidden mb-0.5">
+                <ProfileImage user={artist} size="sm" />
+              </div>
+              <span className="text-xs text-gray-600 max-w-[3.5rem] truncate">{artist.username}</span>
+            </Link>
+          ))}
+        </div>
         <div className="flex bg-gray-100 rounded-lg p-1 mr-2">
           <button
             onClick={() => setViewMode('feed')}

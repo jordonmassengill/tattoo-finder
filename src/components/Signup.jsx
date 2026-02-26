@@ -61,30 +61,7 @@ const Signup = () => {
 
   const validateStep3 = () => { setFormError(''); return true; };
 
-  const validateStep4 = () => {
-    if (!artistStyles.inkSpecialty) {
-      setFormError('Please select an Ink Specialty');
-      return false;
-    }
-    if (!artistStyles.designSpecialty) {
-      setFormError('Please select a Design Specialty');
-      return false;
-    }
-    if (artistStyles.foundationalStyleSpecialties.length === 0) {
-      setFormError('Please mark at least 1 Foundational Style as a specialty (tap a chip twice)');
-      return false;
-    }
-    if (artistStyles.techniqueSpecialties.length === 0) {
-      setFormError('Please mark at least 1 Technique as a specialty (tap a chip twice)');
-      return false;
-    }
-    if (artistStyles.subjectSpecialties.length === 0) {
-      setFormError('Please mark at least 1 Subject as a specialty (tap a chip twice)');
-      return false;
-    }
-    setFormError('');
-    return true;
-  };
+  const validateStep4 = () => { setFormError(''); return true; };
 
   const handleNext = () => {
     let isValid = false;
@@ -102,8 +79,6 @@ const Signup = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     setFormError('');
-
-    if (userType === 'artist' && !validateStep4()) return;
 
     setIsLoading(true);
 

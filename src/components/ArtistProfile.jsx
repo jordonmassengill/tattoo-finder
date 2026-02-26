@@ -429,8 +429,8 @@ const ArtistProfile = () => {
   return (
     <div className="max-w-screen-xl mx-auto pb-16">
       <div className="p-4 border-b">
-        <div className="flex flex-col md:flex-row items-center md:items-start">
-          <div className="w-28 h-28 md:w-36 md:h-36 flex-shrink-0 mb-4 md:mb-0 md:mr-8">
+        <div className="flex flex-col md:flex-row items-center">
+          <div className="w-40 h-40 md:w-52 md:h-52 flex-shrink-0 mb-4 md:mb-0 md:mr-8">
             <ProfileImage user={artistData} size="xl" className="w-full h-full" />
           </div>
           <div className="flex-grow text-center md:text-left">
@@ -446,6 +446,33 @@ const ArtistProfile = () => {
                 </button>
               )}
               {renderAffiliationButton()}
+
+              {/* Own-profile: compact inline affiliation actions */}
+              {isOwnProfile && incomingRequests.map(req => {
+                const shopUser = req.from.userType === 'shop' ? req.from : req.to;
+                return (
+                  <span key={req._id} className="flex items-center gap-1.5 px-2 py-1 bg-blue-50 border border-blue-200 rounded-full text-xs">
+                    <span className="text-blue-700 font-medium">{shopUser.username} invited you</span>
+                    <button onClick={() => handleAcceptIncoming(req._id, shopUser)} className="px-2 py-0.5 bg-blue-500 text-white rounded-full hover:bg-blue-600">Accept</button>
+                    <button onClick={() => handleDeclineIncoming(req._id)} className="px-2 py-0.5 border border-gray-300 rounded-full hover:bg-gray-100">Decline</button>
+                  </span>
+                );
+              })}
+              {isOwnProfile && outgoingRequests.map(req => {
+                const shopUser = req.to.userType === 'shop' ? req.to : req.from;
+                return (
+                  <span key={req._id} className="flex items-center gap-1.5 px-2 py-1 bg-yellow-50 border border-yellow-200 rounded-full text-xs">
+                    <ClockIcon size={12} className="text-yellow-600" />
+                    <span className="text-yellow-700">{shopUser.username} pending</span>
+                    <button onClick={() => handleCancelOutgoing(req._id)} className="px-2 py-0.5 border border-gray-300 rounded-full hover:bg-gray-100">Cancel</button>
+                  </span>
+                );
+              })}
+              {isOwnProfile && shopId && (
+                <button onClick={handleLeaveShop} className="px-3 py-1.5 text-xs text-red-600 border border-red-200 rounded-full hover:bg-red-50">
+                  Leave Shop
+                </button>
+              )}
             </div>
             <div className="flex justify-center md:justify-start space-x-6 mb-4">
               <span><b>{posts.length}</b> posts</span>
@@ -469,15 +496,16 @@ const ArtistProfile = () => {
                 </div>
               )}
 
-              {/* Specialty badges */}
-              {(artistData.inkSpecialty || artistData.designSpecialty) && (
+              {/* Specialty badges — hide "I Do Both Equally" */}
+              {((artistData.inkSpecialty && artistData.inkSpecialty !== 'I Do Both Equally') ||
+                (artistData.designSpecialty && artistData.designSpecialty !== 'I Do Both Equally')) && (
                 <div className="flex flex-wrap gap-1.5 mt-1">
-                  {artistData.inkSpecialty && (
+                  {artistData.inkSpecialty && artistData.inkSpecialty !== 'I Do Both Equally' && (
                     <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-indigo-100 text-indigo-700 text-xs rounded-full font-medium">
                       <Star size={10} fill="currentColor" /> {artistData.inkSpecialty}
                     </span>
                   )}
-                  {artistData.designSpecialty && (
+                  {artistData.designSpecialty && artistData.designSpecialty !== 'I Do Both Equally' && (
                     <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-indigo-100 text-indigo-700 text-xs rounded-full font-medium">
                       <Star size={10} fill="currentColor" /> {artistData.designSpecialty}
                     </span>
@@ -516,89 +544,25 @@ const ArtistProfile = () => {
                   <Link to={`/shop/${shopId}`} className="text-blue-500 hover:text-blue-600">
                     Working at: {shopName || 'Tattoo Shop'}
                   </Link>
-                  {isOwnProfile && (
-                    <button
-                      onClick={handleLeaveShop}
-                      className="text-xs text-red-500 hover:text-red-700 underline"
-                    >
-                      Leave
-                    </button>
-                  )}
                 </div>
               )}
             </div>
 
-            {/* Own-profile: pending incoming shop invitations */}
-            {isOwnProfile && incomingRequests.length > 0 && (
-              <div className="mt-4">
-                <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">Shop Invitations</h3>
-                <div className="flex flex-col gap-2">
-                  {incomingRequests.map(req => {
-                    const shopUser = req.from.userType === 'shop' ? req.from : req.to;
-                    return (
-                      <div key={req._id} className="flex items-center justify-between bg-blue-50 rounded-lg px-3 py-2">
-                        <Link to={`/shop/${shopUser._id}`} className="flex items-center gap-2 hover:underline">
-                          <div className="w-8 h-8 rounded-full overflow-hidden">
-                            <ProfileImage user={shopUser} size="sm" />
-                          </div>
-                          <span className="text-sm font-medium">{shopUser.username}</span>
-                          <span className="text-xs text-blue-500">invited you</span>
-                        </Link>
-                        <div className="flex gap-2">
-                          <button
-                            onClick={() => handleAcceptIncoming(req._id, shopUser)}
-                            className="px-3 py-1 bg-blue-500 text-white text-sm rounded-md hover:bg-blue-600"
-                          >
-                            Accept
-                          </button>
-                          <button
-                            onClick={() => handleDeclineIncoming(req._id)}
-                            className="px-3 py-1 border border-gray-300 text-sm rounded-md hover:bg-gray-100"
-                          >
-                            Decline
-                          </button>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
-            {/* Own-profile: outgoing pending requests (artist requested a shop) */}
-            {isOwnProfile && outgoingRequests.length > 0 && (
-              <div className="mt-3">
-                <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">Pending Requests</h3>
-                <div className="flex flex-col gap-2">
-                  {outgoingRequests.map(req => {
-                    const shopUser = req.to.userType === 'shop' ? req.to : req.from;
-                    return (
-                      <div key={req._id} className="flex items-center justify-between bg-yellow-50 rounded-lg px-3 py-2">
-                        <Link to={`/shop/${shopUser._id}`} className="flex items-center gap-2 hover:underline">
-                          <div className="w-8 h-8 rounded-full overflow-hidden">
-                            <ProfileImage user={shopUser} size="sm" />
-                          </div>
-                          <span className="text-sm font-medium">{shopUser.username}</span>
-                          <span className="text-xs text-yellow-600">request pending</span>
-                        </Link>
-                        <button
-                          onClick={() => handleCancelOutgoing(req._id)}
-                          className="px-3 py-1 border border-gray-300 text-sm rounded-md hover:bg-gray-100"
-                        >
-                          Cancel
-                        </button>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
           </div>
         </div>
       </div>
 
       <div className="flex justify-between items-center p-4 border-b">
-        <h2 className="text-lg font-medium">Portfolio</h2>
+        <div>
+          {shopId && (
+            <Link to={`/shop/${shopId}`} className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+              <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
+                <ProfileImage user={artistData.shop} size="sm" />
+              </div>
+              <span className="font-medium text-sm">{shopName || 'Tattoo Shop'}</span>
+            </Link>
+          )}
+        </div>
         <div className="flex bg-gray-100 rounded-lg p-1 mr-2">
             <button
               onClick={() => setViewMode('feed')}
