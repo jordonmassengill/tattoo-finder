@@ -107,8 +107,15 @@ const UploadPost = ({ onClose, onPostCreated }) => {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to upload post');
+        let errorMessage = 'Failed to upload post';
+        try {
+          const text = await response.text();
+          const errorData = JSON.parse(text);
+          errorMessage = errorData.message || errorMessage;
+        } catch {
+          // response was not JSON (e.g. HTML error page), use default message
+        }
+        throw new Error(errorMessage);
       }
 
       const data = await response.json();
