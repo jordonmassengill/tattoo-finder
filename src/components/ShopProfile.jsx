@@ -361,7 +361,7 @@ const ShopProfile = () => {
             <ProfileImage user={shopData} size="xl" className="w-full h-full" />
           </div>
           <div className="flex-grow text-center md:text-left">
-            <div className="flex flex-col md:flex-row md:items-center md:flex-wrap gap-2 mb-4">
+            <div className="flex flex-col md:flex-row md:items-center md:flex-wrap gap-2 mb-1">
               <h1 className="text-2xl font-bold mr-2">{shopData.username}</h1>
               {currentUser && !isOwnProfile && (
                 <button
@@ -467,8 +467,8 @@ const ShopProfile = () => {
           )}
           {shopData.artists && shopData.artists.map(artist => (
             <Link key={artist._id} to={`/artist/${artist.username}`} className="flex flex-col items-center flex-shrink-0 hover:opacity-80 transition-opacity">
-              <div className="w-12 h-12 rounded-full overflow-hidden mb-0.5">
-                <ProfileImage user={artist} size="md" />
+              <div className="w-16 h-16 rounded-full overflow-hidden mb-0.5">
+                <ProfileImage user={artist} size="lg" />
               </div>
               <span className="text-xs text-gray-600 max-w-[3.5rem] truncate">{artist.username}</span>
             </Link>

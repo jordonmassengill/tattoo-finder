@@ -434,7 +434,7 @@ const ArtistProfile = () => {
             <ProfileImage user={artistData} size="xl" className="w-full h-full" />
           </div>
           <div className="flex-grow text-center md:text-left">
-            <div className="flex flex-col md:flex-row md:items-center md:flex-wrap gap-2 mb-4">
+            <div className="flex flex-col md:flex-row md:items-center md:flex-wrap gap-2 mb-1">
               <h1 className="text-2xl font-bold mr-2">{artistData.username}</h1>
               {currentUser && !isOwnProfile && (
                 <button
@@ -478,16 +478,15 @@ const ArtistProfile = () => {
               <p>{artistData.bio}</p>
             </div>
             <div className="flex flex-col space-y-1">
-              {artistData.location && (
-                <div className="flex items-center">
-                  <MapPin size={16} className="mr-2" />
-                  <span>{artistData.location}</span>
-                </div>
-              )}
-              {artistData.priceRange && (
-                <div className="flex items-center">
-                  <DollarSign size={16} className="mr-2" />
-                  <span>Price Range: {artistData.priceRange}</span>
+              {(artistData.location || artistData.priceRange) && (
+                <div className="flex items-center gap-1.5">
+                  {artistData.priceRange && <span>{artistData.priceRange}</span>}
+                  {artistData.location && (
+                    <>
+                      <MapPin size={14} />
+                      <span>{artistData.location}</span>
+                    </>
+                  )}
                 </div>
               )}
 
@@ -543,14 +542,17 @@ const ArtistProfile = () => {
       </div>
 
       <div className="flex justify-between items-center p-4 border-b">
-        <div>
+        <div className="flex items-center gap-3">
           {shopId && (
-            <Link to={`/shop/${shopId}`} className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-              <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
-                <ProfileImage user={artistData.shop} size="sm" />
-              </div>
-              <span className="font-medium text-sm">{shopName || 'Tattoo Shop'}</span>
-            </Link>
+            <>
+              <span className="text-sm font-semibold text-gray-500 flex-shrink-0">My Shop</span>
+              <Link to={`/shop/${shopId}`} className="flex flex-col items-center flex-shrink-0 hover:opacity-80 transition-opacity">
+                <div className="w-16 h-16 rounded-full overflow-hidden mb-0.5">
+                  <ProfileImage user={artistData.shop} size="lg" />
+                </div>
+                <span className="text-xs text-gray-600 max-w-[4rem] truncate">{shopName || 'Tattoo Shop'}</span>
+              </Link>
+            </>
           )}
         </div>
         <div className="flex bg-gray-100 rounded-lg p-1 mr-2">

@@ -204,7 +204,6 @@ const Signup = () => {
                     </button>
                   ))}
                 </div>
-                <p className="mt-1 text-xs text-gray-500">$ = Budget, $$ = Mid-range, $$$ = High-end, $$$$ = Premium</p>
               </div>
             )}
           </>
