@@ -22,6 +22,8 @@ export const FOUNDATIONAL_STYLES = [
   'Tribal',
   'Blackwork',
   'New School',
+  'Chicano',
+  'Trash Polka',
 ];
 
 // Technique/Finish - up to 2
@@ -33,6 +35,8 @@ export const TECHNIQUES = [
   'Minimalist',
   'Fine Line',
   'Free Hand',
+  'Illustrative',
+  'Sketch',
 ];
 
 // Subject - up to 2
@@ -42,10 +46,11 @@ export const SUBJECTS = [
   'Portrait',
   'Pop Culture',
   'Dark',
-  'Religious',
+  'Spiritual',
   'Decorative',
   'Lettering',
   'Abstract',
   'Sci-Fi',
+  'Psychedelic',
 ];
 
