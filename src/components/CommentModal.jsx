@@ -156,20 +156,20 @@ const CommentModal = ({ post, onClose }) => {
 
             {(post.foundationalStyles?.length > 0 || post.techniques?.length > 0 || post.tags?.length > 0) && (
               <div className="mb-3">
-                {(post.foundationalStyles?.length > 0 || post.techniques?.length > 0) && (
+                {post.tags?.length > 0 && (
                   <div className="flex flex-wrap gap-1 mb-1.5">
+                    {post.tags.map(tag => (
+                      <span key={tag} className="text-xs text-blue-500">#{tag}</span>
+                    ))}
+                  </div>
+                )}
+                {(post.foundationalStyles?.length > 0 || post.techniques?.length > 0) && (
+                  <div className="flex flex-wrap gap-1">
                     {post.foundationalStyles?.map(style => (
                       <span key={style} className="text-xs bg-indigo-50 text-indigo-600 border border-indigo-200 rounded-full px-2 py-0.5">{style}</span>
                     ))}
                     {post.techniques?.map(tech => (
                       <span key={tech} className="text-xs bg-blue-50 text-blue-600 border border-blue-200 rounded-full px-2 py-0.5">{tech}</span>
-                    ))}
-                  </div>
-                )}
-                {post.tags?.length > 0 && (
-                  <div className="flex flex-wrap gap-1">
-                    {post.tags.map(tag => (
-                      <span key={tag} className="text-xs text-blue-500">#{tag}</span>
                     ))}
                   </div>
                 )}
