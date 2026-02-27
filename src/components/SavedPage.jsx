@@ -294,9 +294,11 @@ const SavedPage = () => {
 
   return (
     <div className="max-w-screen-xl mx-auto p-8">
-      {/* Title + Posts / Following toggle on same row */}
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold">Saved</h1>
+      {/* Title */}
+      <h1 className="text-3xl font-bold mb-4">Saved</h1>
+
+      {/* Posts / Following toggle — centered */}
+      <div className="flex justify-center mb-6">
         <div className="inline-flex rounded-md shadow-sm" role="group">
           <button type="button" onClick={() => handleTabSwitch('posts')}
             className={`flex items-center px-4 py-2 text-sm font-medium rounded-l-lg ${viewTab === 'posts' ? 'bg-blue-500 text-white' : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-100'}`}>

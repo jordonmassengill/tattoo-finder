@@ -331,9 +331,11 @@ const SearchPage = () => {
 
   return (
     <div className="max-w-screen-xl mx-auto px-4 py-8">
-      {/* Title + Posts / Artists toggle on same row */}
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold">Search</h1>
+      {/* Title */}
+      <h1 className="text-3xl font-bold mb-4">Search</h1>
+
+      {/* Posts / Artists toggle — centered */}
+      <div className="flex justify-center mb-6">
         <div className="inline-flex rounded-md shadow-sm" role="group">
           <button type="button" onClick={() => handleSearchTypeToggle('posts')} className={`flex items-center px-4 py-2 text-sm font-medium rounded-l-lg ${searchType === 'posts' ? 'bg-blue-500 text-white' : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-100'}`}>
             <Image size={16} className="mr-2" /> Posts
