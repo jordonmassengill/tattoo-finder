@@ -217,8 +217,9 @@ const SavedPage = () => {
 
     if (followingSortOption === 'followers') {
       users.sort((a, b) => (b.followers?.length || 0) - (a.followers?.length || 0));
+    } else {
+      users.reverse(); // server returns oldest-first; flip to most-recently-followed at top
     }
-    // 'recent' = preserve server order (most recently followed)
     setFilteredFollowing(users);
   }, [submittedFollowingQuery, artistFilters, followedUsers, followingSortOption]);
 
@@ -294,19 +295,22 @@ const SavedPage = () => {
 
   return (
     <div className="max-w-screen-xl mx-auto p-8">
-      {/* Title + Posts / Following toggle on same row */}
-      <div className="flex items-center justify-between mb-6">
+      {/* Title (left) + Posts / Following toggle (centered) */}
+      <div className="grid grid-cols-3 items-center mb-6">
         <h1 className="text-3xl font-bold">Saved</h1>
-        <div className="inline-flex rounded-md shadow-sm" role="group">
-          <button type="button" onClick={() => handleTabSwitch('posts')}
-            className={`flex items-center px-4 py-2 text-sm font-medium rounded-l-lg ${viewTab === 'posts' ? 'bg-blue-500 text-white' : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-100'}`}>
-            <Image size={16} className="mr-2" /> Posts
-          </button>
-          <button type="button" onClick={() => handleTabSwitch('following')}
-            className={`flex items-center px-4 py-2 text-sm font-medium rounded-r-lg ${viewTab === 'following' ? 'bg-blue-500 text-white' : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-100'}`}>
-            <Users size={16} className="mr-2" /> Following
-          </button>
+        <div className="flex justify-center">
+          <div className="inline-flex rounded-md shadow-sm" role="group">
+            <button type="button" onClick={() => handleTabSwitch('posts')}
+              className={`flex items-center px-4 py-2 text-sm font-medium rounded-l-lg ${viewTab === 'posts' ? 'bg-blue-500 text-white' : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-100'}`}>
+              <Image size={16} className="mr-2" /> Posts
+            </button>
+            <button type="button" onClick={() => handleTabSwitch('following')}
+              className={`flex items-center px-4 py-2 text-sm font-medium rounded-r-lg ${viewTab === 'following' ? 'bg-blue-500 text-white' : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-100'}`}>
+              <Users size={16} className="mr-2" /> Following
+            </button>
+          </div>
         </div>
+        <div />
       </div>
 
       {/* Search + filters bar */}

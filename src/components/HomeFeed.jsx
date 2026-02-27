@@ -154,6 +154,13 @@ const Post = ({ post: initialPost, isGrid, onCommentClick }) => {
         <p>
           <Link to={profileUrl(post.user)} className="font-semibold">{post.user.username}</Link> {post.caption}
         </p>
+        {post.tags?.length > 0 && (
+          <div className="flex flex-wrap gap-1 mt-1">
+            {post.tags.map(tag => (
+              <span key={tag} className="text-xs text-blue-500">#{tag}</span>
+            ))}
+          </div>
+        )}
         <button onClick={() => onCommentClick(post)} className="text-gray-500 text-sm mt-1 hover:underline">
           View all {post.comments.length} comments
         </button>
