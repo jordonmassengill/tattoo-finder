@@ -17,14 +17,14 @@ const NavBar = () => {
 
   const profileRef = useRef(null);
 
-  // Fetch pending affiliation request count for artists and shops
+  // Fetch pending affiliation request count for artists and shops — re-fetch on every page navigation
   useEffect(() => {
     if (currentUser && ['artist', 'shop'].includes(userType)) {
       api.getPendingAffiliationRequests()
         .then(res => setPendingRequestCount(res.data.length))
         .catch(() => {});
     }
-  }, [currentUser, userType]);
+  }, [currentUser, userType, location.pathname]);
 
   // Close menus when clicking outside
   useEffect(() => {

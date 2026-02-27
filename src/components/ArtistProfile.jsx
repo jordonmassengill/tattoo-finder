@@ -96,6 +96,12 @@ const PostGridItem = ({ post, isOwnProfile, onPostClick, onDeleteClick }) => {
 };
 
 
+const formatNum = (n) => {
+  if (n >= 1000000) return (n / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
+  if (n >= 1000) return (n / 1000).toFixed(1).replace(/\.0$/, '') + 'k';
+  return String(n);
+};
+
 const ArtistProfile = () => {
   const [viewMode, setViewMode] = useState('grid3');
   const [artistData, setArtistData] = useState(null);
@@ -393,9 +399,9 @@ const ArtistProfile = () => {
               {renderAffiliationButton()}
             </div>
             <div className="flex justify-center md:justify-start space-x-6 mb-1">
-              <span><b>{posts.length}</b> posts</span>
               <span><b>{followersCount}</b> followers</span>
-              <span><b>{artistData.following?.length || 0}</b> following</span>
+              <span><b>{formatNum(posts.reduce((s, p) => s + (p.likes?.length || 0), 0))}</b> likes</span>
+              <span><b>{formatNum(posts.reduce((s, p) => s + (p.comments?.length || 0), 0))}</b> comments</span>
             </div>
             <div className="mt-2 mb-2">
               <p>{artistData.bio}</p>

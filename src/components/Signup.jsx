@@ -266,7 +266,7 @@ const Signup = () => {
                   Next
                 </button>
               ) : (
-                <button type="submit" disabled={isLoading} className="py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300">
+                <button type="button" onClick={handleSubmit} disabled={isLoading} className="py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300">
                   {isLoading ? 'Creating Account...' : 'Create Account'}
                 </button>
               )}

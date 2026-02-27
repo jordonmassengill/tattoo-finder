@@ -37,6 +37,7 @@ export default {
   savePost: (postId) => api.put(`/users/save/${postId}`),
   unsavePost: (postId) => api.put(`/users/unsave/${postId}`),
   getSavedPosts: () => api.get('/users/me/saved'),
+  getFollowing: () => api.get('/users/me/following'),
 
   //Profile Pic
   updateProfilePicture: (file) => {

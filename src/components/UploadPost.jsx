@@ -1,6 +1,6 @@
 // src/components/UploadPost.jsx
 import React, { useState, useRef } from 'react';
-import { X, Upload, Camera, Hash } from 'lucide-react';
+import { X, Upload, Hash, Image } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import {
   COLOR_TYPES,
@@ -123,18 +123,6 @@ const UploadPost = ({ onClose, onPostCreated }) => {
     }
   };
 
-  const handlePlaceholderImage = () => {
-    fetch('/api/placeholder/600/600')
-      .then(response => response.blob())
-      .then(blob => {
-        const file = new File([blob], 'placeholder.jpg', { type: 'image/jpeg' });
-        setSelectedImage(file);
-        setPreview(URL.createObjectURL(file));
-        setStep(2);
-      })
-      .catch(() => setError('Could not load placeholder image'));
-  };
-
   // Reusable either/or toggle row
   const EitherOrRow = ({ label, options, value, onChange }) => (
     <div className="mb-4">
@@ -210,7 +198,7 @@ const UploadPost = ({ onClose, onPostCreated }) => {
         {step === 1 && (
           <div className="p-6 flex flex-col items-center">
             <div className="mb-8 text-center">
-              <Camera size={48} className="mx-auto mb-2 text-gray-400" />
+              <Image size={48} className="mx-auto mb-2 text-gray-400" />
               <h3 className="text-lg font-medium mb-2">Upload your artwork</h3>
               <p className="text-gray-500 mb-4">Share your latest tattoo designs with your followers</p>
 
@@ -224,16 +212,9 @@ const UploadPost = ({ onClose, onPostCreated }) => {
 
               <button
                 onClick={() => fileInputRef.current.click()}
-                className="bg-blue-500 text-white px-4 py-2 rounded-md font-medium mb-2 w-full"
+                className="bg-blue-500 text-white px-4 py-2 rounded-md font-medium w-full"
               >
                 Select from device
-              </button>
-
-              <button
-                onClick={handlePlaceholderImage}
-                className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md font-medium w-full"
-              >
-                Use placeholder (demo)
               </button>
             </div>
           </div>
@@ -243,16 +224,16 @@ const UploadPost = ({ onClose, onPostCreated }) => {
         {step === 2 && (
           <div className="flex flex-col md:flex-row">
             {/* Image preview */}
-            <div className="md:w-2/5 p-4 flex items-start justify-center bg-black">
+            <div className="md:w-1/2 p-4 flex items-center justify-center bg-black min-h-[400px]">
               <img
                 src={preview}
                 alt="Preview"
-                className="max-h-[400px] max-w-full object-contain"
+                className="w-full max-h-[520px] object-contain"
               />
             </div>
 
             {/* Post details form */}
-            <div className="md:w-3/5 p-4 overflow-y-auto">
+            <div className="md:w-1/2 p-4 overflow-y-auto">
               {/* Caption */}
               <div className="mb-4">
                 <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">

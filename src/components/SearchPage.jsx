@@ -20,6 +20,13 @@ const profileUrl = (user) => {
   return user.userType === 'shop' ? `/shop/${user.username}` : `/artist/${user.username}`;
 };
 
+const formatNum = (n) => {
+  if (!n) return '0';
+  if (n >= 1000000) return (n / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
+  if (n >= 1000) return (n / 1000).toFixed(1).replace(/\.0$/, '') + 'k';
+  return String(n);
+};
+
 // Sub-component to handle each post's state and actions
 const PostItem = ({ post, onCommentClick }) => {
   const { currentUser, updateCurrentUser } = useAuth();
@@ -102,6 +109,12 @@ const EMPTY_FILTERS = {
   foundationalStyles: [],
   techniques: [],
   subjects: [],
+  // Artist-only filters
+  inkSpecialty: '',
+  designSpecialty: '',
+  foundationalStyleSpecialties: [],
+  techniqueSpecialties: [],
+  subjectSpecialties: [],
 };
 
 const SearchPage = () => {
@@ -124,16 +137,23 @@ const SearchPage = () => {
 
         if (submittedQuery) params.append('query', submittedQuery);
         filters.location.forEach(loc => params.append('location', loc));
-        filters.priceRange.forEach(price => params.append('priceRange', price));
         params.append('sort', sortOption);
 
         if (searchType === 'posts') {
+          filters.priceRange.forEach(price => params.append('priceRange', price));
           if (filters.colorType) params.append('colorType', filters.colorType);
           if (filters.flashOrCustom) params.append('flashOrCustom', filters.flashOrCustom);
           if (filters.size) params.append('size', filters.size);
           if (filters.foundationalStyles.length > 0) params.append('foundationalStyles', filters.foundationalStyles.join(','));
           if (filters.techniques.length > 0) params.append('techniques', filters.techniques.join(','));
           if (filters.subjects.length > 0) params.append('subjects', filters.subjects.join(','));
+        } else {
+          filters.priceRange.forEach(price => params.append('priceRange', price));
+          if (filters.inkSpecialty) params.append('inkSpecialty', filters.inkSpecialty);
+          if (filters.designSpecialty) params.append('designSpecialty', filters.designSpecialty);
+          if (filters.foundationalStyleSpecialties.length > 0) params.append('foundationalStyleSpecialties', filters.foundationalStyleSpecialties.join(','));
+          if (filters.techniqueSpecialties.length > 0) params.append('techniqueSpecialties', filters.techniqueSpecialties.join(','));
+          if (filters.subjectSpecialties.length > 0) params.append('subjectSpecialties', filters.subjectSpecialties.join(','));
         }
 
         const endpoint = searchType === 'artists' ? '/api/search/artists' : '/api/search/posts';
@@ -176,16 +196,9 @@ const SearchPage = () => {
   const handleKeyDown = (e) => { if (e.key === 'Enter') handleSearchSubmit(); };
   const resetFilters = () => { setFilters(EMPTY_FILTERS); setSearchQuery(''); setSubmittedQuery(''); };
 
-  const activeFilterCount = [
-    filters.colorType,
-    filters.flashOrCustom,
-    filters.size,
-    ...filters.location,
-    ...filters.priceRange,
-    ...filters.foundationalStyles,
-    ...filters.techniques,
-    ...filters.subjects,
-  ].filter(Boolean).length;
+  const activeFilterCount = searchType === 'posts'
+    ? [filters.colorType, filters.flashOrCustom, filters.size, ...filters.location, ...filters.priceRange, ...filters.foundationalStyles, ...filters.techniques, ...filters.subjects].filter(Boolean).length
+    : [filters.inkSpecialty, filters.designSpecialty, ...filters.location, ...filters.priceRange, ...filters.foundationalStyleSpecialties, ...filters.techniqueSpecialties, ...filters.subjectSpecialties].filter(Boolean).length;
 
   // ---- Filter sub-components ----
   const EitherOrFilterRow = ({ label, options, filterKey }) => (
@@ -247,7 +260,7 @@ const SearchPage = () => {
               <div className="w-full h-full">
                 <ProfileImage user={item} size="xl" className="w-full h-full object-cover" />
               </div>
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent flex flex-col justify-end p-3">
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent p-3 flex flex-col justify-end">
                 <h3 className="font-bold text-white text-lg">{item.username}</h3>
                 {item.location && (
                   <div className="flex items-center text-white/90 text-sm">
@@ -255,6 +268,17 @@ const SearchPage = () => {
                     <span className="truncate">{item.location}</span>
                   </div>
                 )}
+              </div>
+              {/* Follower and like counts - bottom right */}
+              <div className="absolute bottom-3 right-3 flex flex-col items-end gap-0.5">
+                <div className="flex items-center text-white/90 text-xs drop-shadow">
+                  <span className="mr-1">{formatNum(item.followersCount || 0)}</span>
+                  <Users size={11} />
+                </div>
+                <div className="flex items-center text-white/90 text-xs drop-shadow">
+                  <span className="mr-1">{formatNum(item.totalLikes || 0)}</span>
+                  <Heart size={11} fill="currentColor" className="text-red-400" />
+                </div>
               </div>
             </div>
           </Link>
@@ -294,6 +318,10 @@ const SearchPage = () => {
                   <span>{item.location}</span>
                 </div>
               )}
+              <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
+                <span className="flex items-center gap-1"><Users size={13} />{formatNum(item.followersCount || 0)}</span>
+                <span className="flex items-center gap-1"><Heart size={13} fill="currentColor" className="text-red-400" />{formatNum(item.totalLikes || 0)}</span>
+              </div>
             </div>
           </div>
         </div>
@@ -401,30 +429,68 @@ const SearchPage = () => {
               </div>
             </div>
           ) : (
-            /* Artists filter panel */
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            /* Artists filter panel — mirrors post layout */
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8">
+              {/* Left column */}
               <div>
+                {/* Ink specialty — mirrors Color row */}
                 <div className="mb-4">
-                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Price Range</p>
-                  <div className="flex flex-wrap gap-2">
+                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Ink</p>
+                  <div className="flex gap-2">
+                    {[{ label: 'Black/Grey', value: 'Black/Grey Specialty' }, { label: 'Color', value: 'Color Specialty' }].map(({ label, value }) => (
+                      <button key={value} type="button" onClick={() => toggleSingleFilter('inkSpecialty', value)}
+                        className={`flex-1 py-1.5 text-sm rounded-full border font-medium transition-colors ${filters.inkSpecialty === value ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-600 border-gray-300 hover:border-indigo-400'}`}>
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Design specialty — mirrors Type row */}
+                <div className="mb-4">
+                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Design</p>
+                  <div className="flex gap-2">
+                    {[{ label: 'Flash', value: 'Flash Specialty' }, { label: 'Custom', value: 'Custom Specialty' }].map(({ label, value }) => (
+                      <button key={value} type="button" onClick={() => toggleSingleFilter('designSpecialty', value)}
+                        className={`flex-1 py-1.5 text-sm rounded-full border font-medium transition-colors ${filters.designSpecialty === value ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-600 border-gray-300 hover:border-indigo-400'}`}>
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Price — mirrors Size row */}
+                <div className="mb-4">
+                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Price</p>
+                  <div className="flex gap-2">
                     {['$', '$$', '$$$', '$$$$'].map(price => (
-                      <button key={price} type="button" onClick={() => toggleArrayFilter('priceRange', price)} className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${filters.priceRange.includes(price) ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}>
+                      <button key={price} type="button" onClick={() => toggleArrayFilter('priceRange', price)}
+                        className={`flex-1 py-1.5 text-sm rounded-full border font-medium transition-colors ${filters.priceRange.includes(price) ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-600 border-gray-300 hover:border-indigo-400'}`}>
                         {price}
                       </button>
                     ))}
                   </div>
                 </div>
-              </div>
-              <div>
-                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Location</p>
-                <div className="max-h-48 overflow-y-auto border rounded p-2 bg-white">
-                  {BAY_AREA_CITIES.map(city => (
-                    <label key={city} className="flex items-center text-sm py-0.5 px-1 hover:bg-gray-100 rounded">
-                      <input type="checkbox" checked={filters.location.includes(city)} onChange={() => toggleArrayFilter('location', city)} className="mr-2 h-4 w-4 rounded border-gray-300 text-blue-600" />
-                      {city}
-                    </label>
-                  ))}
+
+                {/* Location */}
+                <div className="mb-4">
+                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Location</p>
+                  <div className="grid grid-cols-2 gap-x-2">
+                    {BAY_AREA_CITIES.map(city => (
+                      <label key={city} className="flex items-center text-sm py-0.5 px-1 hover:bg-gray-100 rounded cursor-pointer">
+                        <input type="checkbox" checked={filters.location.includes(city)} onChange={() => toggleArrayFilter('location', city)} className="mr-2 h-4 w-4 rounded border-gray-300 text-blue-600" />
+                        {city}
+                      </label>
+                    ))}
+                  </div>
                 </div>
+              </div>
+
+              {/* Right column — specialty chips (only artists with that specialty appear) */}
+              <div>
+                <ChipFilterGroup label="Foundational Style" options={FOUNDATIONAL_STYLES} filterKey="foundationalStyleSpecialties" />
+                <ChipFilterGroup label="Technique / Finish" options={TECHNIQUES} filterKey="techniqueSpecialties" />
+                <ChipFilterGroup label="Subject" options={SUBJECTS} filterKey="subjectSpecialties" />
               </div>
             </div>
           )}
