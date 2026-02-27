@@ -256,7 +256,7 @@ const ProfilePage = () => {
                 <label className="font-semibold block mb-2">Price Range:</label>
                 <div className="flex justify-center flex-wrap gap-2">
                   {['$', '$$', '$$$', '$$$$'].map(price => (
-                    <button key={price} type="button" onClick={() => setFormData({ ...formData, priceRange: price })} className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${formData.priceRange === price ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}>
+                    <button key={price} type="button" onClick={() => setFormData({ ...formData, priceRange: formData.priceRange === price ? '' : price })} className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${formData.priceRange === price ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}>
                       {price}
                     </button>
                   ))}

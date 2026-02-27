@@ -113,7 +113,6 @@ const ArtistProfile = () => {
   // Affiliation state
   const [affiliationStatus, setAffiliationStatus] = useState(null); // 'none'|'pending_sent'|'pending_received'|'affiliated'
   const [affiliationRequestId, setAffiliationRequestId] = useState(null);
-  const [pendingRequests, setPendingRequests] = useState([]); // For own profile
   const [affiliationLoading, setAffiliationLoading] = useState(false);
 
   const { id } = useParams();
@@ -146,13 +145,6 @@ const ArtistProfile = () => {
           const statusRes = await api.getAffiliationStatus(artistId);
           setAffiliationStatus(statusRes.data.status);
           setAffiliationRequestId(statusRes.data.requestId || null);
-        }
-
-        // Own-profile: load all pending requests
-        const isOwn = currentUser && (currentUser.id === data._id || currentUser.username === data.username);
-        if (isOwn) {
-          const pendingRes = await api.getPendingAffiliationRequests();
-          setPendingRequests(pendingRes.data);
         }
 
       } catch (error) {
@@ -339,10 +331,6 @@ const ArtistProfile = () => {
     );
   }
 
-  // Separate own-profile pending requests
-  const incomingRequests = pendingRequests.filter(r => r.to._id === currentUser?.id || r.to === currentUser?.id);
-  const outgoingRequests = pendingRequests.filter(r => r.from._id === currentUser?.id || r.from === currentUser?.id);
-
   // shop link — shop field is now a populated object { _id, username, profilePic }
   const shopId = artistData.shop?._id || artistData.shop;
   const shopName = artistData.shop?.username || null;
@@ -446,35 +434,13 @@ const ArtistProfile = () => {
                 </button>
               )}
               {renderAffiliationButton()}
-
-              {/* Own-profile: compact inline affiliation actions */}
-              {isOwnProfile && incomingRequests.map(req => {
-                const shopUser = req.from.userType === 'shop' ? req.from : req.to;
-                return (
-                  <span key={req._id} className="flex items-center gap-1.5 px-2 py-1 bg-blue-50 border border-blue-200 rounded-full text-xs">
-                    <span className="text-blue-700 font-medium">{shopUser.username} invited you</span>
-                    <button onClick={() => handleAcceptIncoming(req._id, shopUser)} className="px-2 py-0.5 bg-blue-500 text-white rounded-full hover:bg-blue-600">Accept</button>
-                    <button onClick={() => handleDeclineIncoming(req._id)} className="px-2 py-0.5 border border-gray-300 rounded-full hover:bg-gray-100">Decline</button>
-                  </span>
-                );
-              })}
-              {isOwnProfile && outgoingRequests.map(req => {
-                const shopUser = req.to.userType === 'shop' ? req.to : req.from;
-                return (
-                  <span key={req._id} className="flex items-center gap-1.5 px-2 py-1 bg-yellow-50 border border-yellow-200 rounded-full text-xs">
-                    <ClockIcon size={12} className="text-yellow-600" />
-                    <span className="text-yellow-700">{shopUser.username} pending</span>
-                    <button onClick={() => handleCancelOutgoing(req._id)} className="px-2 py-0.5 border border-gray-300 rounded-full hover:bg-gray-100">Cancel</button>
-                  </span>
-                );
-              })}
             </div>
             <div className="flex justify-center md:justify-start space-x-6 mb-1">
               <span><b>{posts.length}</b> posts</span>
               <span><b>{followersCount}</b> followers</span>
               <span><b>{artistData.following?.length || 0}</b> following</span>
             </div>
-            <div className="mb-2">
+            <div className="mt-2 mb-2">
               <p>{artistData.bio}</p>
             </div>
             <div className="flex flex-col space-y-1">

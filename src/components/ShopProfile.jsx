@@ -154,12 +154,6 @@ const ShopProfile = () => {
           setAffiliationRequestId(statusRes.data.requestId || null);
         }
 
-        // Own-profile: load all pending requests
-        const isOwn = currentUser && (currentUser.id === profileData._id || currentUser.username === profileData.username);
-        if (isOwn) {
-          const pendingRes = await api.getPendingAffiliationRequests();
-          setPendingRequests(pendingRes.data);
-        }
       } catch (error) {
         console.error('Error fetching shop data:', error);
       } finally {
@@ -349,10 +343,6 @@ const ShopProfile = () => {
     );
   }
 
-  // Separate pending requests into incoming (need action) and outgoing (informational)
-  const incomingRequests = pendingRequests.filter(r => r.to._id === currentUser?.id || r.to === currentUser?.id);
-  const outgoingRequests = pendingRequests.filter(r => r.from._id === currentUser?.id || r.from === currentUser?.id);
-
   return (
     <div className="max-w-screen-xl mx-auto pb-16">
       <div className="p-4 border-b">
@@ -400,34 +390,13 @@ const ShopProfile = () => {
                 </button>
               )}
 
-              {/* Shop own-profile: compact incoming artist requests */}
-              {isOwnProfile && incomingRequests.map(req => {
-                const artistUser = req.from.userType === 'artist' ? req.from : req.to;
-                return (
-                  <span key={req._id} className="flex items-center gap-1.5 px-2 py-1 bg-blue-50 border border-blue-200 rounded-full text-xs">
-                    <span className="text-blue-700 font-medium">{artistUser.username} wants to join</span>
-                    <button onClick={() => handleAcceptIncoming(req._id, artistUser)} className="px-2 py-0.5 bg-blue-500 text-white rounded-full hover:bg-blue-600">Accept</button>
-                    <button onClick={() => handleDeclineIncoming(req._id)} className="px-2 py-0.5 border border-gray-300 rounded-full hover:bg-gray-100">Decline</button>
-                  </span>
-                );
-              })}
-              {isOwnProfile && outgoingRequests.map(req => {
-                const artistUser = req.to.userType === 'artist' ? req.to : req.from;
-                return (
-                  <span key={req._id} className="flex items-center gap-1.5 px-2 py-1 bg-yellow-50 border border-yellow-200 rounded-full text-xs">
-                    <Clock size={12} className="text-yellow-600" />
-                    <span className="text-yellow-700">{artistUser.username} invited</span>
-                    <button onClick={() => handleCancelOutgoing(req._id)} className="px-2 py-0.5 border border-gray-300 rounded-full hover:bg-gray-100">Cancel</button>
-                  </span>
-                );
-              })}
             </div>
             <div className="flex justify-center md:justify-start space-x-6 mb-1">
               <span><b>{posts.length}</b> posts</span>
               <span><b>{followersCount}</b> followers</span>
               <span><b>{shopData.artists?.length || 0}</b> artists</span>
             </div>
-            <div className="mb-2">
+            <div className="mt-2 mb-2">
               <p>{shopData.bio}</p>
             </div>
             <div className="flex flex-col space-y-1">

@@ -76,8 +76,9 @@ const Signup = () => {
 
   const handleBack = () => setStep(prev => prev - 1);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    if (step !== totalSteps) return; // guard against accidental submission on earlier steps
     setFormError('');
 
     setIsLoading(true);
@@ -110,7 +111,7 @@ const Signup = () => {
         });
       }
 
-      const success = signup(userData);
+      const success = await signup(userData);
 
       if (success) {
         navigate('/home');
@@ -120,9 +121,9 @@ const Signup = () => {
     } catch (err) {
       setFormError('An unexpected error occurred');
       console.error(err);
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   };
 
   // Step 1: Select Account Type
@@ -199,7 +200,7 @@ const Signup = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-2">Price Range</label>
                 <div className="flex flex-wrap gap-2">
                   {['$', '$$', '$$$', '$$$$'].map(price => (
-                    <button key={price} type="button" onClick={() => setFormData({ ...formData, priceRange: price })} className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${formData.priceRange === price ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}>
+                    <button key={price} type="button" onClick={() => setFormData({ ...formData, priceRange: formData.priceRange === price ? '' : price })} className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${formData.priceRange === price ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}>
                       {price}
                     </button>
                   ))}
