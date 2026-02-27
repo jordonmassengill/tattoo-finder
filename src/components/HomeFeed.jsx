@@ -8,6 +8,11 @@ import ProfileImage from './ProfileImage';
 import { useAuth } from '../context/AuthContext';
 import CommentModal from './CommentModal';
 
+const profileUrl = (user) => {
+  if (!user?.username) return '/';
+  return user.userType === 'shop' ? `/shop/${user.username}` : `/artist/${user.username}`;
+};
+
 const Post = ({ post: initialPost, isGrid, onCommentClick }) => {
   const { currentUser, updateCurrentUser } = useAuth();
   
@@ -102,7 +107,7 @@ const Post = ({ post: initialPost, isGrid, onCommentClick }) => {
             </button>
           )}
           
-          <Link to={`/artist/${post.user.username}`} onClick={(e) => e.stopPropagation()} className="absolute bottom-2 left-2 text-sm font-medium hover:underline bg-black/50 px-2 py-1 rounded">
+          <Link to={profileUrl(post.user)} onClick={(e) => e.stopPropagation()} className="absolute bottom-2 left-2 text-sm font-medium hover:underline bg-black/50 px-2 py-1 rounded">
             {post.user.username}
           </Link>
         </div>
@@ -113,7 +118,7 @@ const Post = ({ post: initialPost, isGrid, onCommentClick }) => {
   return (
     <div className="bg-white border border-gray-200 rounded-md mb-6">
       <div className="flex items-center p-2">
-        <Link to={`/artist/${post.user.username}`} className="flex items-center">
+        <Link to={profileUrl(post.user)} className="flex items-center">
           <ProfileImage user={post.user} size="md" />
           <div className="ml-3">
             <p className="font-semibold">{post.user.username}</p>
@@ -147,7 +152,7 @@ const Post = ({ post: initialPost, isGrid, onCommentClick }) => {
         </div>
         <p className="font-semibold mb-1">{likeCount} likes</p>
         <p>
-          <Link to={`/artist/${post.user.username}`} className="font-semibold">{post.user.username}</Link> {post.caption}
+          <Link to={profileUrl(post.user)} className="font-semibold">{post.user.username}</Link> {post.caption}
         </p>
         <button onClick={() => onCommentClick(post)} className="text-gray-500 text-sm mt-1 hover:underline">
           View all {post.comments.length} comments

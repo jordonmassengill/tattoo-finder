@@ -1,27 +1,8 @@
 // src/constants/locations.js
 export const BAY_AREA_CITIES = [
-  'San Francisco',
   'Oakland',
-  'San Jose',
-  'Berkeley',
-  'Palo Alto',
-  'Fremont',
-  'Hayward',
-  'Sunnyvale',
-  'Santa Clara',
-  'Daly City',
-  'San Mateo',
-  'Redwood City',
-  'Mountain View',
-  'Walnut Creek',
-  'Concord',
-  'Richmond',
   'Alameda',
-  'Vallejo',
-  'Napa',
-  'Sonoma',
-  'Petaluma',
-  'Santa Rosa',
-  'Fairfield',
-  // Add any other cities as needed
+  'Emeryville',
+  'Berkeley',
+  // More cities will be added as the platform expands to new regions
 ];

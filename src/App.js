@@ -12,6 +12,7 @@ import PublicNavBar from './components/PublicNavBar';
 import Login from './components/Login';
 import Signup from './components/Signup';
 import SavedPage from './components/SavedPage';
+import RequestsPage from './components/RequestsPage';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import './styles.css';
 
@@ -120,6 +121,11 @@ function AppContent() {
           )} 
         />
         
+        <Route
+          path="/requests"
+          element={renderProtectedRoute(<RequestsPage />, ['artist', 'shop'])}
+        />
+
         {/* Settings page */}
         <Route 
           path="/settings" 

@@ -1,9 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Home, Search, Bookmark, PlusSquare, User, LogOut, Settings } from 'lucide-react';
+import { Home, Search, Bookmark, PlusSquare, User, LogOut, Settings, Bell } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import UploadPost from './UploadPost';
 import ProfileImage from './ProfileImage';
+import api from '../services/api';
 
 const NavBar = () => {
   const location = useLocation();
@@ -12,10 +13,19 @@ const NavBar = () => {
   
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
-  const [refreshFeed, setRefreshFeed] = useState(false);
-  
+  const [pendingRequestCount, setPendingRequestCount] = useState(0);
+
   const profileRef = useRef(null);
-  
+
+  // Fetch pending affiliation request count for artists and shops — re-fetch on every page navigation
+  useEffect(() => {
+    if (currentUser && ['artist', 'shop'].includes(userType)) {
+      api.getPendingAffiliationRequests()
+        .then(res => setPendingRequestCount(res.data.length))
+        .catch(() => {});
+    }
+  }, [currentUser, userType, location.pathname]);
+
   // Close menus when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -112,16 +122,28 @@ const NavBar = () => {
                       </Link>
                     )}
                     
-                    <Link 
-                      to="/profile" 
+                    {['artist', 'shop'].includes(userType) && pendingRequestCount > 0 && (
+                      <Link
+                        to="/requests"
+                        className="flex items-center w-full text-left px-3 py-2 hover:bg-gray-100 rounded"
+                        onClick={() => setShowProfileMenu(false)}
+                      >
+                        <Bell size={16} className="mr-2" />
+                        Requests
+                        <span className="ml-auto bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">{pendingRequestCount}</span>
+                      </Link>
+                    )}
+
+                    <Link
+                      to="/profile"
                       className="flex items-center w-full text-left px-3 py-2 hover:bg-gray-100 rounded"
                       onClick={() => setShowProfileMenu(false)}
                     >
                       <Settings size={16} className="mr-2" />
                       Settings
                     </Link>
-                    
-                    <button 
+
+                    <button
                       onClick={() => {
                         setShowProfileMenu(false);
                         handleLogout();
@@ -133,7 +155,7 @@ const NavBar = () => {
                     </button>
                   </div>
                 )}
-                
+
                 {/* Mobile dropdown - positioned above */}
                 {showProfileMenu && (
                   <div className="absolute bottom-full left-0 mb-2 bg-white rounded-lg shadow-lg p-2 w-48 z-50 block md:hidden">
@@ -154,16 +176,28 @@ const NavBar = () => {
                       </Link>
                     )}
                     
-                    <Link 
-                      to="/profile" 
+                    {['artist', 'shop'].includes(userType) && pendingRequestCount > 0 && (
+                      <Link
+                        to="/requests"
+                        className="flex items-center w-full text-left px-3 py-2 hover:bg-gray-100 rounded"
+                        onClick={() => setShowProfileMenu(false)}
+                      >
+                        <Bell size={16} className="mr-2" />
+                        Requests
+                        <span className="ml-auto bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">{pendingRequestCount}</span>
+                      </Link>
+                    )}
+
+                    <Link
+                      to="/profile"
                       className="flex items-center w-full text-left px-3 py-2 hover:bg-gray-100 rounded"
                       onClick={() => setShowProfileMenu(false)}
                     >
                       <Settings size={16} className="mr-2" />
                       Settings
                     </Link>
-                    
-                    <button 
+
+                    <button
                       onClick={() => {
                         setShowProfileMenu(false);
                         handleLogout();
@@ -186,9 +220,6 @@ const NavBar = () => {
         <UploadPost
           onClose={() => setShowUploadModal(false)}
           onPostCreated={() => {
-            // Trigger a refresh of the feed
-            setRefreshFeed(prev => !prev);
-            // You can also force navigation to home to see the new post
             navigate('/home');
           }}
         />

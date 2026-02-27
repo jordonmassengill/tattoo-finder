@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { LayoutGrid, Grid, BarChart2, MapPin, DollarSign, Tag, Trash2, AlertTriangle, Heart, MessageCircle, Bookmark } from 'lucide-react';
+import { LayoutGrid, Grid, BarChart2, MapPin, Star, Trash2, AlertTriangle, Heart, MessageCircle, Bookmark, UserPlus, UserCheck, Clock as ClockIcon } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import ProfileImage from './ProfileImage';
@@ -41,7 +41,7 @@ const PostGridItem = ({ post, isOwnProfile, onPostClick, onDeleteClick }) => {
   const handleSaveToggle = async (e) => {
     e.stopPropagation();
     if (!currentUser) return;
-    
+
     const originalIsSaved = isSaved;
     setIsSaved(!originalIsSaved);
 
@@ -63,7 +63,7 @@ const PostGridItem = ({ post, isOwnProfile, onPostClick, onDeleteClick }) => {
       />
       <div className="absolute inset-0 bg-black bg-opacity-40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-lg font-bold">
         <button onClick={handleLikeToggle} className="flex items-center mr-5">
-          <Heart 
+          <Heart
             size={22}
             className={`mr-1.5 transition-colors ${isLiked ? 'text-red-500' : 'text-white'}`}
             fill={isLiked ? 'currentColor' : 'none'}
@@ -84,7 +84,7 @@ const PostGridItem = ({ post, isOwnProfile, onPostClick, onDeleteClick }) => {
             />
           </button>
         )}
-        
+
         {isOwnProfile && (
           <button onClick={onDeleteClick} className="absolute top-2 right-2 p-2 bg-red-600 rounded-full hover:bg-red-700">
             <Trash2 size={16} />
@@ -95,6 +95,12 @@ const PostGridItem = ({ post, isOwnProfile, onPostClick, onDeleteClick }) => {
   );
 };
 
+
+const formatNum = (n) => {
+  if (n >= 1000000) return (n / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
+  if (n >= 1000) return (n / 1000).toFixed(1).replace(/\.0$/, '') + 'k';
+  return String(n);
+};
 
 const ArtistProfile = () => {
   const [viewMode, setViewMode] = useState('grid3');
@@ -109,46 +115,59 @@ const ArtistProfile = () => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState('');
-  
+
+  // Affiliation state
+  const [affiliationStatus, setAffiliationStatus] = useState(null); // 'none'|'pending_sent'|'pending_received'|'affiliated'
+  const [affiliationRequestId, setAffiliationRequestId] = useState(null);
+  const [affiliationLoading, setAffiliationLoading] = useState(false);
+
   const { id } = useParams();
   const { currentUser } = useAuth();
-  
+
   const isOwnProfile = currentUser && (currentUser.id === artistData?._id || currentUser.username === artistData?.username);
-  
+
   useEffect(() => {
     const fetchArtistData = async () => {
       if (!id) return;
       try {
         setLoading(true);
         const profileResponse = await api.getUserById(id);
-        const artistData = profileResponse.data;
-        
-        setArtistData(artistData);
-        setFollowersCount(artistData.followers?.length || 0);
-        
-        if (currentUser && artistData.followers) {
-          const isUserFollowing = artistData.followers.some(followerId => followerId.toString() === currentUser.id);
+        const data = profileResponse.data;
+
+        setArtistData(data);
+        setFollowersCount(data.followers?.length || 0);
+
+        if (currentUser && data.followers) {
+          const isUserFollowing = data.followers.some(followerId => followerId.toString() === currentUser.id);
           setFollowing(isUserFollowing);
         }
-        
+
         const postsResponse = await api.getUserPosts(id);
         setPosts(postsResponse.data);
-        
+
+        // Affiliation status for a shop viewing this artist
+        if (currentUser && currentUser.userType === 'shop') {
+          const artistId = data._id;
+          const statusRes = await api.getAffiliationStatus(artistId);
+          setAffiliationStatus(statusRes.data.status);
+          setAffiliationRequestId(statusRes.data.requestId || null);
+        }
+
       } catch (error) {
         console.error('Error fetching artist data:', error);
       } finally {
         setLoading(false);
       }
     };
-    
+
     fetchArtistData();
   }, [id, currentUser?.id]);
-  
+
   const handleFollowToggle = async () => {
     if (!currentUser) return;
-    
+
     setIsFollowLoading(true);
-    
+
     try {
       if (following) {
         await api.unfollowUser(artistData._id);
@@ -166,7 +185,7 @@ const ArtistProfile = () => {
       setIsFollowLoading(false);
     }
   };
-  
+
   const handleDeletePost = async () => {
     if (!postToDelete) return;
 
@@ -175,7 +194,6 @@ const ArtistProfile = () => {
 
     try {
       await api.deletePost(postToDelete._id);
-    
       setPosts(posts.filter(post => post._id !== postToDelete._id));
       setPostToDelete(null);
       setShowDeleteConfirm(false);
@@ -186,7 +204,77 @@ const ArtistProfile = () => {
       setIsDeleting(false);
     }
   };
-  
+
+  // --- Affiliation handlers (shop-side) ---
+
+  const handleSendAffiliationRequest = async () => {
+    setAffiliationLoading(true);
+    try {
+      const res = await api.sendAffiliationRequest(artistData._id);
+      setAffiliationStatus('pending_sent');
+      setAffiliationRequestId(res.data._id);
+    } catch (error) {
+      alert(error.response?.data?.message || 'Could not send invitation. Please try again.');
+    } finally {
+      setAffiliationLoading(false);
+    }
+  };
+
+  const handleCancelAffiliationRequest = async () => {
+    if (!affiliationRequestId) return;
+    setAffiliationLoading(true);
+    try {
+      await api.declineAffiliationRequest(affiliationRequestId);
+      setAffiliationStatus('none');
+      setAffiliationRequestId(null);
+    } catch (error) {
+      alert(error.response?.data?.message || 'Could not cancel invitation. Please try again.');
+    } finally {
+      setAffiliationLoading(false);
+    }
+  };
+
+  const handleAcceptAffiliationRequest = async () => {
+    if (!affiliationRequestId) return;
+    setAffiliationLoading(true);
+    try {
+      await api.acceptAffiliationRequest(affiliationRequestId);
+      setAffiliationStatus('affiliated');
+      setAffiliationRequestId(null);
+    } catch (error) {
+      alert(error.response?.data?.message || 'Could not accept request. Please try again.');
+    } finally {
+      setAffiliationLoading(false);
+    }
+  };
+
+  const handleDeclineAffiliationRequest = async () => {
+    if (!affiliationRequestId) return;
+    setAffiliationLoading(true);
+    try {
+      await api.declineAffiliationRequest(affiliationRequestId);
+      setAffiliationStatus('none');
+      setAffiliationRequestId(null);
+    } catch (error) {
+      alert(error.response?.data?.message || 'Could not decline request. Please try again.');
+    } finally {
+      setAffiliationLoading(false);
+    }
+  };
+
+  const handleRemoveFromShop = async () => {
+    if (!window.confirm('Remove this artist from your shop?')) return;
+    setAffiliationLoading(true);
+    try {
+      await api.removeAffiliation(artistData._id);
+      setAffiliationStatus('none');
+    } catch (error) {
+      alert(error.response?.data?.message || 'Could not remove affiliation. Please try again.');
+    } finally {
+      setAffiliationLoading(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -194,7 +282,7 @@ const ArtistProfile = () => {
       </div>
     );
   }
-  
+
   if (!artistData) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -205,82 +293,211 @@ const ArtistProfile = () => {
       </div>
     );
   }
-  
+
+  // shop link — shop field is now a populated object { _id, username, profilePic }
+  const shopId = artistData.shop?._id || artistData.shop;
+  const shopName = artistData.shop?.username || null;
+
+  // Affiliation button shown to a logged-in shop viewing this artist profile
+  const renderAffiliationButton = () => {
+    if (!currentUser || currentUser.userType !== 'shop' || isOwnProfile) return null;
+
+    // Artist already belongs to a different shop — no action available
+    if (artistData.shop && affiliationStatus !== 'affiliated') {
+      return (
+        <span className="px-4 py-2 bg-gray-100 text-gray-500 rounded-md font-medium mt-2 md:mt-0 text-sm">
+          Already at a shop
+        </span>
+      );
+    }
+
+    if (affiliationStatus === 'affiliated') {
+      return (
+        <button
+          onClick={handleRemoveFromShop}
+          disabled={affiliationLoading}
+          className="flex items-center px-4 py-2 bg-gray-200 text-gray-700 rounded-md font-medium mt-2 md:mt-0 hover:bg-red-100 hover:text-red-700 transition-colors disabled:opacity-50"
+        >
+          <UserCheck size={16} className="mr-2" />
+          {affiliationLoading ? '...' : 'Remove from Shop'}
+        </button>
+      );
+    }
+
+    if (affiliationStatus === 'pending_sent') {
+      return (
+        <div className="flex items-center gap-2 mt-2 md:mt-0">
+          <span className="flex items-center px-4 py-2 bg-yellow-100 text-yellow-700 rounded-md font-medium text-sm">
+            <ClockIcon size={14} className="mr-1.5" />
+            Invitation Pending
+          </span>
+          <button
+            onClick={handleCancelAffiliationRequest}
+            disabled={affiliationLoading}
+            className="px-3 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-50 disabled:opacity-50"
+          >
+            Cancel
+          </button>
+        </div>
+      );
+    }
+
+    if (affiliationStatus === 'pending_received') {
+      return (
+        <div className="flex items-center gap-2 mt-2 md:mt-0">
+          <span className="text-sm text-gray-600">Artist requested to join:</span>
+          <button
+            onClick={handleAcceptAffiliationRequest}
+            disabled={affiliationLoading}
+            className="px-3 py-2 bg-blue-500 text-white rounded-md text-sm hover:bg-blue-600 disabled:opacity-50"
+          >
+            Accept
+          </button>
+          <button
+            onClick={handleDeclineAffiliationRequest}
+            disabled={affiliationLoading}
+            className="px-3 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-50 disabled:opacity-50"
+          >
+            Decline
+          </button>
+        </div>
+      );
+    }
+
+    // status === 'none' and artist has no current shop
+    return (
+      <button
+        onClick={handleSendAffiliationRequest}
+        disabled={affiliationLoading}
+        className="flex items-center px-4 py-2 bg-green-500 text-white rounded-md font-medium mt-2 md:mt-0 hover:bg-green-600 disabled:opacity-50"
+      >
+        <UserPlus size={16} className="mr-2" />
+        {affiliationLoading ? '...' : 'Invite to Shop'}
+      </button>
+    );
+  };
+
   return (
     <div className="max-w-screen-xl mx-auto pb-16">
       <div className="p-4 border-b">
-        <div className="flex flex-col md:flex-row items-center md:items-start">
-          <div className="w-28 h-28 md:w-36 md:h-36 flex-shrink-0 mb-4 md:mb-0 md:mr-8">
+        <div className="flex flex-col md:flex-row items-center">
+          <div className="w-40 h-40 md:w-52 md:h-52 flex-shrink-0 mb-4 md:mb-0 md:mr-8">
             <ProfileImage user={artistData} size="xl" className="w-full h-full" />
           </div>
           <div className="flex-grow text-center md:text-left">
-            <div className="flex flex-col md:flex-row md:items-center mb-4">
-              <h1 className="text-2xl font-bold mr-4">{artistData.username}</h1>
+            <div className="flex flex-col md:flex-row md:items-center md:flex-wrap gap-2 mb-1">
+              <h1 className="text-2xl font-bold mr-2">{artistData.username}</h1>
               {currentUser && !isOwnProfile && (
-                <button 
-                  className={`${following ? 'bg-gray-200 text-gray-800' : 'bg-blue-500 text-white'} px-4 py-2 rounded-md font-medium mt-2 md:mt-0 disabled:opacity-50`}
+                <button
+                  className={`${following ? 'bg-gray-200 text-gray-800' : 'bg-blue-500 text-white'} px-4 py-2 rounded-md font-medium disabled:opacity-50`}
                   onClick={handleFollowToggle}
                   disabled={isFollowLoading}
                 >
                   {isFollowLoading ? '...' : (following ? 'Following' : 'Follow Artist')}
                 </button>
               )}
+              {renderAffiliationButton()}
             </div>
-            <div className="flex justify-center md:justify-start space-x-6 mb-4">
-              <span><b>{posts.length}</b> posts</span>
+            <div className="flex justify-center md:justify-start space-x-6 mb-1">
               <span><b>{followersCount}</b> followers</span>
-              <span><b>{artistData.following?.length || 0}</b> following</span>
+              <span><b>{formatNum(posts.reduce((s, p) => s + (p.likes?.length || 0), 0))}</b> likes</span>
+              <span><b>{formatNum(posts.reduce((s, p) => s + (p.comments?.length || 0), 0))}</b> comments</span>
             </div>
-            <div className="mb-2">
+            <div className="mt-2 mb-2">
               <p>{artistData.bio}</p>
             </div>
             <div className="flex flex-col space-y-1">
-              {artistData.location && (
-                <div className="flex items-center">
-                  <MapPin size={16} className="mr-2" />
-                  <span>{artistData.location}</span>
+              {(artistData.location || artistData.priceRange) && (
+                <div className="flex items-center gap-1.5">
+                  {artistData.priceRange && <span>{artistData.priceRange}</span>}
+                  {artistData.location && (
+                    <>
+                      <MapPin size={14} />
+                      <span>{artistData.location}</span>
+                    </>
+                  )}
                 </div>
               )}
-              {artistData.priceRange && (
-                <div className="flex items-center">
-                  <DollarSign size={16} className="mr-2" />
-                  <span>Price Range: {artistData.priceRange}</span>
+
+              {/* Specialty badges — hide "I Do Both Equally" */}
+              {((artistData.inkSpecialty && artistData.inkSpecialty !== 'I Do Both Equally') ||
+                (artistData.designSpecialty && artistData.designSpecialty !== 'I Do Both Equally')) && (
+                <div className="flex flex-wrap gap-1.5 mt-1">
+                  {artistData.inkSpecialty && artistData.inkSpecialty !== 'I Do Both Equally' && (
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-indigo-100 text-indigo-700 text-xs rounded-full font-medium">
+                      <Star size={10} fill="currentColor" /> {artistData.inkSpecialty}
+                    </span>
+                  )}
+                  {artistData.designSpecialty && artistData.designSpecialty !== 'I Do Both Equally' && (
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-indigo-100 text-indigo-700 text-xs rounded-full font-medium">
+                      <Star size={10} fill="currentColor" /> {artistData.designSpecialty}
+                    </span>
+                  )}
                 </div>
               )}
-              {artistData.styles && artistData.styles.length > 0 && (
-                <div className="flex items-center">
-                  <Tag size={16} className="mr-2" />
-                  <span>Styles: {artistData.styles.join(', ')}</span>
-                </div>
-              )}
-              {artistData.shop && (
-                <div className="flex items-center">
-                  <Link to={`/shop/${artistData.shop}`} className="text-blue-500">
-                    Working at: {artistData.shopName || 'Tattoo Shop'}
-                  </Link>
-                </div>
-              )}
+
+              {/* Style chips — specialties first (amber), then others (light blue) */}
+              {[
+                { specialties: artistData.foundationalStyleSpecialties, all: artistData.foundationalStyles, label: 'Style' },
+                { specialties: artistData.techniqueSpecialties, all: artistData.techniques, label: 'Technique' },
+                { specialties: artistData.subjectSpecialties, all: artistData.subjects, label: 'Subject' },
+              ].map(({ specialties = [], all = [], label }) => {
+                if (!all || all.length === 0) return null;
+                const stars = all.filter(item => specialties.includes(item));
+                const rest = all.filter(item => !specialties.includes(item));
+                const ordered = [...stars, ...rest];
+                return (
+                  <div key={label} className="mt-1">
+                    <span className="text-xs text-gray-400 uppercase tracking-wide mr-1">{label}:</span>
+                    <span className="inline-flex flex-wrap gap-1">
+                      {ordered.map(item => {
+                        const isStar = specialties.includes(item);
+                        return (
+                          <span key={item} className={`inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-xs font-medium ${isStar ? 'bg-amber-100 text-amber-700' : 'bg-blue-50 text-blue-600'}`}>
+                            {isStar && <Star size={9} fill="currentColor" />}
+                            {item}
+                          </span>
+                        );
+                      })}
+                    </span>
+                  </div>
+                );
+              })}
+
             </div>
+
           </div>
         </div>
       </div>
-      
+
       <div className="flex justify-between items-center p-4 border-b">
-        <h2 className="text-lg font-medium">Portfolio</h2>
+        <div className="flex items-center gap-3">
+          {shopId && (
+            <>
+              <span className="text-sm font-semibold text-gray-500 flex-shrink-0">My Shop</span>
+              <Link to={`/shop/${shopId}`} className="flex flex-col items-center flex-shrink-0 hover:opacity-80 transition-opacity">
+                <div className="w-16 h-16 rounded-full overflow-hidden mb-0.5">
+                  <ProfileImage user={artistData.shop} size="lg" />
+                </div>
+                <span className="text-xs text-gray-600 max-w-[4rem] truncate">{shopName || 'Tattoo Shop'}</span>
+              </Link>
+            </>
+          )}
+        </div>
         <div className="flex bg-gray-100 rounded-lg p-1 mr-2">
-            <button 
+            <button
               onClick={() => setViewMode('feed')}
               className={`p-2 rounded ${viewMode === 'feed' ? 'bg-white shadow' : ''}`}
             >
               <BarChart2 size={20} />
             </button>
-            <button 
+            <button
               onClick={() => setViewMode('grid3')}
               className={`p-2 rounded mx-1 ${viewMode === 'grid3' ? 'bg-white shadow' : ''}`}
             >
               <LayoutGrid size={20} />
             </button>
-            <button 
+            <button
               onClick={() => setViewMode('grid5')}
               className={`p-2 rounded ${viewMode === 'grid5' ? 'bg-white shadow' : ''}`}
             >
@@ -288,19 +505,19 @@ const ArtistProfile = () => {
             </button>
         </div>
       </div>
-      
+
       {posts.length === 0 && (
         <div className="text-center py-20">
           <p className="text-xl text-gray-500">No posts yet</p>
         </div>
       )}
-      
+
       {posts.length > 0 && (
         <div className={`grid ${
-          viewMode === 'feed' 
-            ? 'grid-cols-1 max-w-xl mx-auto gap-6 p-4' 
-            : viewMode === 'grid3' 
-            ? 'grid-cols-3 gap-1' 
+          viewMode === 'feed'
+            ? 'grid-cols-1 max-w-xl mx-auto gap-6 p-4'
+            : viewMode === 'grid3'
+            ? 'grid-cols-3 gap-1'
             : 'grid-cols-5 gap-1'
         }`}>
           {posts.map(post => (
@@ -318,7 +535,7 @@ const ArtistProfile = () => {
           ))}
         </div>
       )}
-      
+
       {showDeleteConfirm && postToDelete && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg max-w-md w-full p-6">
@@ -326,25 +543,25 @@ const ArtistProfile = () => {
               <AlertTriangle size={24} className="mr-2" />
               <h2 className="text-xl font-bold">Delete Post</h2>
             </div>
-            
+
             <p className="mb-4">
               Are you sure you want to delete this post? This action cannot be undone.
             </p>
-            
+
             <div className="mb-4 border rounded overflow-hidden">
-              <img 
+              <img
                 src={`http://localhost:5000/${postToDelete.image}`}
                 alt="Post to delete"
                 className="w-full h-40 object-cover"
               />
             </div>
-            
+
             {deleteError && (
               <div className="bg-red-50 text-red-700 p-3 rounded mb-4">
                 {deleteError}
               </div>
             )}
-            
+
             <div className="flex justify-end gap-3">
               <button
                 onClick={() => {
