@@ -13,7 +13,6 @@ const NavBar = () => {
   
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
-  const [refreshFeed, setRefreshFeed] = useState(false);
   const [pendingRequestCount, setPendingRequestCount] = useState(0);
 
   const profileRef = useRef(null);
@@ -221,9 +220,6 @@ const NavBar = () => {
         <UploadPost
           onClose={() => setShowUploadModal(false)}
           onPostCreated={() => {
-            // Trigger a refresh of the feed
-            setRefreshFeed(prev => !prev);
-            // You can also force navigation to home to see the new post
             navigate('/home');
           }}
         />

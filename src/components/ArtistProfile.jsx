@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { LayoutGrid, Grid, BarChart2, MapPin, DollarSign, Star, Trash2, AlertTriangle, Heart, MessageCircle, Bookmark, UserPlus, UserCheck, Clock as ClockIcon } from 'lucide-react';
+import { LayoutGrid, Grid, BarChart2, MapPin, Star, Trash2, AlertTriangle, Heart, MessageCircle, Bookmark, UserPlus, UserCheck, Clock as ClockIcon } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import ProfileImage from './ProfileImage';
@@ -266,49 +266,6 @@ const ArtistProfile = () => {
       alert(error.response?.data?.message || 'Could not remove affiliation. Please try again.');
     } finally {
       setAffiliationLoading(false);
-    }
-  };
-
-  // Own-profile (artist): accept an incoming shop invitation
-  const handleAcceptIncoming = async (requestId, shopUser) => {
-    try {
-      await api.acceptAffiliationRequest(requestId);
-      setPendingRequests(prev => prev.filter(r => r._id !== requestId));
-      setArtistData(prev => ({ ...prev, shop: shopUser }));
-    } catch (error) {
-      alert(error.response?.data?.message || 'Could not accept invitation. Please try again.');
-    }
-  };
-
-  // Own-profile (artist): decline an incoming shop invitation
-  const handleDeclineIncoming = async (requestId) => {
-    try {
-      await api.declineAffiliationRequest(requestId);
-      setPendingRequests(prev => prev.filter(r => r._id !== requestId));
-    } catch (error) {
-      alert(error.response?.data?.message || 'Could not decline invitation. Please try again.');
-    }
-  };
-
-  // Own-profile (artist): cancel an outgoing request
-  const handleCancelOutgoing = async (requestId) => {
-    try {
-      await api.declineAffiliationRequest(requestId);
-      setPendingRequests(prev => prev.filter(r => r._id !== requestId));
-    } catch (error) {
-      alert(error.response?.data?.message || 'Could not cancel request. Please try again.');
-    }
-  };
-
-  // Own-profile (artist): leave current shop
-  const handleLeaveShop = async () => {
-    if (!window.confirm('Are you sure you want to leave this shop?')) return;
-    try {
-      const shopId = artistData.shop?._id || artistData.shop;
-      await api.removeAffiliation(shopId);
-      setArtistData(prev => ({ ...prev, shop: null }));
-    } catch (error) {
-      alert(error.response?.data?.message || 'Could not leave shop. Please try again.');
     }
   };
 

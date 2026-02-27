@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { LayoutGrid, Grid, BarChart2, MapPin, Phone, Clock, Tag, Trash2, AlertTriangle, Heart, MessageCircle, Bookmark, X, UserCheck, UserPlus } from 'lucide-react';
+import { LayoutGrid, Grid, BarChart2, MapPin, Phone, Clock, Tag, Trash2, AlertTriangle, Heart, MessageCircle, Bookmark, UserPlus } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import ProfileImage from './ProfileImage';
@@ -119,7 +119,6 @@ const ShopProfile = () => {
   // Affiliation state
   const [affiliationStatus, setAffiliationStatus] = useState(null); // 'none'|'pending_sent'|'pending_received'|'affiliated'
   const [affiliationRequestId, setAffiliationRequestId] = useState(null);
-  const [pendingRequests, setPendingRequests] = useState([]); // incoming + outgoing for own profile
   const [affiliationLoading, setAffiliationLoading] = useState(false);
 
   const { id } = useParams();
@@ -272,55 +271,6 @@ const ShopProfile = () => {
       alert(error.response?.data?.message || 'Could not remove affiliation. Please try again.');
     } finally {
       setAffiliationLoading(false);
-    }
-  };
-
-  // Own-profile: remove an artist from the shop
-  const handleRemoveArtist = async (artistId) => {
-    if (!window.confirm('Remove this artist from your shop?')) return;
-    try {
-      await api.removeAffiliation(artistId);
-      setShopData(prev => ({
-        ...prev,
-        artists: prev.artists.filter(a => a._id !== artistId)
-      }));
-      setPosts(prev => prev.filter(p => p.user._id !== artistId));
-    } catch (error) {
-      alert(error.response?.data?.message || 'Could not remove artist. Please try again.');
-    }
-  };
-
-  // Own-profile: accept an incoming affiliation request
-  const handleAcceptIncoming = async (requestId, artistUser) => {
-    try {
-      await api.acceptAffiliationRequest(requestId);
-      setPendingRequests(prev => prev.filter(r => r._id !== requestId));
-      setShopData(prev => ({
-        ...prev,
-        artists: [...(prev.artists || []), artistUser]
-      }));
-    } catch (error) {
-      alert(error.response?.data?.message || 'Could not accept request. Please try again.');
-    }
-  };
-
-  // Own-profile: decline an incoming affiliation request
-  const handleDeclineIncoming = async (requestId) => {
-    try {
-      await api.declineAffiliationRequest(requestId);
-      setPendingRequests(prev => prev.filter(r => r._id !== requestId));
-    } catch (error) {
-      alert(error.response?.data?.message || 'Could not decline request. Please try again.');
-    }
-  };
-
-  // Own-profile: cancel an outgoing affiliation request
-  const handleCancelOutgoing = async (requestId) => {
-    try {
-      await api.declineAffiliationRequest(requestId);
-      setPendingRequests(prev => prev.filter(r => r._id !== requestId));
-    } catch (error) {
-      alert(error.response?.data?.message || 'Could not cancel request. Please try again.');
     }
   };
 

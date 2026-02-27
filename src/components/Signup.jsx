@@ -61,7 +61,6 @@ const Signup = () => {
 
   const validateStep3 = () => { setFormError(''); return true; };
 
-  const validateStep4 = () => { setFormError(''); return true; };
 
   const handleNext = () => {
     let isValid = false;
