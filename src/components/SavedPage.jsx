@@ -217,8 +217,9 @@ const SavedPage = () => {
 
     if (followingSortOption === 'followers') {
       users.sort((a, b) => (b.followers?.length || 0) - (a.followers?.length || 0));
+    } else {
+      users.reverse(); // server returns oldest-first; flip to most-recently-followed at top
     }
-    // 'recent' = preserve server order (most recently followed)
     setFilteredFollowing(users);
   }, [submittedFollowingQuery, artistFilters, followedUsers, followingSortOption]);
 
