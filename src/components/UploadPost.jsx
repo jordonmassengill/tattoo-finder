@@ -45,7 +45,7 @@ const UploadPost = ({ onClose, onPostCreated }) => {
   };
 
   const handleAddTag = () => {
-    if (currentTag.trim() && !tags.includes(currentTag.trim().toLowerCase())) {
+    if (currentTag.trim() && !tags.includes(currentTag.trim().toLowerCase()) && tags.length < 3) {
       setTags([...tags, currentTag.trim().toLowerCase()]);
       setCurrentTag('');
     }
@@ -176,7 +176,7 @@ const UploadPost = ({ onClose, onPostCreated }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex justify-between items-center p-4 border-b sticky top-0 bg-white z-10">
           <h2 className="text-xl font-semibold">
@@ -250,13 +250,13 @@ const UploadPost = ({ onClose, onPostCreated }) => {
 
               {/* Either/or selectors */}
               <EitherOrRow
-                label="Color"
+                label="Ink"
                 options={COLOR_TYPES}
                 value={colorType}
                 onChange={(v) => toggleSingle(setColorType, colorType, v)}
               />
               <EitherOrRow
-                label="Type"
+                label="Design"
                 options={FLASH_OR_CUSTOM}
                 value={flashOrCustom}
                 onChange={(v) => toggleSingle(setFlashOrCustom, flashOrCustom, v)}
@@ -305,7 +305,9 @@ const UploadPost = ({ onClose, onPostCreated }) => {
 
               {/* Tags */}
               <div className="mb-4">
-                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Tags</label>
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
+                  Tags <span className="font-normal text-gray-400 normal-case">(max 3)</span>
+                </label>
                 <div className="flex mb-2">
                   <div className="relative flex-grow">
                     <Hash size={14} className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -316,11 +318,13 @@ const UploadPost = ({ onClose, onPostCreated }) => {
                       onKeyPress={handleTagKeyPress}
                       className="w-full pl-7 pr-3 py-1.5 border rounded-l-md text-sm focus:ring-blue-500 focus:border-blue-500"
                       placeholder="Add a tag..."
+                      disabled={tags.length >= 3}
                     />
                   </div>
                   <button
                     onClick={handleAddTag}
-                    className="bg-blue-500 text-white px-3 py-1.5 rounded-r-md text-sm"
+                    disabled={tags.length >= 3}
+                    className="bg-blue-500 text-white px-3 py-1.5 rounded-r-md text-sm disabled:bg-blue-300 disabled:cursor-not-allowed"
                   >
                     Add
                   </button>

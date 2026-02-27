@@ -123,7 +123,8 @@ const SavedPage = () => {
   const [postFilters, setPostFilters] = useState(EMPTY_POST_FILTERS);
   const [postQuery, setPostQuery] = useState('');
   const [submittedPostQuery, setSubmittedPostQuery] = useState('');
-  const [sortOption, setSortOption] = useState('newest');
+  const [postSortOption, setPostSortOption] = useState('new');
+  const [followingSortOption, setFollowingSortOption] = useState('recent');
 
   // Following tab
   const [followedUsers, setFollowedUsers] = useState([]);
@@ -190,13 +191,14 @@ const SavedPage = () => {
     if (postFilters.techniques.length > 0) posts = posts.filter(p => p.techniques?.some(t => postFilters.techniques.includes(t)));
     if (postFilters.subjects.length > 0) posts = posts.filter(p => p.subjects?.some(s => postFilters.subjects.includes(s)));
 
-    if (sortOption === 'likes') {
+    if (postSortOption === 'likes') {
       posts.sort((a, b) => b.likes.length - a.likes.length);
-    } else {
+    } else if (postSortOption === 'new') {
       posts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     }
+    // 'recent' = preserve server order (most recently saved)
     setFilteredPosts(posts);
-  }, [submittedPostQuery, postFilters, sortOption, savedPosts]);
+  }, [submittedPostQuery, postFilters, postSortOption, savedPosts]);
 
   // Filter following
   useEffect(() => {
@@ -212,8 +214,13 @@ const SavedPage = () => {
     if (artistFilters.foundationalStyleSpecialties.length > 0) users = users.filter(u => u.foundationalStyleSpecialties?.some(s => artistFilters.foundationalStyleSpecialties.includes(s)));
     if (artistFilters.techniqueSpecialties.length > 0) users = users.filter(u => u.techniqueSpecialties?.some(t => artistFilters.techniqueSpecialties.includes(t)));
     if (artistFilters.subjectSpecialties.length > 0) users = users.filter(u => u.subjectSpecialties?.some(s => artistFilters.subjectSpecialties.includes(s)));
+
+    if (followingSortOption === 'followers') {
+      users.sort((a, b) => (b.followers?.length || 0) - (a.followers?.length || 0));
+    }
+    // 'recent' = preserve server order (most recently followed)
     setFilteredFollowing(users);
-  }, [submittedFollowingQuery, artistFilters, followedUsers]);
+  }, [submittedFollowingQuery, artistFilters, followedUsers, followingSortOption]);
 
   // Toggle helpers
   const togglePostSingle = (key, value) => setPostFilters(prev => ({ ...prev, [key]: prev[key] === value ? '' : value }));
@@ -287,10 +294,9 @@ const SavedPage = () => {
 
   return (
     <div className="max-w-screen-xl mx-auto p-8">
-      <h1 className="text-3xl font-bold mb-6">Saved</h1>
-
-      {/* Tab toggle */}
-      <div className="flex justify-center mb-6">
+      {/* Title + Posts / Following toggle on same row */}
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-3xl font-bold">Saved</h1>
         <div className="inline-flex rounded-md shadow-sm" role="group">
           <button type="button" onClick={() => handleTabSwitch('posts')}
             className={`flex items-center px-4 py-2 text-sm font-medium rounded-l-lg ${viewTab === 'posts' ? 'bg-blue-500 text-white' : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-100'}`}>
@@ -330,9 +336,17 @@ const SavedPage = () => {
             )}
           </button>
           {viewTab === 'posts' && (
-            <button onClick={() => setSortOption(prev => prev === 'newest' ? 'likes' : 'newest')}
+            <button
+              onClick={() => setPostSortOption(prev => prev === 'new' ? 'recent' : prev === 'recent' ? 'likes' : 'new')}
               className="px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition font-medium whitespace-nowrap">
-              {sortOption === 'newest' ? 'Sort - New' : 'Sort - Likes'}
+              {postSortOption === 'new' ? 'Sort - New' : postSortOption === 'recent' ? 'Sort - Recent' : 'Sort - Likes'}
+            </button>
+          )}
+          {viewTab === 'following' && (
+            <button
+              onClick={() => setFollowingSortOption(prev => prev === 'recent' ? 'followers' : 'recent')}
+              className="px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition font-medium whitespace-nowrap">
+              {followingSortOption === 'recent' ? 'Sort - Recent' : 'Sort - Followers'}
             </button>
           )}
         </div>
@@ -346,8 +360,8 @@ const SavedPage = () => {
           {viewTab === 'posts' ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8">
               <div>
-                <EitherOrRow label="Color" options={COLOR_TYPES} filterKey="colorType" onToggle={togglePostSingle} active={(k, v) => postFilters[k] === v} />
-                <EitherOrRow label="Type" options={FLASH_OR_CUSTOM} filterKey="flashOrCustom" onToggle={togglePostSingle} active={(k, v) => postFilters[k] === v} />
+                <EitherOrRow label="Ink" options={COLOR_TYPES} filterKey="colorType" onToggle={togglePostSingle} active={(k, v) => postFilters[k] === v} />
+                <EitherOrRow label="Design" options={FLASH_OR_CUSTOM} filterKey="flashOrCustom" onToggle={togglePostSingle} active={(k, v) => postFilters[k] === v} />
                 <div className="mb-4">
                   <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Size</p>
                   <div className="flex gap-2">

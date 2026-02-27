@@ -129,7 +129,7 @@ const CommentModal = ({ post, onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4" onClick={onClose}>
-      <div className="bg-white rounded-lg w-full max-w-4xl h-full max-h-[90vh] flex overflow-hidden" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-white rounded-lg w-full max-w-5xl h-full max-h-[80vh] flex overflow-hidden" onClick={(e) => e.stopPropagation()}>
         <div className="hidden md:block md:w-3/5 bg-black flex-shrink-0">
           <img
             src={`http://localhost:5000/${post.image}`}
