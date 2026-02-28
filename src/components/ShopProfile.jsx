@@ -353,7 +353,7 @@ const ShopProfile = () => {
               <span><b>{formatNum(posts.reduce((s, p) => s + (p.comments?.length || 0), 0))}</b> comments</span>
             </div>
             <div className="mt-2 mb-2">
-              <p>{shopData.bio}</p>
+              <p className="whitespace-pre-wrap">{shopData.bio}</p>
             </div>
             <div className="flex flex-col space-y-1">
               {shopData.location && (
