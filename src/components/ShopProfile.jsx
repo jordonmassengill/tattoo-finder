@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { LayoutGrid, Grid, BarChart2, MapPin, Phone, Clock, Tag, Trash2, AlertTriangle, Heart, MessageCircle, Bookmark, UserPlus } from 'lucide-react';
+import { LayoutGrid, Grid, BarChart2, MapPin, Phone, Clock, Tag, Trash2, Pencil, AlertTriangle, Heart, MessageCircle, Bookmark, UserPlus } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import ProfileImage from './ProfileImage';
 import CommentModal from './CommentModal';
+import EditPostModal from './EditPostModal';
 
 // Sub-component to handle each post grid item
-const PostGridItem = ({ post, isOwnPost, onPostClick, onDeleteClick }) => {
+const PostGridItem = ({ post, isOwnPost, onPostClick, onDeleteClick, onEditClick }) => {
   const { currentUser, updateCurrentUser } = useAuth();
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(post.likes.length);
@@ -86,9 +87,14 @@ const PostGridItem = ({ post, isOwnPost, onPostClick, onDeleteClick }) => {
         )}
 
         {isOwnPost && (
-          <button onClick={onDeleteClick} className="absolute top-2 right-2 p-2 bg-red-600 rounded-full hover:bg-red-700">
-            <Trash2 size={16} />
-          </button>
+          <>
+            <button onClick={onEditClick} className="absolute top-2 left-2 p-2 bg-blue-600 rounded-full hover:bg-blue-700">
+              <Pencil size={16} />
+            </button>
+            <button onClick={onDeleteClick} className="absolute top-2 right-2 p-2 bg-red-600 rounded-full hover:bg-red-700">
+              <Trash2 size={16} />
+            </button>
+          </>
         )}
       </div>
 
@@ -121,6 +127,7 @@ const ShopProfile = () => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState('');
+  const [postToEdit, setPostToEdit] = useState(null);
 
   // Affiliation state
   const [affiliationStatus, setAffiliationStatus] = useState(null); // 'none'|'pending_sent'|'pending_received'|'affiliated'
@@ -353,7 +360,7 @@ const ShopProfile = () => {
               <span><b>{formatNum(posts.reduce((s, p) => s + (p.comments?.length || 0), 0))}</b> comments</span>
             </div>
             <div className="mt-2 mb-2">
-              <p>{shopData.bio}</p>
+              <p className="whitespace-pre-wrap">{shopData.bio}</p>
             </div>
             <div className="flex flex-col space-y-1">
               {shopData.location && (
@@ -441,6 +448,10 @@ const ShopProfile = () => {
               post={post}
               isOwnPost={currentUser && post.user?._id === currentUser.id}
               onPostClick={setSelectedPost}
+              onEditClick={(e) => {
+                e.stopPropagation();
+                setPostToEdit(post);
+              }}
               onDeleteClick={(e) => {
                 e.stopPropagation();
                 setPostToDelete(post);
@@ -501,6 +512,16 @@ const ShopProfile = () => {
             </div>
           </div>
         </div>
+      )}
+
+      {postToEdit && (
+        <EditPostModal
+          post={postToEdit}
+          onClose={() => setPostToEdit(null)}
+          onPostUpdated={(updatedPost) => {
+            setPosts(posts.map(p => p._id === updatedPost._id ? updatedPost : p));
+          }}
+        />
       )}
 
       {selectedPost && (

@@ -29,6 +29,7 @@ export default {
     return api.get(`/users/${id}/posts${params}`);
   },
   updateProfile: (userData) => api.put('/users/update', userData),
+  changePassword: (currentPassword, newPassword) => api.put('/users/change-password', { currentPassword, newPassword }),
   deleteUser: (id) => api.delete(`/users/${id}`),
   followUser: (id) => api.put(`/users/follow/${id}`),
   unfollowUser: (id) => api.put(`/users/unfollow/${id}`),
@@ -59,6 +60,7 @@ export default {
   likePost: (id) => api.put(`/posts/like/${id}`),
   unlikePost: (id) => api.put(`/posts/unlike/${id}`),
   addComment: (id, text) => api.post(`/posts/comment/${id}`, { text }),
+  updatePost: (id, data) => api.put(`/posts/${id}`, data),
   deletePost: (id) => api.delete(`/posts/${id}`),
 
   deleteComment: (postId, commentId) => api.delete(`/posts/comment/${postId}/${commentId}`),
