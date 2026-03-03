@@ -52,5 +52,6 @@ export const SUBJECTS = [
   'Abstract',
   'Sci-Fi',
   'Psychedelic',
+  'Fantasy',
 ];
 
