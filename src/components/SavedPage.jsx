@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
-import { Heart, MessageCircle, Search, Filter, Bookmark, MapPin, Users, Image } from 'lucide-react';
+import { Heart, MessageCircle, Search, Filter, Bookmark, MapPin, Users, Image, BarChart2, LayoutGrid, Grid } from 'lucide-react';
 import CommentModal from './CommentModal';
 import ProfileImage from './ProfileImage';
 import { BAY_AREA_CITIES } from '../constants/locations';
@@ -27,7 +27,7 @@ const profileUrl = (user) => {
   return user.userType === 'shop' ? `/shop/${user.username}` : `/artist/${user.username}`;
 };
 
-const PostItem = ({ post, onPostClick }) => {
+const PostItem = ({ post, onPostClick, isGrid = true }) => {
   const { currentUser, updateCurrentUser } = useAuth();
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(post.likes.length);
@@ -67,6 +67,38 @@ const PostItem = ({ post, onPostClick }) => {
       setIsSaved(originalIsSaved);
     }
   };
+
+  if (!isGrid) {
+    return (
+      <div className="bg-white border border-gray-200 rounded-md mb-6">
+        <div className="flex items-center p-3">
+          <Link to={profileUrl(post.user)} className="flex items-center">
+            <ProfileImage user={post.user} size="md" />
+            <div className="ml-3">
+              <p className="font-semibold">{post.user.username}</p>
+            </div>
+          </Link>
+        </div>
+        <img src={`http://localhost:5000/${post.image}`} alt={post.caption} className="w-full object-cover cursor-pointer" onClick={() => onPostClick(post)} />
+        <div className="p-3">
+          <div className="flex items-center gap-4 mb-2">
+            <button onClick={handleLikeToggle} className="flex items-center gap-1">
+              <Heart size={22} className={`transition-colors ${isLiked ? 'text-red-500' : 'text-gray-700'}`} fill={isLiked ? 'currentColor' : 'none'} />
+              <span>{likeCount}</span>
+            </button>
+            <button className="flex items-center gap-1" onClick={() => onPostClick(post)}>
+              <MessageCircle size={22} />
+              <span>{post.comments.length}</span>
+            </button>
+            <button onClick={handleSaveToggle} className="ml-auto">
+              <Bookmark size={22} className={`transition-colors ${isSaved ? 'text-blue-400' : 'text-gray-700'}`} fill={isSaved ? 'currentColor' : 'none'} />
+            </button>
+          </div>
+          <p><Link to={profileUrl(post.user)} className="font-semibold">{post.user.username}</Link> {post.caption}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="relative group cursor-pointer" onClick={() => onPostClick(post)}>
@@ -137,6 +169,7 @@ const SavedPage = () => {
   // Shared
   const [viewTab, setViewTab] = useState('posts');
   const [showFilters, setShowFilters] = useState(false);
+  const [viewMode, setViewMode] = useState('grid3');
 
   // Load saved posts once
   useEffect(() => {
@@ -295,7 +328,7 @@ const SavedPage = () => {
 
   return (
     <div className="max-w-screen-xl mx-auto p-8">
-      {/* Title (left) + Posts / Following toggle (centered) */}
+      {/* Title (left) + Posts / Following toggle (centered) + grid selector (right) */}
       <div className="grid grid-cols-3 items-center mb-6">
         <h1 className="text-3xl font-bold">Saved</h1>
         <div className="flex justify-center">
@@ -310,7 +343,19 @@ const SavedPage = () => {
             </button>
           </div>
         </div>
-        <div />
+        <div className="flex justify-end">
+          <div className="flex bg-gray-100 rounded-lg p-1">
+            <button onClick={() => setViewMode('feed')} className={`p-2 rounded ${viewMode === 'feed' ? 'bg-white shadow' : ''}`}>
+              <BarChart2 size={20} />
+            </button>
+            <button onClick={() => setViewMode('grid3')} className={`p-2 rounded mx-1 ${viewMode === 'grid3' ? 'bg-white shadow' : ''}`}>
+              <LayoutGrid size={20} />
+            </button>
+            <button onClick={() => setViewMode('grid5')} className={`p-2 rounded ${viewMode === 'grid5' ? 'bg-white shadow' : ''}`}>
+              <Grid size={20} />
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Search + filters bar */}
@@ -482,11 +527,11 @@ const SavedPage = () => {
             </div>
           )}
           {!loadingPosts && filteredPosts.length > 0 && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-              {filteredPosts.map(post => (
-                <PostItem key={post._id} post={post} onPostClick={setSelectedPost} />
-              ))}
-            </div>
+            viewMode === 'feed'
+              ? <div className="max-w-xl mx-auto">{filteredPosts.map(post => <PostItem key={post._id} post={post} onPostClick={setSelectedPost} isGrid={false} />)}</div>
+              : <div className={`grid ${viewMode === 'grid3' ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3' : 'grid-cols-2 sm:grid-cols-3 md:grid-cols-5'} gap-1`}>
+                  {filteredPosts.map(post => <PostItem key={post._id} post={post} onPostClick={setSelectedPost} isGrid={true} />)}
+                </div>
           )}
         </>
       )}
@@ -512,35 +557,60 @@ const SavedPage = () => {
             </div>
           )}
           {!loadingFollowing && filteredFollowing.length > 0 && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-              {filteredFollowing.map(user => (
-                <div key={user._id} className="relative group">
-                  <Link to={profileUrl(user)} className="block">
-                    <div className="aspect-square relative overflow-hidden rounded-lg border border-gray-200">
-                      <ProfileImage user={user} size="xl" className="w-full h-full object-cover" />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent p-3 flex flex-col justify-end">
-                        <h3 className="font-bold text-white text-lg">{user.username}</h3>
-                        {user.location && (
-                          <div className="flex items-center text-white/90 text-sm">
-                            <MapPin size={12} className="mr-1 flex-shrink-0" />
-                            <span className="truncate">{user.location}</span>
+            viewMode === 'feed'
+              ? <div className="max-w-xl mx-auto">
+                  {filteredFollowing.map(user => (
+                    <div key={user._id} className="bg-white border border-gray-200 rounded-lg overflow-hidden mb-6">
+                      <div className="flex">
+                        <div className="w-24 h-24 sm:w-32 sm:h-32 flex-shrink-0">
+                          <ProfileImage user={user} size="xl" className="w-full h-full object-cover" />
+                        </div>
+                        <div className="p-4 flex-grow">
+                          <Link to={profileUrl(user)} className="font-semibold text-lg hover:text-blue-600">{user.username}</Link>
+                          {user.location && (
+                            <div className="flex items-center text-sm text-gray-600 mt-1">
+                              <MapPin size={14} className="mr-1" />
+                              <span>{user.location}</span>
+                            </div>
+                          )}
+                          <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
+                            <span className="flex items-center gap-1"><Users size={13} />{formatNum(user.followers?.length || 0)}</span>
                           </div>
-                        )}
-                      </div>
-                      <div className="absolute top-2 right-2 bg-black/50 text-white text-xs px-2 py-0.5 rounded-full capitalize">
-                        {user.userType}
-                      </div>
-                      <div className="absolute bottom-3 right-3 flex flex-col items-end gap-0.5">
-                        <div className="flex items-center text-white/90 text-xs drop-shadow">
-                          <span className="mr-1">{formatNum(user.followers?.length || 0)}</span>
-                          <Users size={11} />
+                          <div className="mt-2 text-xs text-gray-400 capitalize">{user.userType}</div>
                         </div>
                       </div>
                     </div>
-                  </Link>
+                  ))}
                 </div>
-              ))}
-            </div>
+              : <div className={`grid ${viewMode === 'grid3' ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3' : 'grid-cols-2 sm:grid-cols-3 md:grid-cols-5'} gap-1`}>
+                  {filteredFollowing.map(user => (
+                    <div key={user._id} className="relative group">
+                      <Link to={profileUrl(user)} className="block">
+                        <div className="aspect-square relative overflow-hidden rounded-lg border border-gray-200">
+                          <ProfileImage user={user} size="xl" className="w-full h-full object-cover" />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent p-3 flex flex-col justify-end">
+                            <h3 className="font-bold text-white text-lg">{user.username}</h3>
+                            {user.location && (
+                              <div className="flex items-center text-white/90 text-sm">
+                                <MapPin size={12} className="mr-1 flex-shrink-0" />
+                                <span className="truncate">{user.location}</span>
+                              </div>
+                            )}
+                          </div>
+                          <div className="absolute top-2 right-2 bg-black/50 text-white text-xs px-2 py-0.5 rounded-full capitalize">
+                            {user.userType}
+                          </div>
+                          <div className="absolute bottom-3 right-3 flex flex-col items-end gap-0.5">
+                            <div className="flex items-center text-white/90 text-xs drop-shadow">
+                              <span className="mr-1">{formatNum(user.followers?.length || 0)}</span>
+                              <Users size={11} />
+                            </div>
+                          </div>
+                        </div>
+                      </Link>
+                    </div>
+                  ))}
+                </div>
           )}
         </>
       )}

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { MapPin, Filter, Users, Image, Heart, MessageCircle, Search, Bookmark } from 'lucide-react';
+import { MapPin, Filter, Users, Image, Heart, MessageCircle, Search, Bookmark, BarChart2, LayoutGrid, Grid } from 'lucide-react';
 import ProfileImage from './ProfileImage';
 import { BAY_AREA_CITIES } from '../constants/locations';
 import {
@@ -344,7 +344,19 @@ const SearchPage = () => {
             </button>
           </div>
         </div>
-        <div />
+        <div className="flex justify-end">
+          <div className="flex bg-gray-100 rounded-lg p-1">
+            <button onClick={() => setViewMode('feed')} className={`p-2 rounded ${viewMode === 'feed' ? 'bg-white shadow' : ''}`}>
+              <BarChart2 size={20} />
+            </button>
+            <button onClick={() => setViewMode('grid3')} className={`p-2 rounded mx-1 ${viewMode === 'grid3' ? 'bg-white shadow' : ''}`}>
+              <LayoutGrid size={20} />
+            </button>
+            <button onClick={() => setViewMode('grid5')} className={`p-2 rounded ${viewMode === 'grid5' ? 'bg-white shadow' : ''}`}>
+              <Grid size={20} />
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Search bar */}
