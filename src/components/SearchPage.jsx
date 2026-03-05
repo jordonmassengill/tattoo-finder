@@ -441,17 +441,17 @@ const SearchPage = () => {
                   <div className="flex rounded-full border border-gray-300 overflow-hidden">
                     <button
                       type="button"
-                      onClick={() => toggleSingleFilter('flashType', 'Flash Sheet')}
-                      className={`flex-1 py-1.5 text-sm font-medium transition-colors ${filters.flashType === 'Flash Sheet' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
+                      onClick={() => toggleSingleFilter('flashType', 'Tattoo Work')}
+                      className={`flex-1 py-1.5 text-sm font-medium transition-colors ${filters.flashType === 'Tattoo Work' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
                     >
-                      Flash Sheet
+                      Tattoo Work
                     </button>
                     <button
                       type="button"
-                      onClick={() => toggleSingleFilter('flashType', 'Tattoo Work')}
-                      className={`flex-1 py-1.5 text-sm font-medium transition-colors border-l border-gray-300 ${filters.flashType === 'Tattoo Work' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
+                      onClick={() => toggleSingleFilter('flashType', 'Flash Sheet')}
+                      className={`flex-1 py-1.5 text-sm font-medium transition-colors border-l border-gray-300 ${filters.flashType === 'Flash Sheet' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
                     >
-                      Tattoo Work
+                      Flash Sheet
                     </button>
                   </div>
                 </div>

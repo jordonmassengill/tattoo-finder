@@ -300,17 +300,17 @@ const UploadPost = ({ onClose, onPostCreated }) => {
                 <div className="flex rounded-full border border-gray-300 overflow-hidden">
                   <button
                     type="button"
-                    onClick={() => setFlashType(flashType === 'Flash Sheet' ? '' : 'Flash Sheet')}
-                    className={`flex-1 py-1.5 text-sm font-medium transition-colors ${flashType === 'Flash Sheet' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
+                    onClick={() => setFlashType(flashType === 'Tattoo Work' ? '' : 'Tattoo Work')}
+                    className={`flex-1 py-1.5 text-sm font-medium transition-colors ${flashType === 'Tattoo Work' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
                   >
-                    Flash Sheet
+                    Tattoo Work
                   </button>
                   <button
                     type="button"
-                    onClick={() => setFlashType(flashType === 'Tattoo Work' ? '' : 'Tattoo Work')}
-                    className={`flex-1 py-1.5 text-sm font-medium transition-colors border-l border-gray-300 ${flashType === 'Tattoo Work' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
+                    onClick={() => setFlashType(flashType === 'Flash Sheet' ? '' : 'Flash Sheet')}
+                    className={`flex-1 py-1.5 text-sm font-medium transition-colors border-l border-gray-300 ${flashType === 'Flash Sheet' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
                   >
-                    Tattoo Work
+                    Flash Sheet
                   </button>
                 </div>
               </div>
