@@ -403,6 +403,20 @@ const SavedPage = () => {
           {viewTab === 'posts' ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8">
               <div>
+                {/* Flash Sheet / Tattoo Work toggle */}
+                <div className="mb-4">
+                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Type</p>
+                  <div className="flex rounded-full border border-gray-300 overflow-hidden">
+                    <button type="button" onClick={() => togglePostSingle('flashType', 'Tattoo Work')}
+                      className={`flex-1 py-1.5 text-sm font-medium transition-colors ${postFilters.flashType === 'Tattoo Work' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}>
+                      Tattoo Work
+                    </button>
+                    <button type="button" onClick={() => togglePostSingle('flashType', 'Flash Sheet')}
+                      className={`flex-1 py-1.5 text-sm font-medium transition-colors border-l border-gray-300 ${postFilters.flashType === 'Flash Sheet' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}>
+                      Flash Sheet
+                    </button>
+                  </div>
+                </div>
                 <EitherOrRow label="Ink" options={COLOR_TYPES} filterKey="colorType" onToggle={togglePostSingle} active={(k, v) => postFilters[k] === v} />
                 <div className="mb-4">
                   <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Size</p>
@@ -430,20 +444,6 @@ const SavedPage = () => {
               <div>
                 <ChipGroup label="Style" options={STYLES} filterKey="styles" onToggle={togglePostArray} active={(k, v) => postFilters[k].includes(v)} />
                 <ChipGroup label="Subject" options={SUBJECTS} filterKey="subjects" onToggle={togglePostArray} active={(k, v) => postFilters[k].includes(v)} />
-                {/* Flash Sheet / Tattoo Work toggle */}
-                <div className="mb-4">
-                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Type</p>
-                  <div className="flex rounded-full border border-gray-300 overflow-hidden">
-                    <button type="button" onClick={() => togglePostSingle('flashType', 'Tattoo Work')}
-                      className={`flex-1 py-1.5 text-sm font-medium transition-colors ${postFilters.flashType === 'Tattoo Work' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}>
-                      Tattoo Work
-                    </button>
-                    <button type="button" onClick={() => togglePostSingle('flashType', 'Flash Sheet')}
-                      className={`flex-1 py-1.5 text-sm font-medium transition-colors border-l border-gray-300 ${postFilters.flashType === 'Flash Sheet' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}>
-                      Flash Sheet
-                    </button>
-                  </div>
-                </div>
               </div>
             </div>
           ) : (

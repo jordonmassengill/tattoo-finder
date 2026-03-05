@@ -24,7 +24,7 @@ export const STYLES = [
   'Blackwork',
   'Minimalist',
   'Fine Line',
-  'Micro-Realism',
+  'Dotwork',
   'Watercolor',
   'Chicano',
   'Sketch',

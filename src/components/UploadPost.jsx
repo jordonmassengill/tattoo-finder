@@ -251,6 +251,27 @@ const UploadPost = ({ onClose, onPostCreated }) => {
                 />
               </div>
 
+              {/* Flash Sheet / Tattoo Work toggle */}
+              <div className="mb-4">
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Type</label>
+                <div className="flex rounded-full border border-gray-300 overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => setFlashType(flashType === 'Tattoo Work' ? '' : 'Tattoo Work')}
+                    className={`flex-1 py-1.5 text-sm font-medium transition-colors ${flashType === 'Tattoo Work' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
+                  >
+                    Tattoo Work
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setFlashType(flashType === 'Flash Sheet' ? '' : 'Flash Sheet')}
+                    className={`flex-1 py-1.5 text-sm font-medium transition-colors border-l border-gray-300 ${flashType === 'Flash Sheet' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
+                  >
+                    Flash Sheet
+                  </button>
+                </div>
+              </div>
+
               {/* Either/or selectors */}
               <EitherOrRow
                 label="Ink"
@@ -293,27 +314,6 @@ const UploadPost = ({ onClose, onPostCreated }) => {
                 selected={subjects}
                 onToggle={(v) => toggleMulti(setSubjects, subjects, v, 'subjects')}
               />
-
-              {/* Flash Sheet / Tattoo Work toggle */}
-              <div className="mb-4">
-                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Type</label>
-                <div className="flex rounded-full border border-gray-300 overflow-hidden">
-                  <button
-                    type="button"
-                    onClick={() => setFlashType(flashType === 'Tattoo Work' ? '' : 'Tattoo Work')}
-                    className={`flex-1 py-1.5 text-sm font-medium transition-colors ${flashType === 'Tattoo Work' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
-                  >
-                    Tattoo Work
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setFlashType(flashType === 'Flash Sheet' ? '' : 'Flash Sheet')}
-                    className={`flex-1 py-1.5 text-sm font-medium transition-colors border-l border-gray-300 ${flashType === 'Flash Sheet' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
-                  >
-                    Flash Sheet
-                  </button>
-                </div>
-              </div>
 
               {/* Tags */}
               <div className="mb-4">

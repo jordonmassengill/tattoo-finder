@@ -393,6 +393,27 @@ const SearchPage = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8">
               {/* Left column */}
               <div>
+                {/* Flash Sheet / Tattoo Work toggle */}
+                <div className="mb-4">
+                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Type</p>
+                  <div className="flex rounded-full border border-gray-300 overflow-hidden">
+                    <button
+                      type="button"
+                      onClick={() => toggleSingleFilter('flashType', 'Tattoo Work')}
+                      className={`flex-1 py-1.5 text-sm font-medium transition-colors ${filters.flashType === 'Tattoo Work' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
+                    >
+                      Tattoo Work
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => toggleSingleFilter('flashType', 'Flash Sheet')}
+                      className={`flex-1 py-1.5 text-sm font-medium transition-colors border-l border-gray-300 ${filters.flashType === 'Flash Sheet' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
+                    >
+                      Flash Sheet
+                    </button>
+                  </div>
+                </div>
+
                 <EitherOrFilterRow label="Ink" options={COLOR_TYPES} filterKey="colorType" />
 
                 {/* Size */}
@@ -434,27 +455,6 @@ const SearchPage = () => {
               <div>
                 <ChipFilterGroup label="Style" options={STYLES} filterKey="styles" />
                 <ChipFilterGroup label="Subject" options={SUBJECTS} filterKey="subjects" />
-
-                {/* Flash Sheet / Tattoo Work toggle */}
-                <div className="mb-4">
-                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Type</p>
-                  <div className="flex rounded-full border border-gray-300 overflow-hidden">
-                    <button
-                      type="button"
-                      onClick={() => toggleSingleFilter('flashType', 'Tattoo Work')}
-                      className={`flex-1 py-1.5 text-sm font-medium transition-colors ${filters.flashType === 'Tattoo Work' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
-                    >
-                      Tattoo Work
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => toggleSingleFilter('flashType', 'Flash Sheet')}
-                      className={`flex-1 py-1.5 text-sm font-medium transition-colors border-l border-gray-300 ${filters.flashType === 'Flash Sheet' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
-                    >
-                      Flash Sheet
-                    </button>
-                  </div>
-                </div>
               </div>
             </div>
           ) : (
