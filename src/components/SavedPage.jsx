@@ -7,10 +7,8 @@ import ProfileImage from './ProfileImage';
 import { BAY_AREA_CITIES } from '../constants/locations';
 import {
   COLOR_TYPES,
-  FLASH_OR_CUSTOM,
   SIZES,
-  FOUNDATIONAL_STYLES,
-  TECHNIQUES,
+  STYLES,
   SUBJECTS,
 } from '../constants/tattooCategories';
 import { useAuth } from '../context/AuthContext';
@@ -128,11 +126,10 @@ const PostItem = ({ post, onPostClick, isGrid = true }) => {
 
 const EMPTY_POST_FILTERS = {
   colorType: '',
-  flashOrCustom: '',
+  flashType: '',
   size: '',
   location: [],
-  foundationalStyles: [],
-  techniques: [],
+  styles: [],
   subjects: [],
 };
 
@@ -141,8 +138,7 @@ const EMPTY_ARTIST_FILTERS = {
   designSpecialty: '',
   priceRange: [],
   location: [],
-  foundationalStyleSpecialties: [],
-  techniqueSpecialties: [],
+  styleSpecialties: [],
   subjectSpecialties: [],
 };
 
@@ -217,11 +213,10 @@ const SavedPage = () => {
       );
     }
     if (postFilters.colorType) posts = posts.filter(p => p.colorType === postFilters.colorType);
-    if (postFilters.flashOrCustom) posts = posts.filter(p => p.flashOrCustom === postFilters.flashOrCustom);
+    if (postFilters.flashType) posts = posts.filter(p => p.flashOrCustom === postFilters.flashType);
     if (postFilters.size) posts = posts.filter(p => p.size === postFilters.size);
     if (postFilters.location.length > 0) posts = posts.filter(p => p.user?.location && postFilters.location.includes(p.user.location));
-    if (postFilters.foundationalStyles.length > 0) posts = posts.filter(p => p.foundationalStyles?.some(s => postFilters.foundationalStyles.includes(s)));
-    if (postFilters.techniques.length > 0) posts = posts.filter(p => p.techniques?.some(t => postFilters.techniques.includes(t)));
+    if (postFilters.styles.length > 0) posts = posts.filter(p => p.styles?.some(s => postFilters.styles.includes(s)));
     if (postFilters.subjects.length > 0) posts = posts.filter(p => p.subjects?.some(s => postFilters.subjects.includes(s)));
 
     if (postSortOption === 'likes') {
@@ -244,8 +239,7 @@ const SavedPage = () => {
     if (artistFilters.designSpecialty) users = users.filter(u => u.designSpecialty === artistFilters.designSpecialty);
     if (artistFilters.priceRange.length > 0) users = users.filter(u => artistFilters.priceRange.includes(u.priceRange));
     if (artistFilters.location.length > 0) users = users.filter(u => artistFilters.location.includes(u.location));
-    if (artistFilters.foundationalStyleSpecialties.length > 0) users = users.filter(u => u.foundationalStyleSpecialties?.some(s => artistFilters.foundationalStyleSpecialties.includes(s)));
-    if (artistFilters.techniqueSpecialties.length > 0) users = users.filter(u => u.techniqueSpecialties?.some(t => artistFilters.techniqueSpecialties.includes(t)));
+    if (artistFilters.styleSpecialties.length > 0) users = users.filter(u => u.styleSpecialties?.some(s => artistFilters.styleSpecialties.includes(s)));
     if (artistFilters.subjectSpecialties.length > 0) users = users.filter(u => u.subjectSpecialties?.some(s => artistFilters.subjectSpecialties.includes(s)));
 
     if (followingSortOption === 'followers') {
@@ -273,14 +267,14 @@ const SavedPage = () => {
   const resetArtistFilters = () => { setArtistFilters(EMPTY_ARTIST_FILTERS); setFollowingQuery(''); setSubmittedFollowingQuery(''); };
 
   const postActiveFilterCount = [
-    postFilters.colorType, postFilters.flashOrCustom, postFilters.size,
-    ...postFilters.location, ...postFilters.foundationalStyles, ...postFilters.techniques, ...postFilters.subjects,
+    postFilters.colorType, postFilters.flashType, postFilters.size,
+    ...postFilters.location, ...postFilters.styles, ...postFilters.subjects,
   ].filter(Boolean).length;
 
   const artistActiveFilterCount = [
     artistFilters.inkSpecialty, artistFilters.designSpecialty,
     ...artistFilters.priceRange, ...artistFilters.location,
-    ...artistFilters.foundationalStyleSpecialties, ...artistFilters.techniqueSpecialties, ...artistFilters.subjectSpecialties,
+    ...artistFilters.styleSpecialties, ...artistFilters.subjectSpecialties,
   ].filter(Boolean).length;
 
   const activeFilterCount = viewTab === 'posts' ? postActiveFilterCount : artistActiveFilterCount;
@@ -410,7 +404,6 @@ const SavedPage = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8">
               <div>
                 <EitherOrRow label="Ink" options={COLOR_TYPES} filterKey="colorType" onToggle={togglePostSingle} active={(k, v) => postFilters[k] === v} />
-                <EitherOrRow label="Design" options={FLASH_OR_CUSTOM} filterKey="flashOrCustom" onToggle={togglePostSingle} active={(k, v) => postFilters[k] === v} />
                 <div className="mb-4">
                   <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Size</p>
                   <div className="flex gap-2">
@@ -435,9 +428,22 @@ const SavedPage = () => {
                 </div>
               </div>
               <div>
-                <ChipGroup label="Foundational Style" options={FOUNDATIONAL_STYLES} filterKey="foundationalStyles" onToggle={togglePostArray} active={(k, v) => postFilters[k].includes(v)} />
-                <ChipGroup label="Technique / Finish" options={TECHNIQUES} filterKey="techniques" onToggle={togglePostArray} active={(k, v) => postFilters[k].includes(v)} />
+                <ChipGroup label="Style" options={STYLES} filterKey="styles" onToggle={togglePostArray} active={(k, v) => postFilters[k].includes(v)} />
                 <ChipGroup label="Subject" options={SUBJECTS} filterKey="subjects" onToggle={togglePostArray} active={(k, v) => postFilters[k].includes(v)} />
+                {/* Flash Sheet / Tattoo Work toggle */}
+                <div className="mb-4">
+                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Type</p>
+                  <div className="flex rounded-full border border-gray-300 overflow-hidden">
+                    <button type="button" onClick={() => togglePostSingle('flashType', 'Flash Sheet')}
+                      className={`flex-1 py-1.5 text-sm font-medium transition-colors ${postFilters.flashType === 'Flash Sheet' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}>
+                      Flash Sheet
+                    </button>
+                    <button type="button" onClick={() => togglePostSingle('flashType', 'Tattoo Work')}
+                      className={`flex-1 py-1.5 text-sm font-medium transition-colors border-l border-gray-300 ${postFilters.flashType === 'Tattoo Work' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}>
+                      Tattoo Work
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           ) : (
@@ -490,8 +496,7 @@ const SavedPage = () => {
                 </div>
               </div>
               <div>
-                <ChipGroup label="Foundational Style" options={FOUNDATIONAL_STYLES} filterKey="foundationalStyleSpecialties" onToggle={toggleArtistArray} active={(k, v) => artistFilters[k].includes(v)} />
-                <ChipGroup label="Technique / Finish" options={TECHNIQUES} filterKey="techniqueSpecialties" onToggle={toggleArtistArray} active={(k, v) => artistFilters[k].includes(v)} />
+                <ChipGroup label="Style" options={STYLES} filterKey="styleSpecialties" onToggle={toggleArtistArray} active={(k, v) => artistFilters[k].includes(v)} />
                 <ChipGroup label="Subject" options={SUBJECTS} filterKey="subjectSpecialties" onToggle={toggleArtistArray} active={(k, v) => artistFilters[k].includes(v)} />
               </div>
             </div>

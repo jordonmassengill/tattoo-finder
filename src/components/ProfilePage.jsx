@@ -43,10 +43,8 @@ const ProfilePage = () => {
         setArtistStyles({
           inkSpecialty: currentUser.inkSpecialty || '',
           designSpecialty: currentUser.designSpecialty || '',
-          foundationalStyles: currentUser.foundationalStyles || [],
-          foundationalStyleSpecialties: currentUser.foundationalStyleSpecialties || [],
-          techniques: currentUser.techniques || [],
-          techniqueSpecialties: currentUser.techniqueSpecialties || [],
+          styles: currentUser.styles || [],
+          styleSpecialties: currentUser.styleSpecialties || [],
           subjects: currentUser.subjects || [],
           subjectSpecialties: currentUser.subjectSpecialties || [],
         });
@@ -128,10 +126,8 @@ const ProfilePage = () => {
         ...(userType === 'artist' && {
           inkSpecialty: artistStyles.inkSpecialty,
           designSpecialty: artistStyles.designSpecialty,
-          foundationalStyles: artistStyles.foundationalStyles,
-          foundationalStyleSpecialties: artistStyles.foundationalStyleSpecialties,
-          techniques: artistStyles.techniques,
-          techniqueSpecialties: artistStyles.techniqueSpecialties,
+          styles: artistStyles.styles,
+          styleSpecialties: artistStyles.styleSpecialties,
           subjects: artistStyles.subjects,
           subjectSpecialties: artistStyles.subjectSpecialties,
         }),

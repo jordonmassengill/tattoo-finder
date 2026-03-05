@@ -101,10 +101,8 @@ const Signup = () => {
           priceRange: formData.priceRange,
           inkSpecialty: artistStyles.inkSpecialty,
           designSpecialty: artistStyles.designSpecialty,
-          foundationalStyles: artistStyles.foundationalStyles,
-          foundationalStyleSpecialties: artistStyles.foundationalStyleSpecialties,
-          techniques: artistStyles.techniques,
-          techniqueSpecialties: artistStyles.techniqueSpecialties,
+          styles: artistStyles.styles,
+          styleSpecialties: artistStyles.styleSpecialties,
           subjects: artistStyles.subjects,
           subjectSpecialties: artistStyles.subjectSpecialties,
         });
