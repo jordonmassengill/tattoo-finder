@@ -78,17 +78,13 @@ const EditPostModal = ({ post, onClose, onPostUpdated }) => {
   const EitherOrRow = ({ label, options, value, onChange }) => (
     <div className="mb-4">
       <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">{label}</label>
-      <div className="flex gap-2">
-        {options.map(opt => (
+      <div className="flex rounded-full border border-gray-300 overflow-hidden">
+        {options.map((opt, i) => (
           <button
             key={opt}
             type="button"
             onClick={() => onChange(opt)}
-            className={`flex-1 py-1.5 text-sm rounded-full border font-medium transition-colors ${
-              value === opt
-                ? 'bg-indigo-600 text-white border-indigo-600'
-                : 'bg-white text-gray-600 border-gray-300 hover:border-indigo-400'
-            }`}
+            className={`flex-1 py-1.5 text-sm font-medium transition-colors ${i > 0 ? 'border-l border-gray-300 ' : ''}${value === opt ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
           >
             {opt}
           </button>
@@ -191,17 +187,13 @@ const EditPostModal = ({ post, onClose, onPostUpdated }) => {
 
             <div className="mb-4">
               <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Size</label>
-              <div className="flex gap-2">
-                {SIZES.map(s => (
+              <div className="flex rounded-full border border-gray-300 overflow-hidden">
+                {SIZES.map((s, i) => (
                   <button
                     key={s}
                     type="button"
                     onClick={() => toggleSingle(setSize, size, s)}
-                    className={`flex-1 py-1.5 text-sm rounded-full border font-medium transition-colors ${
-                      size === s
-                        ? 'bg-indigo-600 text-white border-indigo-600'
-                        : 'bg-white text-gray-600 border-gray-300 hover:border-indigo-400'
-                    }`}
+                    className={`flex-1 py-1.5 text-sm font-medium transition-colors ${i > 0 ? 'border-l border-gray-300 ' : ''}${size === s ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
                   >
                     {s}
                   </button>
