@@ -2,10 +2,8 @@ import React, { useState } from 'react';
 import { X, Hash, Save } from 'lucide-react';
 import {
   COLOR_TYPES,
-  FLASH_OR_CUSTOM,
   SIZES,
-  FOUNDATIONAL_STYLES,
-  TECHNIQUES,
+  STYLES,
   SUBJECTS,
 } from '../constants/tattooCategories';
 
@@ -14,10 +12,9 @@ const EditPostModal = ({ post, onClose, onPostUpdated }) => {
   const [tags, setTags] = useState(post.tags || []);
   const [currentTag, setCurrentTag] = useState('');
   const [colorType, setColorType] = useState(post.colorType || '');
-  const [flashOrCustom, setFlashOrCustom] = useState(post.flashOrCustom || '');
+  const [flashType, setFlashType] = useState(post.flashOrCustom || '');
   const [size, setSize] = useState(post.size || '');
-  const [foundationalStyles, setFoundationalStyles] = useState(post.foundationalStyles || []);
-  const [techniques, setTechniques] = useState(post.techniques || []);
+  const [styles, setStyles] = useState(post.styles || []);
   const [subjects, setSubjects] = useState(post.subjects || []);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
@@ -62,7 +59,7 @@ const EditPostModal = ({ post, onClose, onPostUpdated }) => {
           'Content-Type': 'application/json',
           'x-auth-token': localStorage.getItem('token'),
         },
-        body: JSON.stringify({ caption, tags, colorType, flashOrCustom, size, foundationalStyles, techniques, subjects }),
+        body: JSON.stringify({ caption, tags, colorType, flashOrCustom: flashType, size, styles, subjects }),
       });
       if (!response.ok) {
         const data = await response.json();
@@ -170,12 +167,6 @@ const EditPostModal = ({ post, onClose, onPostUpdated }) => {
               value={colorType}
               onChange={(v) => toggleSingle(setColorType, colorType, v)}
             />
-            <EitherOrRow
-              label="Design"
-              options={FLASH_OR_CUSTOM}
-              value={flashOrCustom}
-              onChange={(v) => toggleSingle(setFlashOrCustom, flashOrCustom, v)}
-            />
 
             <div className="mb-4">
               <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Size</label>
@@ -198,16 +189,10 @@ const EditPostModal = ({ post, onClose, onPostUpdated }) => {
             </div>
 
             <MultiSelectGroup
-              label="Foundational Style"
-              options={FOUNDATIONAL_STYLES}
-              selected={foundationalStyles}
-              onToggle={(v) => toggleMulti(setFoundationalStyles, foundationalStyles, v, 'styles')}
-            />
-            <MultiSelectGroup
-              label="Technique / Finish"
-              options={TECHNIQUES}
-              selected={techniques}
-              onToggle={(v) => toggleMulti(setTechniques, techniques, v, 'techniques')}
+              label="Style"
+              options={STYLES}
+              selected={styles}
+              onToggle={(v) => toggleMulti(setStyles, styles, v, 'styles')}
             />
             <MultiSelectGroup
               label="Subject"
@@ -215,6 +200,27 @@ const EditPostModal = ({ post, onClose, onPostUpdated }) => {
               selected={subjects}
               onToggle={(v) => toggleMulti(setSubjects, subjects, v, 'subjects')}
             />
+
+            {/* Flash Sheet / Tattoo Work toggle */}
+            <div className="mb-4">
+              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Type</label>
+              <div className="flex rounded-full border border-gray-300 overflow-hidden">
+                <button
+                  type="button"
+                  onClick={() => setFlashType(flashType === 'Flash Sheet' ? '' : 'Flash Sheet')}
+                  className={`flex-1 py-1.5 text-sm font-medium transition-colors ${flashType === 'Flash Sheet' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
+                >
+                  Flash Sheet
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setFlashType(flashType === 'Tattoo Work' ? '' : 'Tattoo Work')}
+                  className={`flex-1 py-1.5 text-sm font-medium transition-colors border-l border-gray-300 ${flashType === 'Tattoo Work' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
+                >
+                  Tattoo Work
+                </button>
+              </div>
+            </div>
 
             <div className="mb-4">
               <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">

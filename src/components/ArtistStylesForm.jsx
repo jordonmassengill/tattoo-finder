@@ -14,18 +14,15 @@ import { Star } from 'lucide-react';
 import {
   INK_SPECIALTIES,
   DESIGN_SPECIALTIES,
-  FOUNDATIONAL_STYLES,
-  TECHNIQUES,
+  STYLES,
   SUBJECTS,
 } from '../constants/tattooCategories';
 
 export const EMPTY_ARTIST_STYLES = {
   inkSpecialty: '',
   designSpecialty: '',
-  foundationalStyles: [],
-  foundationalStyleSpecialties: [],
-  techniques: [],
-  techniqueSpecialties: [],
+  styles: [],
+  styleSpecialties: [],
   subjects: [],
   subjectSpecialties: [],
 };
@@ -137,16 +134,10 @@ const ArtistStylesForm = ({ value, onChange }) => {
         hint="Your specialty — not a restriction on what you can do."
       />
       <SpecialtyGroup
-        label="Foundational Style"
-        options={FOUNDATIONAL_STYLES}
-        selectedKey="foundationalStyles"
-        specialtiesKey="foundationalStyleSpecialties"
-      />
-      <SpecialtyGroup
-        label="Technique / Finish"
-        options={TECHNIQUES}
-        selectedKey="techniques"
-        specialtiesKey="techniqueSpecialties"
+        label="Style"
+        options={STYLES}
+        selectedKey="styles"
+        specialtiesKey="styleSpecialties"
       />
       <SpecialtyGroup
         label="Subject"

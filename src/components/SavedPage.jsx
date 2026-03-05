@@ -1,16 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
-import { Heart, MessageCircle, Search, Filter, Bookmark, MapPin, Users, Image } from 'lucide-react';
+import { Heart, MessageCircle, Search, Filter, Bookmark, MapPin, Users, Image, BarChart2, LayoutGrid, Grid } from 'lucide-react';
 import CommentModal from './CommentModal';
 import ProfileImage from './ProfileImage';
 import { BAY_AREA_CITIES } from '../constants/locations';
 import {
   COLOR_TYPES,
-  FLASH_OR_CUSTOM,
   SIZES,
-  FOUNDATIONAL_STYLES,
-  TECHNIQUES,
+  STYLES,
   SUBJECTS,
 } from '../constants/tattooCategories';
 import { useAuth } from '../context/AuthContext';
@@ -27,7 +25,7 @@ const profileUrl = (user) => {
   return user.userType === 'shop' ? `/shop/${user.username}` : `/artist/${user.username}`;
 };
 
-const PostItem = ({ post, onPostClick }) => {
+const PostItem = ({ post, onPostClick, isGrid = true }) => {
   const { currentUser, updateCurrentUser } = useAuth();
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(post.likes.length);
@@ -68,6 +66,38 @@ const PostItem = ({ post, onPostClick }) => {
     }
   };
 
+  if (!isGrid) {
+    return (
+      <div className="bg-white border border-gray-200 rounded-md mb-6">
+        <div className="flex items-center p-3">
+          <Link to={profileUrl(post.user)} className="flex items-center">
+            <ProfileImage user={post.user} size="md" />
+            <div className="ml-3">
+              <p className="font-semibold">{post.user.username}</p>
+            </div>
+          </Link>
+        </div>
+        <img src={`http://localhost:5000/${post.image}`} alt={post.caption} className="w-full object-cover cursor-pointer" onClick={() => onPostClick(post)} />
+        <div className="p-3">
+          <div className="flex items-center gap-4 mb-2">
+            <button onClick={handleLikeToggle} className="flex items-center gap-1">
+              <Heart size={22} className={`transition-colors ${isLiked ? 'text-red-500' : 'text-gray-700'}`} fill={isLiked ? 'currentColor' : 'none'} />
+              <span>{likeCount}</span>
+            </button>
+            <button className="flex items-center gap-1" onClick={() => onPostClick(post)}>
+              <MessageCircle size={22} />
+              <span>{post.comments.length}</span>
+            </button>
+            <button onClick={handleSaveToggle} className="ml-auto">
+              <Bookmark size={22} className={`transition-colors ${isSaved ? 'text-blue-400' : 'text-gray-700'}`} fill={isSaved ? 'currentColor' : 'none'} />
+            </button>
+          </div>
+          <p><Link to={profileUrl(post.user)} className="font-semibold">{post.user.username}</Link> {post.caption}</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="relative group cursor-pointer" onClick={() => onPostClick(post)}>
       <img
@@ -96,11 +126,10 @@ const PostItem = ({ post, onPostClick }) => {
 
 const EMPTY_POST_FILTERS = {
   colorType: '',
-  flashOrCustom: '',
+  flashType: '',
   size: '',
   location: [],
-  foundationalStyles: [],
-  techniques: [],
+  styles: [],
   subjects: [],
 };
 
@@ -109,8 +138,7 @@ const EMPTY_ARTIST_FILTERS = {
   designSpecialty: '',
   priceRange: [],
   location: [],
-  foundationalStyleSpecialties: [],
-  techniqueSpecialties: [],
+  styleSpecialties: [],
   subjectSpecialties: [],
 };
 
@@ -137,6 +165,7 @@ const SavedPage = () => {
   // Shared
   const [viewTab, setViewTab] = useState('posts');
   const [showFilters, setShowFilters] = useState(false);
+  const [viewMode, setViewMode] = useState('grid3');
 
   // Load saved posts once
   useEffect(() => {
@@ -184,11 +213,10 @@ const SavedPage = () => {
       );
     }
     if (postFilters.colorType) posts = posts.filter(p => p.colorType === postFilters.colorType);
-    if (postFilters.flashOrCustom) posts = posts.filter(p => p.flashOrCustom === postFilters.flashOrCustom);
+    if (postFilters.flashType) posts = posts.filter(p => p.flashOrCustom === postFilters.flashType);
     if (postFilters.size) posts = posts.filter(p => p.size === postFilters.size);
     if (postFilters.location.length > 0) posts = posts.filter(p => p.user?.location && postFilters.location.includes(p.user.location));
-    if (postFilters.foundationalStyles.length > 0) posts = posts.filter(p => p.foundationalStyles?.some(s => postFilters.foundationalStyles.includes(s)));
-    if (postFilters.techniques.length > 0) posts = posts.filter(p => p.techniques?.some(t => postFilters.techniques.includes(t)));
+    if (postFilters.styles.length > 0) posts = posts.filter(p => p.styles?.some(s => postFilters.styles.includes(s)));
     if (postFilters.subjects.length > 0) posts = posts.filter(p => p.subjects?.some(s => postFilters.subjects.includes(s)));
 
     if (postSortOption === 'likes') {
@@ -211,8 +239,7 @@ const SavedPage = () => {
     if (artistFilters.designSpecialty) users = users.filter(u => u.designSpecialty === artistFilters.designSpecialty);
     if (artistFilters.priceRange.length > 0) users = users.filter(u => artistFilters.priceRange.includes(u.priceRange));
     if (artistFilters.location.length > 0) users = users.filter(u => artistFilters.location.includes(u.location));
-    if (artistFilters.foundationalStyleSpecialties.length > 0) users = users.filter(u => u.foundationalStyleSpecialties?.some(s => artistFilters.foundationalStyleSpecialties.includes(s)));
-    if (artistFilters.techniqueSpecialties.length > 0) users = users.filter(u => u.techniqueSpecialties?.some(t => artistFilters.techniqueSpecialties.includes(t)));
+    if (artistFilters.styleSpecialties.length > 0) users = users.filter(u => u.styleSpecialties?.some(s => artistFilters.styleSpecialties.includes(s)));
     if (artistFilters.subjectSpecialties.length > 0) users = users.filter(u => u.subjectSpecialties?.some(s => artistFilters.subjectSpecialties.includes(s)));
 
     if (followingSortOption === 'followers') {
@@ -240,14 +267,14 @@ const SavedPage = () => {
   const resetArtistFilters = () => { setArtistFilters(EMPTY_ARTIST_FILTERS); setFollowingQuery(''); setSubmittedFollowingQuery(''); };
 
   const postActiveFilterCount = [
-    postFilters.colorType, postFilters.flashOrCustom, postFilters.size,
-    ...postFilters.location, ...postFilters.foundationalStyles, ...postFilters.techniques, ...postFilters.subjects,
+    postFilters.colorType, postFilters.flashType, postFilters.size,
+    ...postFilters.location, ...postFilters.styles, ...postFilters.subjects,
   ].filter(Boolean).length;
 
   const artistActiveFilterCount = [
     artistFilters.inkSpecialty, artistFilters.designSpecialty,
     ...artistFilters.priceRange, ...artistFilters.location,
-    ...artistFilters.foundationalStyleSpecialties, ...artistFilters.techniqueSpecialties, ...artistFilters.subjectSpecialties,
+    ...artistFilters.styleSpecialties, ...artistFilters.subjectSpecialties,
   ].filter(Boolean).length;
 
   const activeFilterCount = viewTab === 'posts' ? postActiveFilterCount : artistActiveFilterCount;
@@ -295,7 +322,7 @@ const SavedPage = () => {
 
   return (
     <div className="max-w-screen-xl mx-auto p-8">
-      {/* Title (left) + Posts / Following toggle (centered) */}
+      {/* Title (left) + Posts / Following toggle (centered) + grid selector (right) */}
       <div className="grid grid-cols-3 items-center mb-6">
         <h1 className="text-3xl font-bold">Saved</h1>
         <div className="flex justify-center">
@@ -310,7 +337,19 @@ const SavedPage = () => {
             </button>
           </div>
         </div>
-        <div />
+        <div className="flex justify-end">
+          <div className="flex bg-gray-100 rounded-lg p-1">
+            <button onClick={() => setViewMode('feed')} className={`p-2 rounded ${viewMode === 'feed' ? 'bg-white shadow' : ''}`}>
+              <BarChart2 size={20} />
+            </button>
+            <button onClick={() => setViewMode('grid3')} className={`p-2 rounded mx-1 ${viewMode === 'grid3' ? 'bg-white shadow' : ''}`}>
+              <LayoutGrid size={20} />
+            </button>
+            <button onClick={() => setViewMode('grid5')} className={`p-2 rounded ${viewMode === 'grid5' ? 'bg-white shadow' : ''}`}>
+              <Grid size={20} />
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Search + filters bar */}
@@ -365,7 +404,6 @@ const SavedPage = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8">
               <div>
                 <EitherOrRow label="Ink" options={COLOR_TYPES} filterKey="colorType" onToggle={togglePostSingle} active={(k, v) => postFilters[k] === v} />
-                <EitherOrRow label="Design" options={FLASH_OR_CUSTOM} filterKey="flashOrCustom" onToggle={togglePostSingle} active={(k, v) => postFilters[k] === v} />
                 <div className="mb-4">
                   <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Size</p>
                   <div className="flex gap-2">
@@ -390,9 +428,22 @@ const SavedPage = () => {
                 </div>
               </div>
               <div>
-                <ChipGroup label="Foundational Style" options={FOUNDATIONAL_STYLES} filterKey="foundationalStyles" onToggle={togglePostArray} active={(k, v) => postFilters[k].includes(v)} />
-                <ChipGroup label="Technique / Finish" options={TECHNIQUES} filterKey="techniques" onToggle={togglePostArray} active={(k, v) => postFilters[k].includes(v)} />
+                <ChipGroup label="Style" options={STYLES} filterKey="styles" onToggle={togglePostArray} active={(k, v) => postFilters[k].includes(v)} />
                 <ChipGroup label="Subject" options={SUBJECTS} filterKey="subjects" onToggle={togglePostArray} active={(k, v) => postFilters[k].includes(v)} />
+                {/* Flash Sheet / Tattoo Work toggle */}
+                <div className="mb-4">
+                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Type</p>
+                  <div className="flex rounded-full border border-gray-300 overflow-hidden">
+                    <button type="button" onClick={() => togglePostSingle('flashType', 'Flash Sheet')}
+                      className={`flex-1 py-1.5 text-sm font-medium transition-colors ${postFilters.flashType === 'Flash Sheet' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}>
+                      Flash Sheet
+                    </button>
+                    <button type="button" onClick={() => togglePostSingle('flashType', 'Tattoo Work')}
+                      className={`flex-1 py-1.5 text-sm font-medium transition-colors border-l border-gray-300 ${postFilters.flashType === 'Tattoo Work' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}>
+                      Tattoo Work
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           ) : (
@@ -445,8 +496,7 @@ const SavedPage = () => {
                 </div>
               </div>
               <div>
-                <ChipGroup label="Foundational Style" options={FOUNDATIONAL_STYLES} filterKey="foundationalStyleSpecialties" onToggle={toggleArtistArray} active={(k, v) => artistFilters[k].includes(v)} />
-                <ChipGroup label="Technique / Finish" options={TECHNIQUES} filterKey="techniqueSpecialties" onToggle={toggleArtistArray} active={(k, v) => artistFilters[k].includes(v)} />
+                <ChipGroup label="Style" options={STYLES} filterKey="styleSpecialties" onToggle={toggleArtistArray} active={(k, v) => artistFilters[k].includes(v)} />
                 <ChipGroup label="Subject" options={SUBJECTS} filterKey="subjectSpecialties" onToggle={toggleArtistArray} active={(k, v) => artistFilters[k].includes(v)} />
               </div>
             </div>
@@ -482,11 +532,11 @@ const SavedPage = () => {
             </div>
           )}
           {!loadingPosts && filteredPosts.length > 0 && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-              {filteredPosts.map(post => (
-                <PostItem key={post._id} post={post} onPostClick={setSelectedPost} />
-              ))}
-            </div>
+            viewMode === 'feed'
+              ? <div className="max-w-xl mx-auto">{filteredPosts.map(post => <PostItem key={post._id} post={post} onPostClick={setSelectedPost} isGrid={false} />)}</div>
+              : <div className={`grid ${viewMode === 'grid3' ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3' : 'grid-cols-2 sm:grid-cols-3 md:grid-cols-5'} gap-1`}>
+                  {filteredPosts.map(post => <PostItem key={post._id} post={post} onPostClick={setSelectedPost} isGrid={true} />)}
+                </div>
           )}
         </>
       )}
@@ -512,35 +562,60 @@ const SavedPage = () => {
             </div>
           )}
           {!loadingFollowing && filteredFollowing.length > 0 && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-              {filteredFollowing.map(user => (
-                <div key={user._id} className="relative group">
-                  <Link to={profileUrl(user)} className="block">
-                    <div className="aspect-square relative overflow-hidden rounded-lg border border-gray-200">
-                      <ProfileImage user={user} size="xl" className="w-full h-full object-cover" />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent p-3 flex flex-col justify-end">
-                        <h3 className="font-bold text-white text-lg">{user.username}</h3>
-                        {user.location && (
-                          <div className="flex items-center text-white/90 text-sm">
-                            <MapPin size={12} className="mr-1 flex-shrink-0" />
-                            <span className="truncate">{user.location}</span>
+            viewMode === 'feed'
+              ? <div className="max-w-xl mx-auto">
+                  {filteredFollowing.map(user => (
+                    <div key={user._id} className="bg-white border border-gray-200 rounded-lg overflow-hidden mb-6">
+                      <div className="flex">
+                        <div className="w-24 h-24 sm:w-32 sm:h-32 flex-shrink-0">
+                          <ProfileImage user={user} size="xl" className="w-full h-full object-cover" />
+                        </div>
+                        <div className="p-4 flex-grow">
+                          <Link to={profileUrl(user)} className="font-semibold text-lg hover:text-blue-600">{user.username}</Link>
+                          {user.location && (
+                            <div className="flex items-center text-sm text-gray-600 mt-1">
+                              <MapPin size={14} className="mr-1" />
+                              <span>{user.location}</span>
+                            </div>
+                          )}
+                          <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
+                            <span className="flex items-center gap-1"><Users size={13} />{formatNum(user.followers?.length || 0)}</span>
                           </div>
-                        )}
-                      </div>
-                      <div className="absolute top-2 right-2 bg-black/50 text-white text-xs px-2 py-0.5 rounded-full capitalize">
-                        {user.userType}
-                      </div>
-                      <div className="absolute bottom-3 right-3 flex flex-col items-end gap-0.5">
-                        <div className="flex items-center text-white/90 text-xs drop-shadow">
-                          <span className="mr-1">{formatNum(user.followers?.length || 0)}</span>
-                          <Users size={11} />
+                          <div className="mt-2 text-xs text-gray-400 capitalize">{user.userType}</div>
                         </div>
                       </div>
                     </div>
-                  </Link>
+                  ))}
                 </div>
-              ))}
-            </div>
+              : <div className={`grid ${viewMode === 'grid3' ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3' : 'grid-cols-2 sm:grid-cols-3 md:grid-cols-5'} gap-1`}>
+                  {filteredFollowing.map(user => (
+                    <div key={user._id} className="relative group">
+                      <Link to={profileUrl(user)} className="block">
+                        <div className="aspect-square relative overflow-hidden rounded-lg border border-gray-200">
+                          <ProfileImage user={user} size="xl" className="w-full h-full object-cover" />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent p-3 flex flex-col justify-end">
+                            <h3 className="font-bold text-white text-lg">{user.username}</h3>
+                            {user.location && (
+                              <div className="flex items-center text-white/90 text-sm">
+                                <MapPin size={12} className="mr-1 flex-shrink-0" />
+                                <span className="truncate">{user.location}</span>
+                              </div>
+                            )}
+                          </div>
+                          <div className="absolute top-2 right-2 bg-black/50 text-white text-xs px-2 py-0.5 rounded-full capitalize">
+                            {user.userType}
+                          </div>
+                          <div className="absolute bottom-3 right-3 flex flex-col items-end gap-0.5">
+                            <div className="flex items-center text-white/90 text-xs drop-shadow">
+                              <span className="mr-1">{formatNum(user.followers?.length || 0)}</span>
+                              <Users size={11} />
+                            </div>
+                          </div>
+                        </div>
+                      </Link>
+                    </div>
+                  ))}
+                </div>
           )}
         </>
       )}

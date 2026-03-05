@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { MapPin, Filter, Users, Image, Heart, MessageCircle, Search, Bookmark } from 'lucide-react';
+import { MapPin, Filter, Users, Image, Heart, MessageCircle, Search, Bookmark, BarChart2, LayoutGrid, Grid } from 'lucide-react';
 import ProfileImage from './ProfileImage';
 import { BAY_AREA_CITIES } from '../constants/locations';
 import {
   COLOR_TYPES,
-  FLASH_OR_CUSTOM,
   SIZES,
-  FOUNDATIONAL_STYLES,
-  TECHNIQUES,
+  STYLES,
   SUBJECTS,
 } from '../constants/tattooCategories';
 import CommentModal from './CommentModal';
@@ -104,16 +102,14 @@ const EMPTY_FILTERS = {
   location: [],
   priceRange: [],
   colorType: '',
-  flashOrCustom: '',
+  flashType: '',
   size: '',
-  foundationalStyles: [],
-  techniques: [],
+  styles: [],
   subjects: [],
   // Artist-only filters
   inkSpecialty: '',
   designSpecialty: '',
-  foundationalStyleSpecialties: [],
-  techniqueSpecialties: [],
+  styleSpecialties: [],
   subjectSpecialties: [],
 };
 
@@ -142,17 +138,15 @@ const SearchPage = () => {
         if (searchType === 'posts') {
           filters.priceRange.forEach(price => params.append('priceRange', price));
           if (filters.colorType) params.append('colorType', filters.colorType);
-          if (filters.flashOrCustom) params.append('flashOrCustom', filters.flashOrCustom);
+          if (filters.flashType) params.append('flashOrCustom', filters.flashType);
           if (filters.size) params.append('size', filters.size);
-          if (filters.foundationalStyles.length > 0) params.append('foundationalStyles', filters.foundationalStyles.join(','));
-          if (filters.techniques.length > 0) params.append('techniques', filters.techniques.join(','));
+          if (filters.styles.length > 0) params.append('styles', filters.styles.join(','));
           if (filters.subjects.length > 0) params.append('subjects', filters.subjects.join(','));
         } else {
           filters.priceRange.forEach(price => params.append('priceRange', price));
           if (filters.inkSpecialty) params.append('inkSpecialty', filters.inkSpecialty);
           if (filters.designSpecialty) params.append('designSpecialty', filters.designSpecialty);
-          if (filters.foundationalStyleSpecialties.length > 0) params.append('foundationalStyleSpecialties', filters.foundationalStyleSpecialties.join(','));
-          if (filters.techniqueSpecialties.length > 0) params.append('techniqueSpecialties', filters.techniqueSpecialties.join(','));
+          if (filters.styleSpecialties.length > 0) params.append('styleSpecialties', filters.styleSpecialties.join(','));
           if (filters.subjectSpecialties.length > 0) params.append('subjectSpecialties', filters.subjectSpecialties.join(','));
         }
 
@@ -197,8 +191,8 @@ const SearchPage = () => {
   const resetFilters = () => { setFilters(EMPTY_FILTERS); setSearchQuery(''); setSubmittedQuery(''); };
 
   const activeFilterCount = searchType === 'posts'
-    ? [filters.colorType, filters.flashOrCustom, filters.size, ...filters.location, ...filters.priceRange, ...filters.foundationalStyles, ...filters.techniques, ...filters.subjects].filter(Boolean).length
-    : [filters.inkSpecialty, filters.designSpecialty, ...filters.location, ...filters.priceRange, ...filters.foundationalStyleSpecialties, ...filters.techniqueSpecialties, ...filters.subjectSpecialties].filter(Boolean).length;
+    ? [filters.colorType, filters.flashType, filters.size, ...filters.location, ...filters.priceRange, ...filters.styles, ...filters.subjects].filter(Boolean).length
+    : [filters.inkSpecialty, filters.designSpecialty, ...filters.location, ...filters.priceRange, ...filters.styleSpecialties, ...filters.subjectSpecialties].filter(Boolean).length;
 
   // ---- Filter sub-components ----
   const EitherOrFilterRow = ({ label, options, filterKey }) => (
@@ -344,7 +338,19 @@ const SearchPage = () => {
             </button>
           </div>
         </div>
-        <div />
+        <div className="flex justify-end">
+          <div className="flex bg-gray-100 rounded-lg p-1">
+            <button onClick={() => setViewMode('feed')} className={`p-2 rounded ${viewMode === 'feed' ? 'bg-white shadow' : ''}`}>
+              <BarChart2 size={20} />
+            </button>
+            <button onClick={() => setViewMode('grid3')} className={`p-2 rounded mx-1 ${viewMode === 'grid3' ? 'bg-white shadow' : ''}`}>
+              <LayoutGrid size={20} />
+            </button>
+            <button onClick={() => setViewMode('grid5')} className={`p-2 rounded ${viewMode === 'grid5' ? 'bg-white shadow' : ''}`}>
+              <Grid size={20} />
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Search bar */}
@@ -388,7 +394,6 @@ const SearchPage = () => {
               {/* Left column */}
               <div>
                 <EitherOrFilterRow label="Ink" options={COLOR_TYPES} filterKey="colorType" />
-                <EitherOrFilterRow label="Design" options={FLASH_OR_CUSTOM} filterKey="flashOrCustom" />
 
                 {/* Size */}
                 <div className="mb-4">
@@ -427,17 +432,37 @@ const SearchPage = () => {
 
               {/* Right column */}
               <div>
-                <ChipFilterGroup label="Foundational Style" options={FOUNDATIONAL_STYLES} filterKey="foundationalStyles" />
-                <ChipFilterGroup label="Technique / Finish" options={TECHNIQUES} filterKey="techniques" />
+                <ChipFilterGroup label="Style" options={STYLES} filterKey="styles" />
                 <ChipFilterGroup label="Subject" options={SUBJECTS} filterKey="subjects" />
+
+                {/* Flash Sheet / Tattoo Work toggle */}
+                <div className="mb-4">
+                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Type</p>
+                  <div className="flex rounded-full border border-gray-300 overflow-hidden">
+                    <button
+                      type="button"
+                      onClick={() => toggleSingleFilter('flashType', 'Flash Sheet')}
+                      className={`flex-1 py-1.5 text-sm font-medium transition-colors ${filters.flashType === 'Flash Sheet' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
+                    >
+                      Flash Sheet
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => toggleSingleFilter('flashType', 'Tattoo Work')}
+                      className={`flex-1 py-1.5 text-sm font-medium transition-colors border-l border-gray-300 ${filters.flashType === 'Tattoo Work' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
+                    >
+                      Tattoo Work
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           ) : (
-            /* Artists filter panel — mirrors post layout */
+            /* Artists filter panel */
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8">
               {/* Left column */}
               <div>
-                {/* Ink specialty — mirrors Color row */}
+                {/* Ink specialty */}
                 <div className="mb-4">
                   <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Ink</p>
                   <div className="flex gap-2">
@@ -450,7 +475,7 @@ const SearchPage = () => {
                   </div>
                 </div>
 
-                {/* Design specialty — mirrors Type row */}
+                {/* Design specialty */}
                 <div className="mb-4">
                   <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Design</p>
                   <div className="flex gap-2">
@@ -463,7 +488,7 @@ const SearchPage = () => {
                   </div>
                 </div>
 
-                {/* Price — mirrors Size row */}
+                {/* Price */}
                 <div className="mb-4">
                   <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Price</p>
                   <div className="flex gap-2">
@@ -490,10 +515,9 @@ const SearchPage = () => {
                 </div>
               </div>
 
-              {/* Right column — specialty chips (only artists with that specialty appear) */}
+              {/* Right column — specialty chips */}
               <div>
-                <ChipFilterGroup label="Foundational Style" options={FOUNDATIONAL_STYLES} filterKey="foundationalStyleSpecialties" />
-                <ChipFilterGroup label="Technique / Finish" options={TECHNIQUES} filterKey="techniqueSpecialties" />
+                <ChipFilterGroup label="Style" options={STYLES} filterKey="styleSpecialties" />
                 <ChipFilterGroup label="Subject" options={SUBJECTS} filterKey="subjectSpecialties" />
               </div>
             </div>

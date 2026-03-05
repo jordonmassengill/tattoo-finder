@@ -1,9 +1,6 @@
 // Color type - either/or
 export const COLOR_TYPES = ['Black/Grey', 'Color'];
 
-// Flash vs Custom - either/or
-export const FLASH_OR_CUSTOM = ['Flash', 'Custom'];
-
 // Size - single select
 export const SIZES = ['Small', 'Medium', 'Large'];
 
@@ -13,45 +10,43 @@ export const INK_SPECIALTIES = ['Black/Grey Specialty', 'Color Specialty', 'I Do
 // Artist design specialty - single select (required for artists)
 export const DESIGN_SPECIALTIES = ['Flash Specialty', 'Custom Specialty', 'I Do Both Equally'];
 
-// Foundational styles - up to 2
-export const FOUNDATIONAL_STYLES = [
+// Style - up to 2 (combines former Foundational Style + Technique/Finish)
+export const STYLES = [
   'Traditional',
-  'Neo-Traditional',
-  'Japanese/Irezumi',
-  'Realism',
-  'Tribal',
-  'Blackwork',
   'New School',
-  'Chicano',
-  'Trash Polka',
-];
-
-// Technique/Finish - up to 2
-export const TECHNIQUES = [
-  'Dotwork',
-  'Linework',
-  'Watercolor',
+  'Lettering',
+  'Realism',
+  'Illustrative',
+  'Tribal',
   'Geometric',
+  'Neo-Traditional',
+  'Japanese',
+  'Blackwork',
   'Minimalist',
   'Fine Line',
-  'Free Hand',
-  'Illustrative',
+  'Micro-Realism',
+  'Watercolor',
+  'Chicano',
   'Sketch',
+  'Trash Polka',
 ];
 
 // Subject - up to 2
 export const SUBJECTS = [
   'Animal',
-  'Floral/Nature',
+  'Floral',
+  'Traditional Imagery',
   'Portrait',
+  'Lettering',
   'Pop Culture',
+  'Anime',
+  'Nature',
   'Dark',
+  'Fantasy',
   'Spiritual',
   'Decorative',
-  'Lettering',
+  'Sci-fi',
   'Abstract',
-  'Sci-Fi',
   'Psychedelic',
-  'Fantasy',
+  'Nautical',
 ];
-

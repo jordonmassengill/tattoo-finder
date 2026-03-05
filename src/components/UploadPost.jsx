@@ -4,10 +4,8 @@ import { X, Upload, Hash, Image } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import {
   COLOR_TYPES,
-  FLASH_OR_CUSTOM,
   SIZES,
-  FOUNDATIONAL_STYLES,
-  TECHNIQUES,
+  STYLES,
   SUBJECTS,
 } from '../constants/tattooCategories';
 
@@ -23,13 +21,12 @@ const UploadPost = ({ onClose, onPostCreated }) => {
   const [step, setStep] = useState(1);
   const [error, setError] = useState('');
 
-  // New category state
-  const [colorType, setColorType] = useState('');         // 'Black/Grey' | 'Color' | ''
-  const [flashOrCustom, setFlashOrCustom] = useState(''); // 'Flash' | 'Custom' | ''
-  const [size, setSize] = useState('');                   // 'Small' | 'Medium' | 'Large' | ''
-  const [foundationalStyles, setFoundationalStyles] = useState([]);  // up to 2
-  const [techniques, setTechniques] = useState([]);                  // up to 2
-  const [subjects, setSubjects] = useState([]);                      // up to 2
+  // Category state
+  const [colorType, setColorType] = useState('');   // 'Black/Grey' | 'Color' | ''
+  const [flashType, setFlashType] = useState('');   // 'Flash Sheet' | 'Tattoo Work' | ''
+  const [size, setSize] = useState('');             // 'Small' | 'Medium' | 'Large' | ''
+  const [styles, setStyles] = useState([]);         // up to 2
+  const [subjects, setSubjects] = useState([]);     // up to 2
 
   const fileInputRef = useRef(null);
 
@@ -94,10 +91,9 @@ const UploadPost = ({ onClose, onPostCreated }) => {
       formData.append('caption', caption);
       if (tags.length > 0) formData.append('tags', tags.join(','));
       if (colorType) formData.append('colorType', colorType);
-      if (flashOrCustom) formData.append('flashOrCustom', flashOrCustom);
+      if (flashType) formData.append('flashOrCustom', flashType);
       if (size) formData.append('size', size);
-      if (foundationalStyles.length > 0) formData.append('foundationalStyles', foundationalStyles.join(','));
-      if (techniques.length > 0) formData.append('techniques', techniques.join(','));
+      if (styles.length > 0) formData.append('styles', styles.join(','));
       if (subjects.length > 0) formData.append('subjects', subjects.join(','));
 
       const response = await fetch('http://localhost:5000/api/posts', {
@@ -262,12 +258,6 @@ const UploadPost = ({ onClose, onPostCreated }) => {
                 value={colorType}
                 onChange={(v) => toggleSingle(setColorType, colorType, v)}
               />
-              <EitherOrRow
-                label="Design"
-                options={FLASH_OR_CUSTOM}
-                value={flashOrCustom}
-                onChange={(v) => toggleSingle(setFlashOrCustom, flashOrCustom, v)}
-              />
 
               {/* Size - single select */}
               <div className="mb-4">
@@ -292,16 +282,10 @@ const UploadPost = ({ onClose, onPostCreated }) => {
 
               {/* Multi-select groups */}
               <MultiSelectGroup
-                label="Foundational Style"
-                options={FOUNDATIONAL_STYLES}
-                selected={foundationalStyles}
-                onToggle={(v) => toggleMulti(setFoundationalStyles, foundationalStyles, v, 'styles')}
-              />
-              <MultiSelectGroup
-                label="Technique / Finish"
-                options={TECHNIQUES}
-                selected={techniques}
-                onToggle={(v) => toggleMulti(setTechniques, techniques, v, 'techniques')}
+                label="Style"
+                options={STYLES}
+                selected={styles}
+                onToggle={(v) => toggleMulti(setStyles, styles, v, 'styles')}
               />
               <MultiSelectGroup
                 label="Subject"
@@ -309,6 +293,27 @@ const UploadPost = ({ onClose, onPostCreated }) => {
                 selected={subjects}
                 onToggle={(v) => toggleMulti(setSubjects, subjects, v, 'subjects')}
               />
+
+              {/* Flash Sheet / Tattoo Work toggle */}
+              <div className="mb-4">
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Type</label>
+                <div className="flex rounded-full border border-gray-300 overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => setFlashType(flashType === 'Flash Sheet' ? '' : 'Flash Sheet')}
+                    className={`flex-1 py-1.5 text-sm font-medium transition-colors ${flashType === 'Flash Sheet' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
+                  >
+                    Flash Sheet
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setFlashType(flashType === 'Tattoo Work' ? '' : 'Tattoo Work')}
+                    className={`flex-1 py-1.5 text-sm font-medium transition-colors border-l border-gray-300 ${flashType === 'Tattoo Work' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
+                  >
+                    Tattoo Work
+                  </button>
+                </div>
+              </div>
 
               {/* Tags */}
               <div className="mb-4">
