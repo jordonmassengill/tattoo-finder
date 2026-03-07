@@ -41,13 +41,13 @@ const Login = () => {
   };
   
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-gray-100">
             Log in to your account
           </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
+          <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
             Or{' '}
             <Link to="/signup" className="font-medium text-blue-600 hover:text-blue-500">
               create a new account
@@ -71,7 +71,7 @@ const Login = () => {
                 type="text"
                 autoComplete="username"
                 required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-gray-100 dark:bg-gray-700 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
                 placeholder="Username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
@@ -85,7 +85,7 @@ const Login = () => {
                 type="password"
                 autoComplete="current-password"
                 required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-gray-100 dark:bg-gray-700 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -101,7 +101,7 @@ const Login = () => {
                 type="checkbox"
                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
               />
-              <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
+              <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900 dark:text-gray-300">
                 Remember me
               </label>
             </div>
@@ -125,7 +125,7 @@ const Login = () => {
           
           {/* Demo account shortcuts */}
           <div className="mt-6">
-            <p className="text-center text-sm text-gray-600 mb-2">Demo accounts:</p>
+            <p className="text-center text-sm text-gray-600 dark:text-gray-400 mb-2">Demo accounts:</p>
             <div className="grid grid-cols-3 gap-2">
               <button
                 type="button"
@@ -133,7 +133,7 @@ const Login = () => {
                   setUsername('user1');
                   setPassword('password123');
                 }}
-                className="py-1 px-2 text-xs border border-gray-300 rounded hover:bg-gray-100"
+                className="py-1 px-2 text-xs border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded hover:bg-gray-100 dark:hover:bg-gray-600"
               >
                 Enthusiast
               </button>
@@ -143,7 +143,7 @@ const Login = () => {
                   setUsername('artist1');
                   setPassword('password123');
                 }}
-                className="py-1 px-2 text-xs border border-gray-300 rounded hover:bg-gray-100"
+                className="py-1 px-2 text-xs border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded hover:bg-gray-100 dark:hover:bg-gray-600"
               >
                 Artist
               </button>
@@ -153,7 +153,7 @@ const Login = () => {
                   setUsername('shop1');
                   setPassword('password123');
                 }}
-                className="py-1 px-2 text-xs border border-gray-300 rounded hover:bg-gray-100"
+                className="py-1 px-2 text-xs border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded hover:bg-gray-100 dark:hover:bg-gray-600"
               >
                 Shop
               </button>

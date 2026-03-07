@@ -68,12 +68,12 @@ const PostItem = ({ post, onPostClick, isGrid = true }) => {
 
   if (!isGrid) {
     return (
-      <div className="bg-white border border-gray-200 rounded-md mb-6">
+      <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md mb-6">
         <div className="flex items-center p-3">
           <Link to={profileUrl(post.user)} className="flex items-center">
             <ProfileImage user={post.user} size="md" />
             <div className="ml-3">
-              <p className="font-semibold">{post.user.username}</p>
+              <p className="font-semibold dark:text-gray-100">{post.user.username}</p>
             </div>
           </Link>
         </div>
@@ -81,18 +81,18 @@ const PostItem = ({ post, onPostClick, isGrid = true }) => {
         <div className="p-3">
           <div className="flex items-center gap-4 mb-2">
             <button onClick={handleLikeToggle} className="flex items-center gap-1">
-              <Heart size={22} className={`transition-colors ${isLiked ? 'text-red-500' : 'text-gray-700'}`} fill={isLiked ? 'currentColor' : 'none'} />
-              <span>{likeCount}</span>
+              <Heart size={22} className={`transition-colors ${isLiked ? 'text-red-500' : 'text-gray-700 dark:text-gray-300'}`} fill={isLiked ? 'currentColor' : 'none'} />
+              <span className="dark:text-gray-200">{likeCount}</span>
             </button>
-            <button className="flex items-center gap-1" onClick={() => onPostClick(post)}>
+            <button className="flex items-center gap-1 dark:text-gray-200" onClick={() => onPostClick(post)}>
               <MessageCircle size={22} />
               <span>{post.comments.length}</span>
             </button>
             <button onClick={handleSaveToggle} className="ml-auto">
-              <Bookmark size={22} className={`transition-colors ${isSaved ? 'text-blue-400' : 'text-gray-700'}`} fill={isSaved ? 'currentColor' : 'none'} />
+              <Bookmark size={22} className={`transition-colors ${isSaved ? 'text-blue-400' : 'text-gray-700 dark:text-gray-300'}`} fill={isSaved ? 'currentColor' : 'none'} />
             </button>
           </div>
-          <p><Link to={profileUrl(post.user)} className="font-semibold">{post.user.username}</Link> {post.caption}</p>
+          <p className="dark:text-gray-200"><Link to={profileUrl(post.user)} className="font-semibold dark:text-gray-100">{post.user.username}</Link> {post.caption}</p>
         </div>
       </div>
     );
@@ -282,11 +282,11 @@ const SavedPage = () => {
   // Sub-components
   const EitherOrRow = ({ label, options, filterKey, onToggle, active }) => (
     <div className="mb-4">
-      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">{label}</p>
-      <div className="flex rounded-full border border-gray-300 overflow-hidden">
+      <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">{label}</p>
+      <div className="flex rounded-full border border-gray-300 dark:border-gray-600 overflow-hidden">
         {options.map((opt, i) => (
           <button key={opt} type="button" onClick={() => onToggle(filterKey, opt)}
-            className={`flex-1 py-1.5 text-sm font-medium transition-colors ${i > 0 ? 'border-l border-gray-300 ' : ''}${active(filterKey, opt) ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}>
+            className={`flex-1 py-1.5 text-sm font-medium transition-colors ${i > 0 ? 'border-l border-gray-300 dark:border-gray-600 ' : ''}${active(filterKey, opt) ? 'bg-indigo-600 text-white' : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600'}`}>
             {opt}
           </button>
         ))}
@@ -296,11 +296,11 @@ const SavedPage = () => {
 
   const ChipGroup = ({ label, options, filterKey, onToggle, active }) => (
     <div className="mb-4">
-      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">{label}</p>
+      <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">{label}</p>
       <div className="flex flex-wrap gap-1.5">
         {options.map(opt => (
           <button key={opt} type="button" onClick={() => onToggle(filterKey, opt)}
-            className={`px-2.5 py-1 text-xs rounded-full border font-medium transition-colors ${active(filterKey, opt) ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-600 border-gray-300 hover:border-indigo-400'}`}>
+            className={`px-2.5 py-1 text-xs rounded-full border font-medium transition-colors ${active(filterKey, opt) ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:border-indigo-400'}`}>
             {opt}
           </button>
         ))}
@@ -328,24 +328,24 @@ const SavedPage = () => {
         <div className="flex justify-center">
           <div className="inline-flex rounded-md shadow-sm" role="group">
             <button type="button" onClick={() => handleTabSwitch('posts')}
-              className={`flex items-center px-4 py-2 text-sm font-medium rounded-l-lg ${viewTab === 'posts' ? 'bg-blue-500 text-white' : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-100'}`}>
+              className={`flex items-center px-4 py-2 text-sm font-medium rounded-l-lg ${viewTab === 'posts' ? 'bg-blue-500 text-white' : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600'}`}>
               <Image size={16} className="mr-2" /> Posts
             </button>
             <button type="button" onClick={() => handleTabSwitch('following')}
-              className={`flex items-center px-4 py-2 text-sm font-medium rounded-r-lg ${viewTab === 'following' ? 'bg-blue-500 text-white' : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-100'}`}>
+              className={`flex items-center px-4 py-2 text-sm font-medium rounded-r-lg ${viewTab === 'following' ? 'bg-blue-500 text-white' : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600'}`}>
               <Users size={16} className="mr-2" /> Following
             </button>
           </div>
         </div>
         <div className="flex justify-end">
-          <div className="flex bg-gray-100 rounded-lg p-1">
-            <button onClick={() => setViewMode('feed')} className={`p-2 rounded ${viewMode === 'feed' ? 'bg-white shadow' : ''}`}>
+          <div className="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
+            <button onClick={() => setViewMode('feed')} className={`p-2 rounded ${viewMode === 'feed' ? 'bg-white dark:bg-gray-500 shadow' : 'dark:text-gray-300'}`}>
               <BarChart2 size={20} />
             </button>
-            <button onClick={() => setViewMode('grid3')} className={`p-2 rounded mx-1 ${viewMode === 'grid3' ? 'bg-white shadow' : ''}`}>
+            <button onClick={() => setViewMode('grid3')} className={`p-2 rounded mx-1 ${viewMode === 'grid3' ? 'bg-white dark:bg-gray-500 shadow' : 'dark:text-gray-300'}`}>
               <LayoutGrid size={20} />
             </button>
-            <button onClick={() => setViewMode('grid5')} className={`p-2 rounded ${viewMode === 'grid5' ? 'bg-white shadow' : ''}`}>
+            <button onClick={() => setViewMode('grid5')} className={`p-2 rounded ${viewMode === 'grid5' ? 'bg-white dark:bg-gray-500 shadow' : 'dark:text-gray-300'}`}>
               <Grid size={20} />
             </button>
           </div>
@@ -358,7 +358,7 @@ const SavedPage = () => {
           <input
             type="text"
             placeholder={viewTab === 'posts' ? 'Search in saved posts...' : 'Search followed artists & shops...'}
-            className="w-full pl-10 pr-24 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full pl-10 pr-24 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 dark:placeholder-gray-400"
             value={currentQuery}
             onChange={(e) => setCurrentQuery(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter') handleSearch(); }}
@@ -371,7 +371,7 @@ const SavedPage = () => {
         </div>
         <div className="flex items-center space-x-2">
           <button onClick={() => setShowFilters(!showFilters)}
-            className={`flex items-center px-4 py-2 rounded-lg hover:bg-gray-200 transition ${activeFilterCount > 0 ? 'bg-indigo-100 text-indigo-700' : 'bg-gray-100 text-gray-700'}`}>
+            className={`flex items-center px-4 py-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition ${activeFilterCount > 0 ? 'bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200'}`}>
             <Filter size={18} className="mr-2" />
             Filters
             {activeFilterCount > 0 && (
@@ -381,14 +381,14 @@ const SavedPage = () => {
           {viewTab === 'posts' && (
             <button
               onClick={() => setPostSortOption(prev => prev === 'new' ? 'recent' : prev === 'recent' ? 'likes' : 'new')}
-              className="px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition font-medium whitespace-nowrap">
+              className="px-4 py-2 bg-gray-100 dark:bg-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition font-medium whitespace-nowrap">
               {postSortOption === 'new' ? 'Sort - New' : postSortOption === 'recent' ? 'Sort - Recent' : 'Sort - Likes'}
             </button>
           )}
           {viewTab === 'following' && (
             <button
               onClick={() => setFollowingSortOption(prev => prev === 'recent' ? 'followers' : 'recent')}
-              className="px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition font-medium whitespace-nowrap">
+              className="px-4 py-2 bg-gray-100 dark:bg-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition font-medium whitespace-nowrap">
               {followingSortOption === 'recent' ? 'Sort - Recent' : 'Sort - Followers'}
             </button>
           )}
@@ -397,8 +397,8 @@ const SavedPage = () => {
 
       {/* Filter panel */}
       {showFilters && (
-        <div className="bg-gray-50 rounded-lg p-5 mb-6 border border-gray-200">
-          <h3 className="font-semibold mb-4 text-center">Filter Options</h3>
+        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-5 mb-6 border border-gray-200 dark:border-gray-700">
+          <h3 className="font-semibold mb-4 text-center dark:text-gray-100">Filter Options</h3>
 
           {viewTab === 'posts' ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8">
@@ -408,11 +408,11 @@ const SavedPage = () => {
                   <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Type</p>
                   <div className="flex rounded-full border border-gray-300 overflow-hidden">
                     <button type="button" onClick={() => togglePostSingle('flashType', 'Tattoo Work')}
-                      className={`flex-1 py-1.5 text-sm font-medium transition-colors ${postFilters.flashType === 'Tattoo Work' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}>
+                      className={`flex-1 py-1.5 text-sm font-medium transition-colors ${postFilters.flashType === 'Tattoo Work' ? 'bg-indigo-600 text-white' : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600'}`}>
                       Tattoo Work
                     </button>
                     <button type="button" onClick={() => togglePostSingle('flashType', 'Flash Sheet')}
-                      className={`flex-1 py-1.5 text-sm font-medium transition-colors border-l border-gray-300 ${postFilters.flashType === 'Flash Sheet' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}>
+                      className={`flex-1 py-1.5 text-sm font-medium transition-colors border-l border-gray-300 dark:border-gray-600 ${postFilters.flashType === 'Flash Sheet' ? 'bg-indigo-600 text-white' : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600'}`}>
                       Flash Sheet
                     </button>
                   </div>
@@ -423,7 +423,7 @@ const SavedPage = () => {
                   <div className="flex rounded-full border border-gray-300 overflow-hidden">
                     {SIZES.map((s, i) => (
                       <button key={s} type="button" onClick={() => togglePostSingle('size', s)}
-                        className={`flex-1 py-1.5 text-sm font-medium transition-colors ${i > 0 ? 'border-l border-gray-300 ' : ''}${postFilters.size === s ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}>
+                        className={`flex-1 py-1.5 text-sm font-medium transition-colors ${i > 0 ? 'border-l border-gray-300 dark:border-gray-600 ' : ''}${postFilters.size === s ? 'bg-indigo-600 text-white' : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600'}`}>
                         {s}
                       </button>
                     ))}
@@ -433,7 +433,7 @@ const SavedPage = () => {
                   <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Location</p>
                   <div className="grid grid-cols-2 gap-x-2">
                     {BAY_AREA_CITIES.map(city => (
-                      <label key={city} className="flex items-center text-sm py-0.5 px-1 hover:bg-gray-100 rounded cursor-pointer">
+                      <label key={city} className="flex items-center text-sm py-0.5 px-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded cursor-pointer dark:text-gray-200">
                         <input type="checkbox" checked={postFilters.location.includes(city)} onChange={() => togglePostArray('location', city)} className="mr-2 h-4 w-4 rounded border-gray-300 text-blue-600" />
                         {city}
                       </label>
@@ -455,7 +455,7 @@ const SavedPage = () => {
                   <div className="flex gap-2">
                     {[{ label: 'Black/Grey', value: 'Black/Grey Specialty' }, { label: 'Color', value: 'Color Specialty' }].map(({ label, value }) => (
                       <button key={value} type="button" onClick={() => toggleArtistSingle('inkSpecialty', value)}
-                        className={`flex-1 py-1.5 text-sm rounded-full border font-medium transition-colors ${artistFilters.inkSpecialty === value ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-600 border-gray-300 hover:border-indigo-400'}`}>
+                        className={`flex-1 py-1.5 text-sm rounded-full border font-medium transition-colors ${artistFilters.inkSpecialty === value ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:border-indigo-400'}`}>
                         {label}
                       </button>
                     ))}
@@ -466,7 +466,7 @@ const SavedPage = () => {
                   <div className="flex gap-2">
                     {[{ label: 'Flash', value: 'Flash Specialty' }, { label: 'Custom', value: 'Custom Specialty' }].map(({ label, value }) => (
                       <button key={value} type="button" onClick={() => toggleArtistSingle('designSpecialty', value)}
-                        className={`flex-1 py-1.5 text-sm rounded-full border font-medium transition-colors ${artistFilters.designSpecialty === value ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-600 border-gray-300 hover:border-indigo-400'}`}>
+                        className={`flex-1 py-1.5 text-sm rounded-full border font-medium transition-colors ${artistFilters.designSpecialty === value ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:border-indigo-400'}`}>
                         {label}
                       </button>
                     ))}
@@ -477,7 +477,7 @@ const SavedPage = () => {
                   <div className="flex gap-2">
                     {['$', '$$', '$$$', '$$$$'].map(price => (
                       <button key={price} type="button" onClick={() => toggleArtistArray('priceRange', price)}
-                        className={`flex-1 py-1.5 text-sm rounded-full border font-medium transition-colors ${artistFilters.priceRange.includes(price) ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-600 border-gray-300 hover:border-indigo-400'}`}>
+                        className={`flex-1 py-1.5 text-sm rounded-full border font-medium transition-colors ${artistFilters.priceRange.includes(price) ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:border-indigo-400'}`}>
                         {price}
                       </button>
                     ))}
@@ -487,7 +487,7 @@ const SavedPage = () => {
                   <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Location</p>
                   <div className="grid grid-cols-2 gap-x-2">
                     {BAY_AREA_CITIES.map(city => (
-                      <label key={city} className="flex items-center text-sm py-0.5 px-1 hover:bg-gray-100 rounded cursor-pointer">
+                      <label key={city} className="flex items-center text-sm py-0.5 px-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded cursor-pointer dark:text-gray-200">
                         <input type="checkbox" checked={artistFilters.location.includes(city)} onChange={() => toggleArtistArray('location', city)} className="mr-2 h-4 w-4 rounded border-gray-300 text-blue-600" />
                         {city}
                       </label>
@@ -502,8 +502,8 @@ const SavedPage = () => {
             </div>
           )}
 
-          <div className="flex justify-end mt-4 space-x-2 border-t pt-3">
-            <button className="px-4 py-2 text-sm rounded-md bg-gray-300 text-gray-700 hover:bg-gray-400"
+          <div className="flex justify-end mt-4 space-x-2 border-t dark:border-gray-700 pt-3">
+            <button className="px-4 py-2 text-sm rounded-md bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-400 dark:hover:bg-gray-500"
               onClick={viewTab === 'posts' ? resetPostFilters : resetArtistFilters}>Reset</button>
             <button className="px-4 py-2 text-sm rounded-md bg-blue-500 text-white hover:bg-blue-600"
               onClick={() => setShowFilters(false)}>Apply</button>
@@ -521,14 +521,14 @@ const SavedPage = () => {
           )}
           {!loadingPosts && savedPosts.length === 0 && (
             <div className="text-center py-20">
-              <p className="text-xl text-gray-500">You haven't saved any posts yet.</p>
-              <p className="text-gray-400 mt-2">Click the bookmark icon on a post to save it here.</p>
+              <p className="text-xl text-gray-500 dark:text-gray-400">You haven't saved any posts yet.</p>
+              <p className="text-gray-400 dark:text-gray-500 mt-2">Click the bookmark icon on a post to save it here.</p>
             </div>
           )}
           {!loadingPosts && savedPosts.length > 0 && filteredPosts.length === 0 && (
             <div className="text-center py-20">
-              <p className="text-xl text-gray-500">No saved posts match your filters.</p>
-              <p className="text-gray-400 mt-2">Try adjusting your search or click Reset.</p>
+              <p className="text-xl text-gray-500 dark:text-gray-400">No saved posts match your filters.</p>
+              <p className="text-gray-400 dark:text-gray-500 mt-2">Try adjusting your search or click Reset.</p>
             </div>
           )}
           {!loadingPosts && filteredPosts.length > 0 && (
@@ -565,23 +565,23 @@ const SavedPage = () => {
             viewMode === 'feed'
               ? <div className="max-w-xl mx-auto">
                   {filteredFollowing.map(user => (
-                    <div key={user._id} className="bg-white border border-gray-200 rounded-lg overflow-hidden mb-6">
+                    <div key={user._id} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden mb-6">
                       <div className="flex">
                         <div className="w-24 h-24 sm:w-32 sm:h-32 flex-shrink-0">
                           <ProfileImage user={user} size="xl" className="w-full h-full object-cover" />
                         </div>
                         <div className="p-4 flex-grow">
-                          <Link to={profileUrl(user)} className="font-semibold text-lg hover:text-blue-600">{user.username}</Link>
+                          <Link to={profileUrl(user)} className="font-semibold text-lg hover:text-blue-600 dark:text-gray-100">{user.username}</Link>
                           {user.location && (
-                            <div className="flex items-center text-sm text-gray-600 mt-1">
+                            <div className="flex items-center text-sm text-gray-600 dark:text-gray-400 mt-1">
                               <MapPin size={14} className="mr-1" />
                               <span>{user.location}</span>
                             </div>
                           )}
-                          <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
+                          <div className="flex items-center gap-4 mt-2 text-sm text-gray-500 dark:text-gray-400">
                             <span className="flex items-center gap-1"><Users size={13} />{formatNum(user.followers?.length || 0)}</span>
                           </div>
-                          <div className="mt-2 text-xs text-gray-400 capitalize">{user.userType}</div>
+                          <div className="mt-2 text-xs text-gray-400 dark:text-gray-500 capitalize">{user.userType}</div>
                         </div>
                       </div>
                     </div>

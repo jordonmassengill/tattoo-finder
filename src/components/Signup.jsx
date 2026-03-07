@@ -126,7 +126,7 @@ const Signup = () => {
   // Step 1: Select Account Type
   const renderStep1 = () => (
     <div className="space-y-6">
-      <h2 className="text-xl font-semibold mb-4">Choose Account Type</h2>
+      <h2 className="text-xl font-semibold mb-4 dark:text-gray-100">Choose Account Type</h2>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {[
           { type: 'enthusiast', title: 'Tattoo Enthusiast', desc: 'Follow artists, save tattoo ideas, and book appointments.' },
@@ -135,11 +135,11 @@ const Signup = () => {
         ].map(({ type, title, desc }) => (
           <div
             key={type}
-            className={`border rounded-lg p-6 cursor-pointer hover:border-blue-500 ${userType === type ? 'border-blue-500 bg-blue-50' : ''}`}
+            className={`border rounded-lg p-6 cursor-pointer hover:border-blue-500 ${userType === type ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/30' : 'dark:border-gray-600'}`}
             onClick={() => setUserType(type)}
           >
             <h3 className="font-semibold mb-2">{title}</h3>
-            <p className="text-sm text-gray-600">{desc}</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">{desc}</p>
           </div>
         ))}
       </div>
@@ -149,26 +149,26 @@ const Signup = () => {
   // Step 2: Account Credentials
   const renderStep2 = () => (
     <div className="space-y-6">
-      <h2 className="text-xl font-semibold mb-4">Create Your Account</h2>
+      <h2 className="text-xl font-semibold mb-4 dark:text-gray-100">Create Your Account</h2>
       <div className="space-y-4">
         <div>
-          <label htmlFor="username" className="block text-sm font-medium text-gray-700">Username</label>
+          <label htmlFor="username" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Username</label>
           <div className="mt-1 flex rounded-md shadow-sm">
-            <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 sm:text-sm">@</span>
-            <input type="text" id="username" name="username" value={formData.username} onChange={handleChange} className="flex-1 min-w-0 block w-full px-3 py-2 rounded-none rounded-r-md border border-gray-300 focus:ring-blue-500 focus:border-blue-500 sm:text-sm" required />
+            <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-500 dark:text-gray-400 sm:text-sm">@</span>
+            <input type="text" id="username" name="username" value={formData.username} onChange={handleChange} className="flex-1 min-w-0 block w-full px-3 py-2 rounded-none rounded-r-md border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 focus:ring-blue-500 focus:border-blue-500 sm:text-sm" required />
           </div>
         </div>
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email address</label>
-          <input type="email" id="email" name="email" value={formData.email} onChange={handleChange} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" required />
+          <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Email address</label>
+          <input type="email" id="email" name="email" value={formData.email} onChange={handleChange} className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" required />
         </div>
         <div>
-          <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
-          <input type="password" id="password" name="password" value={formData.password} onChange={handleChange} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" required />
+          <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Password</label>
+          <input type="password" id="password" name="password" value={formData.password} onChange={handleChange} className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" required />
         </div>
         <div>
-          <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">Confirm Password</label>
-          <input type="password" id="confirmPassword" name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" required />
+          <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Confirm Password</label>
+          <input type="password" id="confirmPassword" name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" required />
         </div>
       </div>
     </div>
@@ -177,27 +177,27 @@ const Signup = () => {
   // Step 3: Profile Details (artist / shop)
   const renderStep3 = () => (
     <div className="space-y-6">
-      <h2 className="text-xl font-semibold mb-4">Profile Details</h2>
+      <h2 className="text-xl font-semibold mb-4 dark:text-gray-100">Profile Details</h2>
       <div className="space-y-4">
         {(userType === 'artist' || userType === 'shop') && (
           <>
             <div>
-              <label htmlFor="bio" className="block text-sm font-medium text-gray-700">Bio</label>
-              <textarea id="bio" name="bio" rows={3} value={formData.bio} onChange={handleChange} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
+              <label htmlFor="bio" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Bio</label>
+              <textarea id="bio" name="bio" rows={3} value={formData.bio} onChange={handleChange} className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
             </div>
             <div>
-              <label htmlFor="location" className="block text-sm font-medium text-gray-700">Location</label>
-              <select id="location" name="location" value={formData.location} onChange={handleChange} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+              <label htmlFor="location" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Location</label>
+              <select id="location" name="location" value={formData.location} onChange={handleChange} className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
                 <option value="">Select a Location</option>
                 {BAY_AREA_CITIES.map(city => <option key={city} value={city}>{city}</option>)}
               </select>
             </div>
             {userType === 'artist' && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Price Range</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Price Range</label>
                 <div className="flex flex-wrap gap-2">
                   {['$', '$$', '$$$', '$$$$'].map(price => (
-                    <button key={price} type="button" onClick={() => setFormData({ ...formData, priceRange: formData.priceRange === price ? '' : price })} className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${formData.priceRange === price ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}>
+                    <button key={price} type="button" onClick={() => setFormData({ ...formData, priceRange: formData.priceRange === price ? '' : price })} className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${formData.priceRange === price ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600'}`}>
                       {price}
                     </button>
                   ))}
@@ -225,17 +225,17 @@ const Signup = () => {
   const isLastStep = step === totalSteps;
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">Create Your InkSpace Account</h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-gray-100">Create Your InkSpace Account</h2>
+          <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
             Or{' '}
             <Link to="/login" className="font-medium text-blue-600 hover:text-blue-500">log in to your existing account</Link>
           </p>
         </div>
 
-        <div className="w-full bg-gray-200 rounded-full h-2.5">
+        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
           <div className="bg-blue-600 h-2.5 rounded-full transition-all duration-300" style={{ width: `${(step / totalSteps) * 100}%` }} />
         </div>
 
@@ -253,7 +253,7 @@ const Signup = () => {
 
           <div className="flex justify-between">
             {step > 1 && (
-              <button type="button" onClick={handleBack} className="py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+              <button type="button" onClick={handleBack} className="py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
                 Back
               </button>
             )}
