@@ -41,7 +41,7 @@ const Login = () => {
   };
   
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-zinc-950 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-gray-100">
@@ -71,7 +71,7 @@ const Login = () => {
                 type="text"
                 autoComplete="username"
                 required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-gray-100 dark:bg-gray-700 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 dark:border-zinc-700 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-gray-100 dark:bg-zinc-800 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
                 placeholder="Username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
@@ -85,7 +85,7 @@ const Login = () => {
                 type="password"
                 autoComplete="current-password"
                 required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-gray-100 dark:bg-gray-700 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 dark:border-zinc-700 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-gray-100 dark:bg-zinc-800 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -133,7 +133,7 @@ const Login = () => {
                   setUsername('user1');
                   setPassword('password123');
                 }}
-                className="py-1 px-2 text-xs border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded hover:bg-gray-100 dark:hover:bg-gray-600"
+                className="py-1 px-2 text-xs border border-gray-300 dark:border-zinc-700 dark:bg-zinc-800 dark:text-gray-200 rounded hover:bg-gray-100 dark:hover:bg-zinc-700"
               >
                 Enthusiast
               </button>
@@ -143,7 +143,7 @@ const Login = () => {
                   setUsername('artist1');
                   setPassword('password123');
                 }}
-                className="py-1 px-2 text-xs border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded hover:bg-gray-100 dark:hover:bg-gray-600"
+                className="py-1 px-2 text-xs border border-gray-300 dark:border-zinc-700 dark:bg-zinc-800 dark:text-gray-200 rounded hover:bg-gray-100 dark:hover:bg-zinc-700"
               >
                 Artist
               </button>
@@ -153,7 +153,7 @@ const Login = () => {
                   setUsername('shop1');
                   setPassword('password123');
                 }}
-                className="py-1 px-2 text-xs border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded hover:bg-gray-100 dark:hover:bg-gray-600"
+                className="py-1 px-2 text-xs border border-gray-300 dark:border-zinc-700 dark:bg-zinc-800 dark:text-gray-200 rounded hover:bg-gray-100 dark:hover:bg-zinc-700"
               >
                 Shop
               </button>

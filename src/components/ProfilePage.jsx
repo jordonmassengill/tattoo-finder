@@ -227,14 +227,14 @@ const ProfilePage = () => {
 
   return (
     <div className="max-w-screen-xl mx-auto p-8">
-      <div className="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
+      <div className="bg-white dark:bg-zinc-900 shadow rounded-lg overflow-hidden">
         <div className="bg-blue-500 h-32 flex items-center justify-center">
           <div className="relative">
             <div className="w-24 h-24 bg-white rounded-full overflow-hidden border-4 border-white relative">
               {profileImagePreview ? (
                 <img src={profileImagePreview} alt={currentUser?.username || 'Profile'} className="w-full h-full object-cover" />
               ) : (
-                <div className="w-full h-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center">
+                <div className="w-full h-full bg-gray-300 dark:bg-zinc-700 flex items-center justify-center">
                   <span className="text-3xl text-gray-500 dark:text-gray-300">
                     {currentUser?.username ? currentUser.username.charAt(0).toUpperCase() : '?'}
                   </span>
@@ -266,7 +266,7 @@ const ProfilePage = () => {
 
           <div className="space-y-4 max-w-lg mx-auto">
             {/* Dark Mode Toggle */}
-            <div className="flex justify-between items-center pb-4 border-b dark:border-gray-700">
+            <div className="flex justify-between items-center pb-4 border-b dark:border-zinc-800">
               <div>
                 <span className="font-semibold">Dark Mode</span>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Switch between light and dark theme</p>
@@ -282,16 +282,16 @@ const ProfilePage = () => {
               </button>
             </div>
 
-            <div className="flex justify-between pb-4 border-b dark:border-gray-700">
+            <div className="flex justify-between pb-4 border-b dark:border-zinc-800">
               <span className="font-semibold">Account Type:</span>
               <span className="capitalize">{userType}</span>
             </div>
-            <div className="flex justify-between pb-4 border-b dark:border-gray-700">
+            <div className="flex justify-between pb-4 border-b dark:border-zinc-800">
               <span className="font-semibold">Email:</span>
               <span>{currentUser?.email}</span>
             </div>
             {currentUser?.username && (
-              <div className="flex justify-between pb-4 border-b dark:border-gray-700">
+              <div className="flex justify-between pb-4 border-b dark:border-zinc-800">
                 <span className="font-semibold">Username:</span>
                 <span>@{currentUser.username}</span>
               </div>
@@ -300,13 +300,13 @@ const ProfilePage = () => {
             {/* Editable fields - only for artists and shops */}
             {['artist', 'shop'].includes(userType) && (
               <>
-                <div className="pb-4 border-b dark:border-gray-700">
+                <div className="pb-4 border-b dark:border-zinc-800">
                   <label htmlFor="bio" className="font-semibold block mb-2">Bio:</label>
-                  <textarea id="bio" name="bio" value={formData.bio} onChange={handleChange} rows={4} className="w-full p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 dark:placeholder-gray-400" placeholder="Tell people about yourself..." />
+                  <textarea id="bio" name="bio" value={formData.bio} onChange={handleChange} rows={4} className="w-full p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-zinc-800 dark:border-zinc-700 dark:text-gray-200 dark:placeholder-gray-400" placeholder="Tell people about yourself..." />
                 </div>
-                <div className="pb-4 border-b dark:border-gray-700">
+                <div className="pb-4 border-b dark:border-zinc-800">
                   <label htmlFor="location" className="font-semibold block mb-2">Location:</label>
-                  <select id="location" name="location" value={formData.location} onChange={handleChange} className="w-full p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200">
+                  <select id="location" name="location" value={formData.location} onChange={handleChange} className="w-full p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-zinc-800 dark:border-zinc-700 dark:text-gray-200">
                     <option value="">Select a Location</option>
                     {BAY_AREA_CITIES.map(city => <option key={city} value={city}>{city}</option>)}
                   </select>
@@ -316,11 +316,11 @@ const ProfilePage = () => {
 
             {/* Price Range - only for artists */}
             {userType === 'artist' && (
-              <div className="pb-4 border-b dark:border-gray-700">
+              <div className="pb-4 border-b dark:border-zinc-800">
                 <label className="font-semibold block mb-2">Price Range:</label>
                 <div className="flex justify-center flex-wrap gap-2">
                   {['$', '$$', '$$$', '$$$$'].map(price => (
-                    <button key={price} type="button" onClick={() => setFormData({ ...formData, priceRange: formData.priceRange === price ? '' : price })} className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${formData.priceRange === price ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600'}`}>
+                    <button key={price} type="button" onClick={() => setFormData({ ...formData, priceRange: formData.priceRange === price ? '' : price })} className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${formData.priceRange === price ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-zinc-800 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-zinc-700'}`}>
                       {price}
                     </button>
                   ))}
@@ -330,7 +330,7 @@ const ProfilePage = () => {
 
             {/* Specialties - only for artists */}
             {userType === 'artist' && (
-              <div className="pb-4 border-b dark:border-gray-700">
+              <div className="pb-4 border-b dark:border-zinc-800">
                 <h3 className="font-semibold mb-1">Specialties &amp; Styles:</h3>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">Tap once = can do (blue) &nbsp;·&nbsp; Tap again = ★ specialty (gold, max 2 per group)</p>
                 <ArtistStylesForm value={artistStyles} onChange={setArtistStyles} />
@@ -367,7 +367,7 @@ const ProfilePage = () => {
       {/* Change Password Modal */}
       {showPasswordModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-lg max-w-md w-full p-6">
+          <div className="bg-white dark:bg-zinc-900 rounded-lg max-w-md w-full p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold">Change Password</h2>
               <button onClick={() => setShowPasswordModal(false)} className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
@@ -383,7 +383,7 @@ const ProfilePage = () => {
                   type="password"
                   value={passwordForm.currentPassword}
                   onChange={(e) => setPasswordForm(prev => ({ ...prev, currentPassword: e.target.value }))}
-                  className="w-full p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 dark:placeholder-gray-400"
+                  className="w-full p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-zinc-800 dark:border-zinc-700 dark:text-gray-200 dark:placeholder-gray-400"
                   placeholder="Enter current password"
                 />
               </div>
@@ -393,7 +393,7 @@ const ProfilePage = () => {
                   type="password"
                   value={passwordForm.newPassword}
                   onChange={(e) => setPasswordForm(prev => ({ ...prev, newPassword: e.target.value }))}
-                  className="w-full p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 dark:placeholder-gray-400"
+                  className="w-full p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-zinc-800 dark:border-zinc-700 dark:text-gray-200 dark:placeholder-gray-400"
                   placeholder="Enter new password"
                 />
               </div>
@@ -403,13 +403,13 @@ const ProfilePage = () => {
                   type="password"
                   value={passwordForm.confirmPassword}
                   onChange={(e) => setPasswordForm(prev => ({ ...prev, confirmPassword: e.target.value }))}
-                  className="w-full p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 dark:placeholder-gray-400"
+                  className="w-full p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-zinc-800 dark:border-zinc-700 dark:text-gray-200 dark:placeholder-gray-400"
                   placeholder="Confirm new password"
                 />
               </div>
             </div>
             <div className="flex justify-end gap-3 mt-6">
-              <button onClick={() => setShowPasswordModal(false)} className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 dark:text-gray-200" disabled={isChangingPassword}>Cancel</button>
+              <button onClick={() => setShowPasswordModal(false)} className="px-4 py-2 border border-gray-300 dark:border-zinc-700 rounded-md hover:bg-gray-50 dark:hover:bg-zinc-800 dark:text-gray-200" disabled={isChangingPassword}>Cancel</button>
               <button onClick={handleChangePassword} disabled={isChangingPassword} className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-blue-300">
                 {isChangingPassword ? (
                   <>
@@ -426,7 +426,7 @@ const ProfilePage = () => {
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-lg max-w-md w-full p-6">
+          <div className="bg-white dark:bg-zinc-900 rounded-lg max-w-md w-full p-6">
             <div className="flex items-center text-red-600 mb-4">
               <AlertTriangle size={24} className="mr-2" />
               <h2 className="text-xl font-bold">Delete Account</h2>
@@ -440,7 +440,7 @@ const ProfilePage = () => {
             </ul>
             {error && <div className="bg-red-50 text-red-700 p-3 rounded mb-4">{error}</div>}
             <div className="flex justify-end gap-3">
-              <button onClick={() => setShowDeleteConfirm(false)} className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 dark:text-gray-200" disabled={isDeleting}>Cancel</button>
+              <button onClick={() => setShowDeleteConfirm(false)} className="px-4 py-2 border border-gray-300 dark:border-zinc-700 rounded-md hover:bg-gray-50 dark:hover:bg-zinc-800 dark:text-gray-200" disabled={isDeleting}>Cancel</button>
               <button onClick={handleDeleteAccount} className="flex items-center px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:bg-red-300" disabled={isDeleting}>
                 {isDeleting ? (
                   <>

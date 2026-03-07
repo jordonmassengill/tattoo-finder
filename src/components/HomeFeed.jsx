@@ -116,7 +116,7 @@ const Post = ({ post: initialPost, isGrid, onCommentClick }) => {
   }
 
   return (
-    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md mb-6">
+    <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-md mb-6">
       <div className="flex items-center p-2">
         <Link to={profileUrl(post.user)} className="flex items-center">
           <ProfileImage user={post.user} size="md" />
@@ -197,22 +197,22 @@ const HomeFeed = () => {
     <div className="max-w-screen-xl mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-semibold">Your Feed</h2>
-        <div className="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1 mr-20">
+        <div className="flex bg-gray-100 dark:bg-zinc-800 rounded-lg p-1 mr-20">
           <button
             onClick={() => setViewMode('feed')}
-            className={`p-2 rounded ${viewMode === 'feed' ? 'bg-white dark:bg-gray-500 shadow' : 'dark:text-gray-300'}`}
+            className={`p-2 rounded ${viewMode === 'feed' ? 'bg-white dark:bg-zinc-600 shadow' : 'dark:text-gray-300'}`}
           >
             <BarChart2 size={20} />
           </button>
           <button
             onClick={() => setViewMode('grid3')}
-            className={`p-2 rounded mx-1 ${viewMode === 'grid3' ? 'bg-white dark:bg-gray-500 shadow' : 'dark:text-gray-300'}`}
+            className={`p-2 rounded mx-1 ${viewMode === 'grid3' ? 'bg-white dark:bg-zinc-600 shadow' : 'dark:text-gray-300'}`}
           >
             <LayoutGrid size={20} />
           </button>
           <button
             onClick={() => setViewMode('grid5')}
-            className={`p-2 rounded ${viewMode === 'grid5' ? 'bg-white dark:bg-gray-500 shadow' : 'dark:text-gray-300'}`}
+            className={`p-2 rounded ${viewMode === 'grid5' ? 'bg-white dark:bg-zinc-600 shadow' : 'dark:text-gray-300'}`}
           >
             <Grid size={20} />
           </button>

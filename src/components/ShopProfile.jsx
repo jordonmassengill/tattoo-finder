@@ -308,17 +308,17 @@ const ShopProfile = () => {
 
   return (
     <div className="max-w-screen-xl mx-auto pb-16">
-      <div className="p-4 border-b">
+      <div className="p-4 border-b dark:border-zinc-800">
         <div className="flex flex-col md:flex-row items-center md:items-start">
           <div className="w-28 h-28 md:w-36 md:h-36 flex-shrink-0 mb-4 md:mb-0 md:mr-8">
             <ProfileImage user={shopData} size="xl" className="w-full h-full" />
           </div>
           <div className="flex-grow text-center md:text-left">
             <div className="flex flex-col md:flex-row md:items-center md:flex-wrap gap-2 mb-1">
-              <h1 className="text-2xl font-bold mr-2">{shopData.username}</h1>
+              <h1 className="text-2xl font-bold mr-2 dark:text-gray-100">{shopData.username}</h1>
               {currentUser && !isOwnProfile && (
                 <button
-                  className={`${following ? 'bg-gray-200 text-gray-800' : 'bg-blue-500 text-white'} px-4 py-2 rounded-md font-medium disabled:opacity-50`}
+                  className={`${following ? 'bg-gray-200 dark:bg-zinc-700 text-gray-800 dark:text-gray-200' : 'bg-blue-500 text-white'} px-4 py-2 rounded-md font-medium disabled:opacity-50`}
                   onClick={handleFollowToggle}
                   disabled={isFollowLoading}
                 >
@@ -354,15 +354,15 @@ const ShopProfile = () => {
               )}
 
             </div>
-            <div className="flex justify-center md:justify-start space-x-6 mb-1">
+            <div className="flex justify-center md:justify-start space-x-6 mb-1 dark:text-gray-300">
               <span><b>{followersCount}</b> followers</span>
               <span><b>{formatNum(posts.reduce((s, p) => s + (p.likes?.length || 0), 0))}</b> likes</span>
               <span><b>{formatNum(posts.reduce((s, p) => s + (p.comments?.length || 0), 0))}</b> comments</span>
             </div>
             <div className="mt-2 mb-2">
-              <p className="whitespace-pre-wrap">{shopData.bio}</p>
+              <p className="whitespace-pre-wrap dark:text-gray-200">{shopData.bio}</p>
             </div>
-            <div className="flex flex-col space-y-1">
+            <div className="flex flex-col space-y-1 dark:text-gray-300">
               {shopData.location && (
                 <div className="flex items-center">
                   <MapPin size={16} className="mr-2" />
@@ -392,36 +392,36 @@ const ShopProfile = () => {
         </div>
       </div>
 
-      <div className="flex justify-between items-center p-4 border-b">
+      <div className="flex justify-between items-center p-4 border-b dark:border-zinc-800">
         <div className="flex items-center gap-3 overflow-x-auto">
           {shopData.artists && shopData.artists.length > 0 && (
-            <span className="text-sm font-semibold text-gray-500 flex-shrink-0">Our Artists</span>
+            <span className="text-sm font-semibold text-gray-500 dark:text-gray-400 flex-shrink-0">Our Artists</span>
           )}
           {shopData.artists && shopData.artists.map(artist => (
             <Link key={artist._id} to={`/artist/${artist.username}`} className="flex flex-col items-center flex-shrink-0 hover:opacity-80 transition-opacity">
               <div className="w-16 h-16 rounded-full overflow-hidden mb-0.5">
                 <ProfileImage user={artist} size="lg" />
               </div>
-              <span className="text-xs text-gray-600 max-w-[3.5rem] truncate">{artist.username}</span>
+              <span className="text-xs text-gray-600 dark:text-gray-400 max-w-[3.5rem] truncate">{artist.username}</span>
             </Link>
           ))}
         </div>
-        <div className="flex bg-gray-100 rounded-lg p-1 mr-2">
+        <div className="flex bg-gray-100 dark:bg-zinc-800 rounded-lg p-1 mr-2">
           <button
             onClick={() => setViewMode('feed')}
-            className={`p-2 rounded ${viewMode === 'feed' ? 'bg-white shadow' : ''}`}
+            className={`p-2 rounded ${viewMode === 'feed' ? 'bg-white dark:bg-zinc-600 shadow' : 'dark:text-gray-300'}`}
           >
             <BarChart2 size={20} />
           </button>
           <button
             onClick={() => setViewMode('grid3')}
-            className={`p-2 rounded mx-1 ${viewMode === 'grid3' ? 'bg-white shadow' : ''}`}
+            className={`p-2 rounded mx-1 ${viewMode === 'grid3' ? 'bg-white dark:bg-zinc-600 shadow' : 'dark:text-gray-300'}`}
           >
             <LayoutGrid size={20} />
           </button>
           <button
             onClick={() => setViewMode('grid5')}
-            className={`p-2 rounded ${viewMode === 'grid5' ? 'bg-white shadow' : ''}`}
+            className={`p-2 rounded ${viewMode === 'grid5' ? 'bg-white dark:bg-zinc-600 shadow' : 'dark:text-gray-300'}`}
           >
             <Grid size={20} />
           </button>
@@ -430,7 +430,7 @@ const ShopProfile = () => {
 
       {posts.length === 0 && (
         <div className="text-center py-20">
-          <p className="text-xl text-gray-500">No posts yet</p>
+          <p className="text-xl text-gray-500 dark:text-gray-400">No posts yet</p>
         </div>
       )}
 
@@ -464,15 +464,15 @@ const ShopProfile = () => {
 
       {showDeleteConfirm && postToDelete && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg max-w-md w-full p-6">
+          <div className="bg-white dark:bg-zinc-900 rounded-lg max-w-md w-full p-6">
             <div className="flex items-center text-red-600 mb-4">
               <AlertTriangle size={24} className="mr-2" />
-              <h2 className="text-xl font-bold">Delete Post</h2>
+              <h2 className="text-xl font-bold dark:text-gray-100">Delete Post</h2>
             </div>
-            <p className="mb-4">
+            <p className="mb-4 dark:text-gray-200">
               Are you sure you want to delete this post? This action cannot be undone.
             </p>
-            <div className="mb-4 border rounded overflow-hidden">
+            <div className="mb-4 border dark:border-zinc-700 rounded overflow-hidden">
               <img
                 src={`http://localhost:5000/${postToDelete.image}`}
                 alt="Post to delete"
@@ -490,7 +490,7 @@ const ShopProfile = () => {
                   setShowDeleteConfirm(false);
                   setPostToDelete(null);
                 }}
-                className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
+                className="px-4 py-2 border border-gray-300 dark:border-zinc-700 rounded-md hover:bg-gray-50 dark:hover:bg-zinc-800 dark:text-gray-200"
                 disabled={isDeleting}
               >
                 Cancel

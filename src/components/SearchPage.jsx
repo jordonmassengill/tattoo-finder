@@ -198,13 +198,13 @@ const SearchPage = () => {
   const EitherOrFilterRow = ({ label, options, filterKey }) => (
     <div className="mb-4">
       <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">{label}</p>
-      <div className="flex rounded-full border border-gray-300 dark:border-gray-600 overflow-hidden">
+      <div className="flex rounded-full border border-gray-300 dark:border-zinc-700 overflow-hidden">
         {options.map((opt, i) => (
           <button
             key={opt}
             type="button"
             onClick={() => toggleSingleFilter(filterKey, opt)}
-            className={`flex-1 py-1.5 text-sm font-medium transition-colors ${i > 0 ? 'border-l border-gray-300 dark:border-gray-600 ' : ''}${filters[filterKey] === opt ? 'bg-indigo-600 text-white' : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600'}`}
+            className={`flex-1 py-1.5 text-sm font-medium transition-colors ${i > 0 ? 'border-l border-gray-300 dark:border-zinc-700 ' : ''}${filters[filterKey] === opt ? 'bg-indigo-600 text-white' : 'bg-white dark:bg-zinc-800 text-gray-600 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-zinc-700'}`}
           >
             {opt}
           </button>
@@ -225,7 +225,7 @@ const SearchPage = () => {
             className={`px-2.5 py-1 text-xs rounded-full border font-medium transition-colors ${
               filters[filterKey].includes(opt)
                 ? 'bg-indigo-600 text-white border-indigo-600'
-                : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:border-indigo-400'
+                : 'bg-white dark:bg-zinc-800 text-gray-600 dark:text-gray-200 border-gray-300 dark:border-zinc-700 hover:border-indigo-400'
             }`}
           >
             {opt}
@@ -278,7 +278,7 @@ const SearchPage = () => {
 
     if (isPost) {
       return (
-        <div key={item._id} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md mb-6">
+        <div key={item._id} className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-md mb-6">
           <div className="flex items-center p-3">
             <Link to={profileUrl(item.user)} className="flex items-center">
               <ProfileImage user={item.user} size="md" />
@@ -295,7 +295,7 @@ const SearchPage = () => {
       );
     } else {
       return (
-        <div key={item._id} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden mb-6">
+        <div key={item._id} className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-lg overflow-hidden mb-6">
           <div className="flex">
             <div className="w-24 h-24 sm:w-32 sm:h-32 flex-shrink-0">
               <ProfileImage user={item} size="xl" className="w-full h-full object-cover" />
@@ -326,23 +326,23 @@ const SearchPage = () => {
         <h1 className="text-3xl font-bold">Search</h1>
         <div className="flex justify-center">
           <div className="inline-flex rounded-md shadow-sm" role="group">
-            <button type="button" onClick={() => handleSearchTypeToggle('posts')} className={`flex items-center px-4 py-2 text-sm font-medium rounded-l-lg ${searchType === 'posts' ? 'bg-blue-500 text-white' : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600'}`}>
+            <button type="button" onClick={() => handleSearchTypeToggle('posts')} className={`flex items-center px-4 py-2 text-sm font-medium rounded-l-lg ${searchType === 'posts' ? 'bg-blue-500 text-white' : 'bg-white dark:bg-zinc-800 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-700'}`}>
               <Image size={16} className="mr-2" /> Posts
             </button>
-            <button type="button" onClick={() => handleSearchTypeToggle('artists')} className={`flex items-center px-4 py-2 text-sm font-medium rounded-r-lg ${searchType === 'artists' ? 'bg-blue-500 text-white' : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600'}`}>
+            <button type="button" onClick={() => handleSearchTypeToggle('artists')} className={`flex items-center px-4 py-2 text-sm font-medium rounded-r-lg ${searchType === 'artists' ? 'bg-blue-500 text-white' : 'bg-white dark:bg-zinc-800 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-700'}`}>
               <Users size={16} className="mr-2" /> Artists
             </button>
           </div>
         </div>
         <div className="flex justify-end">
-          <div className="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
-            <button onClick={() => setViewMode('feed')} className={`p-2 rounded ${viewMode === 'feed' ? 'bg-white dark:bg-gray-500 shadow' : 'dark:text-gray-300'}`}>
+          <div className="flex bg-gray-100 dark:bg-zinc-800 rounded-lg p-1">
+            <button onClick={() => setViewMode('feed')} className={`p-2 rounded ${viewMode === 'feed' ? 'bg-white dark:bg-zinc-600 shadow' : 'dark:text-gray-300'}`}>
               <BarChart2 size={20} />
             </button>
-            <button onClick={() => setViewMode('grid3')} className={`p-2 rounded mx-1 ${viewMode === 'grid3' ? 'bg-white dark:bg-gray-500 shadow' : 'dark:text-gray-300'}`}>
+            <button onClick={() => setViewMode('grid3')} className={`p-2 rounded mx-1 ${viewMode === 'grid3' ? 'bg-white dark:bg-zinc-600 shadow' : 'dark:text-gray-300'}`}>
               <LayoutGrid size={20} />
             </button>
-            <button onClick={() => setViewMode('grid5')} className={`p-2 rounded ${viewMode === 'grid5' ? 'bg-white dark:bg-gray-500 shadow' : 'dark:text-gray-300'}`}>
+            <button onClick={() => setViewMode('grid5')} className={`p-2 rounded ${viewMode === 'grid5' ? 'bg-white dark:bg-zinc-600 shadow' : 'dark:text-gray-300'}`}>
               <Grid size={20} />
             </button>
           </div>
@@ -355,7 +355,7 @@ const SearchPage = () => {
           <input
             type="text"
             placeholder={searchType === 'artists' ? "Search artists by username..." : "Search posts by tags or username..."}
-            className="w-full pl-10 pr-24 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 dark:placeholder-gray-400"
+            className="w-full pl-10 pr-24 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-zinc-800 dark:border-zinc-700 dark:text-gray-200 dark:placeholder-gray-400"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             onKeyDown={handleKeyDown}
@@ -367,14 +367,14 @@ const SearchPage = () => {
         </div>
 
         <div className="flex items-center space-x-2">
-          <button onClick={() => setShowFilters(!showFilters)} className={`flex items-center px-4 py-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition ${activeFilterCount > 0 ? 'bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200'}`}>
+          <button onClick={() => setShowFilters(!showFilters)} className={`flex items-center px-4 py-2 rounded-lg hover:bg-gray-200 dark:hover:bg-zinc-700 transition ${activeFilterCount > 0 ? 'bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300' : 'bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-gray-200'}`}>
             <Filter size={18} className="mr-2" />
             Filters
             {activeFilterCount > 0 && (
               <span className="ml-1.5 bg-indigo-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">{activeFilterCount}</span>
             )}
           </button>
-          <button onClick={handleSortToggle} className="px-4 py-2 bg-gray-100 dark:bg-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition font-medium whitespace-nowrap">
+          <button onClick={handleSortToggle} className="px-4 py-2 bg-gray-100 dark:bg-zinc-800 dark:text-gray-200 rounded-lg hover:bg-gray-200 dark:hover:bg-zinc-700 transition font-medium whitespace-nowrap">
             {sortOption === 'newest' ? 'Sort - New' : (searchType === 'artists' ? 'Sort - Followers' : 'Sort - Likes')}
           </button>
         </div>
@@ -382,7 +382,7 @@ const SearchPage = () => {
 
       {/* Filter panel */}
       {showFilters && (
-        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-5 mb-6 border border-gray-200 dark:border-gray-700">
+        <div className="bg-gray-50 dark:bg-zinc-900 rounded-lg p-5 mb-6 border border-gray-200 dark:border-zinc-800">
           <h3 className="font-semibold mb-4 text-center dark:text-gray-100">Filter Options</h3>
 
           {searchType === 'posts' ? (
@@ -396,14 +396,14 @@ const SearchPage = () => {
                     <button
                       type="button"
                       onClick={() => toggleSingleFilter('flashType', 'Tattoo Work')}
-                      className={`flex-1 py-1.5 text-sm font-medium transition-colors ${filters.flashType === 'Tattoo Work' ? 'bg-indigo-600 text-white' : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600'}`}
+                      className={`flex-1 py-1.5 text-sm font-medium transition-colors ${filters.flashType === 'Tattoo Work' ? 'bg-indigo-600 text-white' : 'bg-white dark:bg-zinc-800 text-gray-600 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-zinc-700'}`}
                     >
                       Tattoo Work
                     </button>
                     <button
                       type="button"
                       onClick={() => toggleSingleFilter('flashType', 'Flash Sheet')}
-                      className={`flex-1 py-1.5 text-sm font-medium transition-colors border-l border-gray-300 dark:border-gray-600 ${filters.flashType === 'Flash Sheet' ? 'bg-indigo-600 text-white' : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600'}`}
+                      className={`flex-1 py-1.5 text-sm font-medium transition-colors border-l border-gray-300 dark:border-zinc-700 ${filters.flashType === 'Flash Sheet' ? 'bg-indigo-600 text-white' : 'bg-white dark:bg-zinc-800 text-gray-600 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-zinc-700'}`}
                     >
                       Flash Sheet
                     </button>
@@ -421,7 +421,7 @@ const SearchPage = () => {
                         key={s}
                         type="button"
                         onClick={() => toggleSingleFilter('size', s)}
-                        className={`flex-1 py-1.5 text-sm font-medium transition-colors ${i > 0 ? 'border-l border-gray-300 dark:border-gray-600 ' : ''}${filters.size === s ? 'bg-indigo-600 text-white' : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600'}`}
+                        className={`flex-1 py-1.5 text-sm font-medium transition-colors ${i > 0 ? 'border-l border-gray-300 dark:border-zinc-700 ' : ''}${filters.size === s ? 'bg-indigo-600 text-white' : 'bg-white dark:bg-zinc-800 text-gray-600 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-zinc-700'}`}
                       >
                         {s}
                       </button>
@@ -434,7 +434,7 @@ const SearchPage = () => {
                   <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Location</p>
                   <div className="grid grid-cols-2 gap-x-2">
                     {BAY_AREA_CITIES.map(city => (
-                      <label key={city} className="flex items-center text-sm py-0.5 px-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded cursor-pointer dark:text-gray-200">
+                      <label key={city} className="flex items-center text-sm py-0.5 px-1 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded cursor-pointer dark:text-gray-200">
                         <input type="checkbox" checked={filters.location.includes(city)} onChange={() => toggleArrayFilter('location', city)} className="mr-2 h-4 w-4 rounded border-gray-300 text-blue-600" />
                         {city}
                       </label>
@@ -460,7 +460,7 @@ const SearchPage = () => {
                   <div className="flex gap-2">
                     {[{ label: 'Black/Grey', value: 'Black/Grey Specialty' }, { label: 'Color', value: 'Color Specialty' }].map(({ label, value }) => (
                       <button key={value} type="button" onClick={() => toggleSingleFilter('inkSpecialty', value)}
-                        className={`flex-1 py-1.5 text-sm rounded-full border font-medium transition-colors ${filters.inkSpecialty === value ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:border-indigo-400'}`}>
+                        className={`flex-1 py-1.5 text-sm rounded-full border font-medium transition-colors ${filters.inkSpecialty === value ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white dark:bg-zinc-800 text-gray-600 dark:text-gray-200 border-gray-300 dark:border-zinc-700 hover:border-indigo-400'}`}>
                         {label}
                       </button>
                     ))}
@@ -473,7 +473,7 @@ const SearchPage = () => {
                   <div className="flex gap-2">
                     {[{ label: 'Flash', value: 'Flash Specialty' }, { label: 'Custom', value: 'Custom Specialty' }].map(({ label, value }) => (
                       <button key={value} type="button" onClick={() => toggleSingleFilter('designSpecialty', value)}
-                        className={`flex-1 py-1.5 text-sm rounded-full border font-medium transition-colors ${filters.designSpecialty === value ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:border-indigo-400'}`}>
+                        className={`flex-1 py-1.5 text-sm rounded-full border font-medium transition-colors ${filters.designSpecialty === value ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white dark:bg-zinc-800 text-gray-600 dark:text-gray-200 border-gray-300 dark:border-zinc-700 hover:border-indigo-400'}`}>
                         {label}
                       </button>
                     ))}
@@ -486,7 +486,7 @@ const SearchPage = () => {
                   <div className="flex gap-2">
                     {['$', '$$', '$$$', '$$$$'].map(price => (
                       <button key={price} type="button" onClick={() => toggleArrayFilter('priceRange', price)}
-                        className={`flex-1 py-1.5 text-sm rounded-full border font-medium transition-colors ${filters.priceRange.includes(price) ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:border-indigo-400'}`}>
+                        className={`flex-1 py-1.5 text-sm rounded-full border font-medium transition-colors ${filters.priceRange.includes(price) ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white dark:bg-zinc-800 text-gray-600 dark:text-gray-200 border-gray-300 dark:border-zinc-700 hover:border-indigo-400'}`}>
                         {price}
                       </button>
                     ))}
@@ -498,7 +498,7 @@ const SearchPage = () => {
                   <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Location</p>
                   <div className="grid grid-cols-2 gap-x-2">
                     {BAY_AREA_CITIES.map(city => (
-                      <label key={city} className="flex items-center text-sm py-0.5 px-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded cursor-pointer dark:text-gray-200">
+                      <label key={city} className="flex items-center text-sm py-0.5 px-1 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded cursor-pointer dark:text-gray-200">
                         <input type="checkbox" checked={filters.location.includes(city)} onChange={() => toggleArrayFilter('location', city)} className="mr-2 h-4 w-4 rounded border-gray-300 text-blue-600" />
                         {city}
                       </label>
@@ -515,8 +515,8 @@ const SearchPage = () => {
             </div>
           )}
 
-          <div className="flex justify-end mt-4 space-x-2 border-t dark:border-gray-700 pt-3">
-            <button className="px-4 py-2 text-sm rounded-md bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-400 dark:hover:bg-gray-500" onClick={resetFilters}>Reset</button>
+          <div className="flex justify-end mt-4 space-x-2 border-t dark:border-zinc-800 pt-3">
+            <button className="px-4 py-2 text-sm rounded-md bg-gray-300 dark:bg-zinc-700 text-gray-700 dark:text-gray-200 hover:bg-gray-400 dark:hover:bg-gray-500" onClick={resetFilters}>Reset</button>
             <button className="px-4 py-2 text-sm rounded-md bg-blue-500 text-white hover:bg-blue-600" onClick={() => setShowFilters(false)}>Apply</button>
           </div>
         </div>
