@@ -129,14 +129,14 @@ const UploadPost = ({ onClose, onPostCreated }) => {
   // Reusable either/or toggle row
   const EitherOrRow = ({ label, options, value, onChange }) => (
     <div className="mb-4">
-      <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">{label}</label>
-      <div className="flex rounded-full border border-gray-300 overflow-hidden">
+      <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">{label}</label>
+      <div className="flex rounded-full border border-gray-300 dark:border-zinc-600 overflow-hidden">
         {options.map((opt, i) => (
           <button
             key={opt}
             type="button"
             onClick={() => onChange(opt)}
-            className={`flex-1 py-1.5 text-sm font-medium transition-colors ${i > 0 ? 'border-l border-gray-300 ' : ''}${value === opt ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
+            className={`flex-1 py-1.5 text-sm font-medium transition-colors ${i > 0 ? 'border-l border-gray-300 dark:border-zinc-600 ' : ''}${value === opt ? 'bg-indigo-600 text-white' : 'bg-white dark:bg-zinc-800 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-zinc-700'}`}
           >
             {opt}
           </button>
@@ -148,7 +148,7 @@ const UploadPost = ({ onClose, onPostCreated }) => {
   // Reusable multi-select chip row (up to 2)
   const MultiSelectGroup = ({ label, options, selected, onToggle }) => (
     <div className="mb-4">
-      <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
+      <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
         {label} <span className="font-normal text-gray-400">(up to 2)</span>
       </label>
       <div className="flex flex-wrap gap-1.5">
@@ -161,8 +161,8 @@ const UploadPost = ({ onClose, onPostCreated }) => {
               selected.includes(opt)
                 ? 'bg-indigo-600 text-white border-indigo-600'
                 : selected.length >= 2
-                ? 'bg-white text-gray-400 border-gray-200 cursor-not-allowed'
-                : 'bg-white text-gray-600 border-gray-300 hover:border-indigo-400'
+                ? 'bg-white dark:bg-zinc-800 text-gray-400 dark:text-gray-500 border-gray-200 dark:border-zinc-700 cursor-not-allowed'
+                : 'bg-white dark:bg-zinc-800 text-gray-600 dark:text-gray-300 border-gray-300 dark:border-zinc-600 hover:border-indigo-400 dark:hover:border-indigo-500'
             }`}
             disabled={!selected.includes(opt) && selected.length >= 2}
           >
@@ -175,13 +175,13 @@ const UploadPost = ({ onClose, onPostCreated }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-white dark:bg-zinc-900 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="flex justify-between items-center p-4 border-b sticky top-0 bg-white z-10">
-          <h2 className="text-xl font-semibold">
+        <div className="flex justify-between items-center p-4 border-b dark:border-zinc-800 sticky top-0 bg-white dark:bg-zinc-900 z-10">
+          <h2 className="text-xl font-semibold dark:text-gray-100">
             {step === 1 ? 'Create New Post' : 'Add Post Details'}
           </h2>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
+          <button onClick={onClose} className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
             <X size={24} />
           </button>
         </div>
@@ -199,7 +199,7 @@ const UploadPost = ({ onClose, onPostCreated }) => {
             <div className="mb-8 text-center">
               <Image size={48} className="mx-auto mb-2 text-gray-400" />
               <h3 className="text-lg font-medium mb-2">Upload your artwork</h3>
-              <p className="text-gray-500 mb-4">Share your latest tattoo designs with your followers</p>
+              <p className="text-gray-500 dark:text-gray-400 mb-4">Share your latest tattoo designs with your followers</p>
 
               <input
                 type="file"
@@ -235,13 +235,13 @@ const UploadPost = ({ onClose, onPostCreated }) => {
             <div className="md:w-1/2 p-4 overflow-y-auto">
               {/* Caption */}
               <div className="mb-4">
-                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
+                <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
                   Caption
                 </label>
                 <textarea
                   value={caption}
                   onChange={(e) => setCaption(e.target.value)}
-                  className="w-full p-2 border rounded-md resize-none focus:ring-blue-500 focus:border-blue-500 text-sm"
+                  className="w-full p-2 border dark:border-zinc-700 rounded-md resize-none focus:ring-blue-500 focus:border-blue-500 text-sm dark:bg-zinc-800 dark:text-gray-200 dark:placeholder-gray-500"
                   rows={2}
                   placeholder="Write a caption..."
                 />
@@ -249,19 +249,19 @@ const UploadPost = ({ onClose, onPostCreated }) => {
 
               {/* Flash Sheet / Tattoo Work toggle */}
               <div className="mb-4">
-                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Type</label>
-                <div className="flex rounded-full border border-gray-300 overflow-hidden">
+                <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">Type</label>
+                <div className="flex rounded-full border border-gray-300 dark:border-zinc-600 overflow-hidden">
                   <button
                     type="button"
                     onClick={() => setFlashType(flashType === 'Tattoo Work' ? '' : 'Tattoo Work')}
-                    className={`flex-1 py-1.5 text-sm font-medium transition-colors ${flashType === 'Tattoo Work' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
+                    className={`flex-1 py-1.5 text-sm font-medium transition-colors ${flashType === 'Tattoo Work' ? 'bg-indigo-600 text-white' : 'bg-white dark:bg-zinc-800 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-zinc-700'}`}
                   >
                     Tattoo Work
                   </button>
                   <button
                     type="button"
                     onClick={() => setFlashType(flashType === 'Flash Sheet' ? '' : 'Flash Sheet')}
-                    className={`flex-1 py-1.5 text-sm font-medium transition-colors border-l border-gray-300 ${flashType === 'Flash Sheet' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
+                    className={`flex-1 py-1.5 text-sm font-medium transition-colors border-l border-gray-300 dark:border-zinc-600 ${flashType === 'Flash Sheet' ? 'bg-indigo-600 text-white' : 'bg-white dark:bg-zinc-800 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-zinc-700'}`}
                   >
                     Flash Sheet
                   </button>
@@ -278,14 +278,14 @@ const UploadPost = ({ onClose, onPostCreated }) => {
 
               {/* Size - single select */}
               <div className="mb-4">
-                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Size</label>
-                <div className="flex rounded-full border border-gray-300 overflow-hidden">
+                <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">Size</label>
+                <div className="flex rounded-full border border-gray-300 dark:border-zinc-600 overflow-hidden">
                   {SIZES.map((s, i) => (
                     <button
                       key={s}
                       type="button"
                       onClick={() => toggleSingle(setSize, size, s)}
-                      className={`flex-1 py-1.5 text-sm font-medium transition-colors ${i > 0 ? 'border-l border-gray-300 ' : ''}${size === s ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
+                      className={`flex-1 py-1.5 text-sm font-medium transition-colors ${i > 0 ? 'border-l border-gray-300 dark:border-zinc-600 ' : ''}${size === s ? 'bg-indigo-600 text-white' : 'bg-white dark:bg-zinc-800 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-zinc-700'}`}
                     >
                       {s}
                     </button>
@@ -309,7 +309,7 @@ const UploadPost = ({ onClose, onPostCreated }) => {
 
               {/* Tags */}
               <div className="mb-4">
-                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
+                <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
                   Tags <span className="font-normal text-gray-400 normal-case">(max 3)</span>
                 </label>
                 <div className="flex mb-2">
@@ -320,7 +320,7 @@ const UploadPost = ({ onClose, onPostCreated }) => {
                       value={currentTag}
                       onChange={(e) => setCurrentTag(e.target.value)}
                       onKeyPress={handleTagKeyPress}
-                      className="w-full pl-7 pr-3 py-1.5 border rounded-l-md text-sm focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full pl-7 pr-3 py-1.5 border dark:border-zinc-700 rounded-l-md text-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-zinc-800 dark:text-gray-200 dark:placeholder-gray-500"
                       placeholder="Add a tag..."
                       disabled={tags.length >= 3}
                     />
@@ -335,9 +335,9 @@ const UploadPost = ({ onClose, onPostCreated }) => {
                 </div>
                 <div className="flex flex-wrap gap-1.5">
                   {tags.map(tag => (
-                    <div key={tag} className="flex items-center bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full text-xs">
+                    <div key={tag} className="flex items-center bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-300 px-2 py-0.5 rounded-full text-xs">
                       #{tag}
-                      <button onClick={() => handleRemoveTag(tag)} className="ml-1 text-blue-600 hover:text-blue-800">
+                      <button onClick={() => handleRemoveTag(tag)} className="ml-1 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200">
                         <X size={12} />
                       </button>
                     </div>
@@ -346,10 +346,10 @@ const UploadPost = ({ onClose, onPostCreated }) => {
               </div>
 
               {/* Actions */}
-              <div className="flex justify-between pt-2 border-t mt-2">
+              <div className="flex justify-between pt-2 border-t dark:border-zinc-700 mt-2">
                 <button
                   onClick={() => setStep(1)}
-                  className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 text-sm"
+                  className="px-4 py-2 border border-gray-300 dark:border-zinc-700 rounded-md hover:bg-gray-50 dark:hover:bg-zinc-800 text-sm dark:text-gray-200"
                 >
                   Back
                 </button>
