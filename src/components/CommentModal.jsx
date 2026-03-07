@@ -129,7 +129,7 @@ const CommentModal = ({ post, onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4" onClick={onClose}>
-      <div className="bg-white rounded-lg w-full max-w-5xl h-full max-h-[80vh] flex overflow-hidden" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-white dark:bg-zinc-900 rounded-lg w-full max-w-5xl h-full max-h-[80vh] flex overflow-hidden" onClick={(e) => e.stopPropagation()}>
         <div className="hidden md:block md:w-3/5 bg-black flex-shrink-0">
           <img
             src={`http://localhost:5000/${post.image}`}
@@ -139,19 +139,19 @@ const CommentModal = ({ post, onClose }) => {
         </div>
 
         <div className="w-full md:w-2/5 flex flex-col">
-          <header className="p-3 border-b flex items-center justify-between">
-            <Link to={profileUrl(post.user)} className="flex items-center font-semibold">
+          <header className="p-3 border-b dark:border-zinc-800 flex items-center justify-between">
+            <Link to={profileUrl(post.user)} className="flex items-center font-semibold dark:text-gray-100">
               <ProfileImage user={post.user} size="sm" />
               <span className="ml-2">{post.user.username}</span>
             </Link>
-            <button onClick={onClose} className="p-1 rounded-full hover:bg-gray-100">
+            <button onClick={onClose} className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-zinc-800 dark:text-gray-300">
               <X size={20} />
             </button>
           </header>
 
           <main ref={scrollContainerRef} className="flex-grow p-3 overflow-y-auto">
             {post.caption && (
-              <p className="text-sm mb-2">{post.caption}</p>
+              <p className="text-sm mb-2 dark:text-gray-200">{post.caption}</p>
             )}
 
             {(post.styles?.length > 0 || post.tags?.length > 0) && (
@@ -166,7 +166,7 @@ const CommentModal = ({ post, onClose }) => {
                 {post.styles?.length > 0 && (
                   <div className="flex flex-wrap gap-1">
                     {post.styles.map(style => (
-                      <span key={style} className="text-xs bg-indigo-50 text-indigo-600 border border-indigo-200 rounded-full px-2 py-0.5">{style}</span>
+                      <span key={style} className="text-xs bg-indigo-50 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 rounded-full px-2 py-0.5">{style}</span>
                     ))}
                   </div>
                 )}
@@ -174,11 +174,11 @@ const CommentModal = ({ post, onClose }) => {
             )}
 
             {(post.caption || post.styles?.length > 0 || post.tags?.length > 0) && (
-              <hr className="mb-3"/>
+              <hr className="mb-3 dark:border-zinc-700"/>
             )}
 
             {loading ? (
-              <div className="text-center text-gray-500 py-4">Loading comments...</div>
+              <div className="text-center text-gray-500 dark:text-gray-400 py-4">Loading comments...</div>
             ) : (
               <div className="space-y-4">
                 {comments.map(comment => {
@@ -191,11 +191,11 @@ const CommentModal = ({ post, onClose }) => {
                       <div className="flex items-start flex-grow min-w-0">
                         <ProfileImage user={comment.user} size="sm" />
                         <div className="ml-3 text-sm flex-grow min-w-0">
-                          <p className="break-words">
-                            <Link to={profileUrl(comment.user)} className="font-semibold">{comment.user.username || 'User'}</Link>
+                          <p className="break-words dark:text-gray-200">
+                            <Link to={profileUrl(comment.user)} className="font-semibold dark:text-gray-100">{comment.user.username || 'User'}</Link>
                             <span className="ml-1">{comment.text}</span>
                           </p>
-                          <div className="flex items-center text-xs text-gray-400 mt-1 space-x-3">
+                          <div className="flex items-center text-xs text-gray-400 dark:text-gray-500 mt-1 space-x-3">
                               <time dateTime={comment.date}>{new Date(comment.date).toLocaleDateString()}</time>
                               <button 
                                 onClick={() => handleInteraction(comment._id, 'like')} 
@@ -215,7 +215,7 @@ const CommentModal = ({ post, onClose }) => {
                         </div>
                       </div>
                       <div className="flex items-center space-x-2 pl-2 flex-shrink-0">
-                          <div className={`flex items-center text-sm ${isLiked ? 'text-red-500' : isDisliked ? 'text-black' : 'text-gray-500'}`}>
+                          <div className={`flex items-center text-sm ${isLiked ? 'text-red-500' : isDisliked ? 'text-black dark:text-gray-200' : 'text-gray-500 dark:text-gray-400'}`}>
                               <Heart size={12} className="mr-1" fill={isLiked || isDisliked ? 'currentColor' : 'none'} />
                               <span>{score}</span>
                           </div>
@@ -229,13 +229,13 @@ const CommentModal = ({ post, onClose }) => {
                   );
                 })}
                 {comments.length === 0 && !loading && (
-                    <p className="text-sm text-gray-500 text-center py-4">No comments yet. Be the first!</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-4">No comments yet. Be the first!</p>
                 )}
               </div>
             )}
           </main>
 
-          <footer className="p-3 border-t">
+          <footer className="p-3 border-t dark:border-zinc-800">
             <form onSubmit={handleCommentSubmit} className="flex items-center space-x-2">
               <ProfileImage user={currentUser} size="sm" />
               <input
@@ -243,7 +243,7 @@ const CommentModal = ({ post, onClose }) => {
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
                 placeholder="Add a comment..."
-                className="flex-grow border rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="flex-grow border rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 dark:bg-zinc-800 dark:border-zinc-700 dark:text-gray-200 dark:placeholder-gray-400"
                 disabled={isSubmitting}
                 aria-label="Add a comment"
               />

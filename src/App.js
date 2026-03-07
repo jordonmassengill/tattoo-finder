@@ -14,6 +14,7 @@ import Signup from './components/Signup';
 import SavedPage from './components/SavedPage';
 import RequestsPage from './components/RequestsPage';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { ThemeProvider } from './context/ThemeContext';
 import './styles.css';
 
 // Layout component conditionally renders the appropriate NavBar
@@ -44,9 +45,11 @@ const Layout = ({ children }) => {
 function App() {
   return (
     <BrowserRouter>
-      <AuthProvider>
-        <AppContent />
-      </AuthProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <AppContent />
+        </AuthProvider>
+      </ThemeProvider>
     </BrowserRouter>
   );
 }

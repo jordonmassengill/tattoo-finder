@@ -116,43 +116,43 @@ const Post = ({ post: initialPost, isGrid, onCommentClick }) => {
   }
 
   return (
-    <div className="bg-white border border-gray-200 rounded-md mb-6">
+    <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-md mb-6">
       <div className="flex items-center p-2">
         <Link to={profileUrl(post.user)} className="flex items-center">
           <ProfileImage user={post.user} size="md" />
           <div className="ml-3">
-            <p className="font-semibold">{post.user.username}</p>
+            <p className="font-semibold dark:text-gray-100">{post.user.username}</p>
           </div>
         </Link>
       </div>
-      
-      <img 
-        src={`http://localhost:5000/${post.image}`} 
-        alt={post.caption} 
+
+      <img
+        src={`http://localhost:5000/${post.image}`}
+        alt={post.caption}
         className="w-full aspect-portrait object-cover"
       />
-      
+
       <div className="px-2 py-1">
         <div className="flex items-center my-1 space-x-4 h-10">
           <button onClick={handleLikeToggle}>
-            <Heart 
-              className={`transition-colors ${isLiked ? 'text-red-500' : 'text-gray-500'}`}
+            <Heart
+              className={`transition-colors ${isLiked ? 'text-red-500' : 'text-gray-500 dark:text-gray-400'}`}
               fill={isLiked ? 'currentColor' : 'none'}
             />
           </button>
           <button onClick={() => onCommentClick(post)}>
-              <MessageCircle className="text-gray-500" />
+            <MessageCircle className="text-gray-500 dark:text-gray-400" />
           </button>
           <button onClick={handleSaveToggle}>
             <Bookmark
-              className={`transition-colors ${isSaved ? 'text-blue-500' : 'text-gray-500'}`}
+              className={`transition-colors ${isSaved ? 'text-blue-500' : 'text-gray-500 dark:text-gray-400'}`}
               fill={isSaved ? 'currentColor' : 'none'}
             />
           </button>
         </div>
-        <p className="font-semibold mb-1">{likeCount} likes</p>
-        <p>
-          <Link to={profileUrl(post.user)} className="font-semibold">{post.user.username}</Link> {post.caption}
+        <p className="font-semibold mb-1 dark:text-gray-100">{likeCount} likes</p>
+        <p className="dark:text-gray-200">
+          <Link to={profileUrl(post.user)} className="font-semibold dark:text-gray-100">{post.user.username}</Link> {post.caption}
         </p>
         {post.tags?.length > 0 && (
           <div className="flex flex-wrap gap-1 mt-1">
@@ -161,10 +161,10 @@ const Post = ({ post: initialPost, isGrid, onCommentClick }) => {
             ))}
           </div>
         )}
-        <button onClick={() => onCommentClick(post)} className="text-gray-500 text-sm mt-1 hover:underline">
+        <button onClick={() => onCommentClick(post)} className="text-gray-500 dark:text-gray-400 text-sm mt-1 hover:underline">
           View all {post.comments.length} comments
         </button>
-        <p className="text-gray-400 text-xs mt-2">
+        <p className="text-gray-400 dark:text-gray-500 text-xs mt-2">
           {new Date(post.createdAt).toLocaleDateString()}
         </p>
       </div>
@@ -197,22 +197,22 @@ const HomeFeed = () => {
     <div className="max-w-screen-xl mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-semibold">Your Feed</h2>
-        <div className="flex bg-gray-100 rounded-lg p-1 mr-20">
-          <button 
+        <div className="flex bg-gray-100 dark:bg-zinc-800 rounded-lg p-1 mr-20">
+          <button
             onClick={() => setViewMode('feed')}
-            className={`p-2 rounded ${viewMode === 'feed' ? 'bg-white shadow' : ''}`}
+            className={`p-2 rounded ${viewMode === 'feed' ? 'bg-white dark:bg-zinc-600 shadow' : 'dark:text-gray-300'}`}
           >
             <BarChart2 size={20} />
           </button>
-          <button 
+          <button
             onClick={() => setViewMode('grid3')}
-            className={`p-2 rounded mx-1 ${viewMode === 'grid3' ? 'bg-white shadow' : ''}`}
+            className={`p-2 rounded mx-1 ${viewMode === 'grid3' ? 'bg-white dark:bg-zinc-600 shadow' : 'dark:text-gray-300'}`}
           >
             <LayoutGrid size={20} />
           </button>
-          <button 
+          <button
             onClick={() => setViewMode('grid5')}
-            className={`p-2 rounded ${viewMode === 'grid5' ? 'bg-white shadow' : ''}`}
+            className={`p-2 rounded ${viewMode === 'grid5' ? 'bg-white dark:bg-zinc-600 shadow' : 'dark:text-gray-300'}`}
           >
             <Grid size={20} />
           </button>
@@ -227,7 +227,7 @@ const HomeFeed = () => {
       
       {!loading && posts.length === 0 && (
         <div className="text-center py-20">
-          <p className="text-xl text-gray-500">Your feed is empty. Follow artists and shops to see their posts here!</p>
+          <p className="text-xl text-gray-500 dark:text-gray-400">Your feed is empty. Follow artists and shops to see their posts here!</p>
         </div>
       )}
       
