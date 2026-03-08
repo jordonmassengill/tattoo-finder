@@ -1,6 +1,6 @@
 // File: src/components/HomeFeed.jsx
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { BarChart2, LayoutGrid, Grid, Heart, MessageCircle, Bookmark } from 'lucide-react';
 import api from '../services/api';
 import { Link } from 'react-router-dom';
@@ -176,14 +176,21 @@ const HomeFeed = () => {
   const [viewMode, setViewMode] = useState('feed');
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
   const [selectedPost, setSelectedPost] = useState(null);
-  
+  const sentinelRef = useRef(null);
+  const PAGE_SIZE = 30;
+
   useEffect(() => {
     const fetchPosts = async () => {
       try {
         setLoading(true);
-        const response = await api.getPosts();
+        const response = await api.getPosts(1);
         setPosts(response.data);
+        setHasMore(response.data.length === PAGE_SIZE);
+        setPage(1);
       } catch (error) {
         console.error('Error fetching posts:', error);
       } finally {
@@ -192,6 +199,36 @@ const HomeFeed = () => {
     };
     fetchPosts();
   }, []);
+
+  const loadMore = useCallback(async () => {
+    if (loadingMore || !hasMore) return;
+    try {
+      setLoadingMore(true);
+      const nextPage = page + 1;
+      const response = await api.getPosts(nextPage);
+      if (response.data.length === 0) {
+        setHasMore(false);
+      } else {
+        setPosts(prev => [...prev, ...response.data]);
+        setPage(nextPage);
+        setHasMore(response.data.length === PAGE_SIZE);
+      }
+    } catch (error) {
+      console.error('Error loading more posts:', error);
+    } finally {
+      setLoadingMore(false);
+    }
+  }, [loadingMore, hasMore, page]);
+
+  useEffect(() => {
+    if (!sentinelRef.current) return;
+    const observer = new IntersectionObserver(
+      (entries) => { if (entries[0].isIntersecting) loadMore(); },
+      { threshold: 0.1 }
+    );
+    observer.observe(sentinelRef.current);
+    return () => observer.disconnect();
+  }, [loadMore]);
   
   return (
     <div className="max-w-screen-xl mx-auto px-4 py-8">
@@ -257,9 +294,17 @@ const HomeFeed = () => {
         </div>
       )}
 
+      {/* Infinite scroll sentinel */}
+      {!loading && (
+        <div ref={sentinelRef} className="py-4 flex justify-center">
+          {loadingMore && <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />}
+          {!hasMore && posts.length > 0 && <p className="text-gray-400 dark:text-gray-500 text-sm">No more posts</p>}
+        </div>
+      )}
+
       {selectedPost && (
-        <CommentModal 
-          post={selectedPost} 
+        <CommentModal
+          post={selectedPost}
           onClose={() => setSelectedPost(null)}
         />
       )}

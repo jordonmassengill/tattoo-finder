@@ -25,8 +25,11 @@ export default {
   getCurrentUser: () => api.get('/users/me'),
   getUserById: (id) => api.get(`/users/${id}`),
   getUserPosts: (id, options = {}) => {
-    const params = options.includeArtists ? '?includeArtists=true' : '';
-    return api.get(`/users/${id}/posts${params}`);
+    const params = new URLSearchParams();
+    if (options.includeArtists) params.set('includeArtists', 'true');
+    if (options.page) params.set('page', options.page);
+    const query = params.toString();
+    return api.get(`/users/${id}/posts${query ? '?' + query : ''}`);
   },
   updateProfile: (userData) => api.put('/users/update', userData),
   changePassword: (currentPassword, newPassword) => api.put('/users/change-password', { currentPassword, newPassword }),
@@ -48,7 +51,7 @@ export default {
   },
   
   // Post endpoints
-  getPosts: () => api.get('/posts'),
+  getPosts: (page = 1) => api.get(`/posts?page=${page}`),
   getPostById: (id) => api.get(`/posts/${id}`),
   createPost: (postData) => {
     const formData = new FormData();

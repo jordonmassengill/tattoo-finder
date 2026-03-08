@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { MapPin, Filter, Users, Image, Heart, MessageCircle, Search, Bookmark, BarChart2, LayoutGrid, Grid } from 'lucide-react';
 import ProfileImage from './ProfileImage';
@@ -113,6 +113,8 @@ const EMPTY_FILTERS = {
   subjectSpecialties: [],
 };
 
+const PAGE_SIZE = 30;
+
 const SearchPage = () => {
   const [viewMode, setViewMode] = useState('grid3');
   const [showFilters, setShowFilters] = useState(false);
@@ -122,48 +124,94 @@ const SearchPage = () => {
   const [filters, setFilters] = useState(EMPTY_FILTERS);
   const [searchResults, setSearchResults] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(false);
   const [selectedPost, setSelectedPost] = useState(null);
   const [sortOption, setSortOption] = useState('newest');
+  const sentinelRef = useRef(null);
 
+  const buildParams = useCallback((pageNum) => {
+    const params = new URLSearchParams();
+    if (submittedQuery) params.append('query', submittedQuery);
+    filters.location.forEach(loc => params.append('location', loc));
+    params.append('sort', sortOption);
+    params.append('page', pageNum);
+
+    if (searchType === 'posts') {
+      filters.priceRange.forEach(price => params.append('priceRange', price));
+      if (filters.colorType) params.append('colorType', filters.colorType);
+      if (filters.flashType) params.append('flashOrCustom', filters.flashType);
+      if (filters.size) params.append('size', filters.size);
+      if (filters.styles.length > 0) params.append('styles', filters.styles.join(','));
+      if (filters.subjects.length > 0) params.append('subjects', filters.subjects.join(','));
+    } else {
+      filters.priceRange.forEach(price => params.append('priceRange', price));
+      if (filters.inkSpecialty) params.append('inkSpecialty', filters.inkSpecialty);
+      if (filters.designSpecialty) params.append('designSpecialty', filters.designSpecialty);
+      if (filters.styleSpecialties.length > 0) params.append('styleSpecialties', filters.styleSpecialties.join(','));
+      if (filters.subjectSpecialties.length > 0) params.append('subjectSpecialties', filters.subjectSpecialties.join(','));
+    }
+    return params;
+  }, [submittedQuery, filters, sortOption, searchType]);
+
+  // Reset and fetch page 1 when filters/query/type/sort change
   useEffect(() => {
     const fetchSearchResults = async () => {
       try {
         setLoading(true);
-        const params = new URLSearchParams();
-
-        if (submittedQuery) params.append('query', submittedQuery);
-        filters.location.forEach(loc => params.append('location', loc));
-        params.append('sort', sortOption);
-
-        if (searchType === 'posts') {
-          filters.priceRange.forEach(price => params.append('priceRange', price));
-          if (filters.colorType) params.append('colorType', filters.colorType);
-          if (filters.flashType) params.append('flashOrCustom', filters.flashType);
-          if (filters.size) params.append('size', filters.size);
-          if (filters.styles.length > 0) params.append('styles', filters.styles.join(','));
-          if (filters.subjects.length > 0) params.append('subjects', filters.subjects.join(','));
-        } else {
-          filters.priceRange.forEach(price => params.append('priceRange', price));
-          if (filters.inkSpecialty) params.append('inkSpecialty', filters.inkSpecialty);
-          if (filters.designSpecialty) params.append('designSpecialty', filters.designSpecialty);
-          if (filters.styleSpecialties.length > 0) params.append('styleSpecialties', filters.styleSpecialties.join(','));
-          if (filters.subjectSpecialties.length > 0) params.append('subjectSpecialties', filters.subjectSpecialties.join(','));
-        }
-
+        setSearchResults([]);
+        setPage(1);
+        setHasMore(false);
+        const params = buildParams(1);
         const endpoint = searchType === 'artists' ? '/api/search/artists' : '/api/search/posts';
         const response = await fetch(`http://localhost:5000${endpoint}?${params.toString()}`);
         if (!response.ok) throw new Error('Failed to fetch search results');
         const data = await response.json();
         setSearchResults(data);
+        setHasMore(data.length === PAGE_SIZE);
       } catch (error) {
         console.error('Error fetching search results:', error);
       } finally {
         setLoading(false);
       }
     };
-
     fetchSearchResults();
-  }, [submittedQuery, filters, searchType, sortOption]);
+  }, [submittedQuery, filters, searchType, sortOption]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const loadMore = useCallback(async () => {
+    if (loadingMore || !hasMore) return;
+    try {
+      setLoadingMore(true);
+      const nextPage = page + 1;
+      const params = buildParams(nextPage);
+      const endpoint = searchType === 'artists' ? '/api/search/artists' : '/api/search/posts';
+      const response = await fetch(`http://localhost:5000${endpoint}?${params.toString()}`);
+      if (!response.ok) throw new Error('Failed to fetch more results');
+      const data = await response.json();
+      if (data.length === 0) {
+        setHasMore(false);
+      } else {
+        setSearchResults(prev => [...prev, ...data]);
+        setPage(nextPage);
+        setHasMore(data.length === PAGE_SIZE);
+      }
+    } catch (error) {
+      console.error('Error loading more results:', error);
+    } finally {
+      setLoadingMore(false);
+    }
+  }, [loadingMore, hasMore, page, buildParams, searchType]);
+
+  useEffect(() => {
+    if (!sentinelRef.current) return;
+    const observer = new IntersectionObserver(
+      (entries) => { if (entries[0].isIntersecting) loadMore(); },
+      { threshold: 0.1 }
+    );
+    observer.observe(sentinelRef.current);
+    return () => observer.disconnect();
+  }, [loadMore]);
 
   // Generic togglers
   const toggleSingleFilter = (key, value) => {
@@ -537,6 +585,14 @@ const SearchPage = () => {
         viewMode === 'feed'
           ? <div className="max-w-xl mx-auto">{searchResults.map(result => renderSearchItem(result, false))}</div>
           : <div className={`grid ${viewMode === 'grid3' ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3' : 'grid-cols-2 sm:grid-cols-3 md:grid-cols-5'} gap-4`}>{searchResults.map(result => renderSearchItem(result, true))}</div>
+      )}
+
+      {/* Infinite scroll sentinel */}
+      {!loading && (
+        <div ref={sentinelRef} className="py-4 flex justify-center">
+          {loadingMore && <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />}
+          {!hasMore && searchResults.length > 0 && <p className="text-gray-400 dark:text-gray-500 text-sm">No more results</p>}
+        </div>
       )}
 
       {selectedPost && (
