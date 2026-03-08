@@ -171,6 +171,7 @@ const SavedPage = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [viewMode, setViewMode] = useState('grid3');
   const sentinelRef = useRef(null);
+  const loadMoreRef = useRef(null);
 
   // Load saved posts once
   useEffect(() => {
@@ -268,15 +269,19 @@ const SavedPage = () => {
     }
   }, [viewTab, filteredPosts.length, filteredFollowing.length]);
 
+  // Keep ref always pointing to latest loadMoreVisible without recreating observer
+  loadMoreRef.current = loadMoreVisible;
+
   useEffect(() => {
-    if (!sentinelRef.current) return;
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
     const observer = new IntersectionObserver(
-      (entries) => { if (entries[0].isIntersecting) loadMoreVisible(); },
-      { threshold: 0.1 }
+      (entries) => { if (entries[0].isIntersecting) loadMoreRef.current(); },
+      { rootMargin: '0px 0px 300px 0px' }
     );
-    observer.observe(sentinelRef.current);
+    observer.observe(sentinel);
     return () => observer.disconnect();
-  }, [loadMoreVisible]);
+  }, []); // set up once — loadMoreRef always stays current
 
   // Toggle helpers
   const togglePostSingle = (key, value) => setPostFilters(prev => ({ ...prev, [key]: prev[key] === value ? '' : value }));

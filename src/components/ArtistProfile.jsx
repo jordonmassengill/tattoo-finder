@@ -128,6 +128,7 @@ const ArtistProfile = () => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState('');
   const sentinelRef = useRef(null);
+  const loadMoreRef = useRef(null);
 
   // Affiliation state
   const [affiliationStatus, setAffiliationStatus] = useState(null); // 'none'|'pending_sent'|'pending_received'|'affiliated'
@@ -200,15 +201,19 @@ const ArtistProfile = () => {
     }
   }, [loadingMore, hasMore, postsPage, artistData, id]);
 
+  // Keep ref always pointing to latest loadMore without recreating observer
+  loadMoreRef.current = loadMore;
+
   useEffect(() => {
-    if (!sentinelRef.current) return;
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
     const observer = new IntersectionObserver(
-      (entries) => { if (entries[0].isIntersecting) loadMore(); },
-      { threshold: 0.1 }
+      (entries) => { if (entries[0].isIntersecting) loadMoreRef.current(); },
+      { rootMargin: '0px 0px 300px 0px' }
     );
-    observer.observe(sentinelRef.current);
+    observer.observe(sentinel);
     return () => observer.disconnect();
-  }, [loadMore]);
+  }, []); // set up once — loadMoreRef always stays current
 
   const handleFollowToggle = async () => {
     if (!currentUser) return;
@@ -587,13 +592,11 @@ const ArtistProfile = () => {
         </div>
       )}
 
-      {/* Infinite scroll sentinel */}
-      {!loading && (
-        <div ref={sentinelRef} className="py-4 flex justify-center">
-          {loadingMore && <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />}
-          {!hasMore && posts.length > 0 && <p className="text-gray-400 dark:text-gray-500 text-sm">No more posts</p>}
-        </div>
-      )}
+      {/* Infinite scroll sentinel — always rendered so observer can attach on mount */}
+      <div ref={sentinelRef} className="py-4 flex justify-center">
+        {loadingMore && <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />}
+        {!loading && !hasMore && posts.length > 0 && <p className="text-gray-400 dark:text-gray-500 text-sm">No more posts</p>}
+      </div>
 
       {showDeleteConfirm && postToDelete && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">

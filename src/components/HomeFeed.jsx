@@ -178,9 +178,10 @@ const HomeFeed = () => {
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
+  const [hasMore, setHasMore] = useState(false);
   const [selectedPost, setSelectedPost] = useState(null);
   const sentinelRef = useRef(null);
+  const loadMoreRef = useRef(null);
   const PAGE_SIZE = 30;
 
   useEffect(() => {
@@ -220,15 +221,19 @@ const HomeFeed = () => {
     }
   }, [loadingMore, hasMore, page]);
 
+  // Keep ref always pointing to latest loadMore without recreating observer
+  loadMoreRef.current = loadMore;
+
   useEffect(() => {
-    if (!sentinelRef.current) return;
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
     const observer = new IntersectionObserver(
-      (entries) => { if (entries[0].isIntersecting) loadMore(); },
-      { threshold: 0.1 }
+      (entries) => { if (entries[0].isIntersecting) loadMoreRef.current(); },
+      { rootMargin: '0px 0px 300px 0px' }
     );
-    observer.observe(sentinelRef.current);
+    observer.observe(sentinel);
     return () => observer.disconnect();
-  }, [loadMore]);
+  }, []); // set up once — loadMoreRef always stays current
   
   return (
     <div className="max-w-screen-xl mx-auto px-4 py-8">
@@ -294,13 +299,11 @@ const HomeFeed = () => {
         </div>
       )}
 
-      {/* Infinite scroll sentinel */}
-      {!loading && (
-        <div ref={sentinelRef} className="py-4 flex justify-center">
-          {loadingMore && <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />}
-          {!hasMore && posts.length > 0 && <p className="text-gray-400 dark:text-gray-500 text-sm">No more posts</p>}
-        </div>
-      )}
+      {/* Infinite scroll sentinel — always rendered so observer can attach on mount */}
+      <div ref={sentinelRef} className="py-4 flex justify-center">
+        {loadingMore && <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />}
+        {!loading && !hasMore && posts.length > 0 && <p className="text-gray-400 dark:text-gray-500 text-sm">No more posts</p>}
+      </div>
 
       {selectedPost && (
         <CommentModal

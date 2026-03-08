@@ -130,6 +130,7 @@ const SearchPage = () => {
   const [selectedPost, setSelectedPost] = useState(null);
   const [sortOption, setSortOption] = useState('newest');
   const sentinelRef = useRef(null);
+  const loadMoreRef = useRef(null);
 
   const buildParams = useCallback((pageNum) => {
     const params = new URLSearchParams();
@@ -203,15 +204,19 @@ const SearchPage = () => {
     }
   }, [loadingMore, hasMore, page, buildParams, searchType]);
 
+  // Keep ref always pointing to latest loadMore without recreating observer
+  loadMoreRef.current = loadMore;
+
   useEffect(() => {
-    if (!sentinelRef.current) return;
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
     const observer = new IntersectionObserver(
-      (entries) => { if (entries[0].isIntersecting) loadMore(); },
-      { threshold: 0.1 }
+      (entries) => { if (entries[0].isIntersecting) loadMoreRef.current(); },
+      { rootMargin: '0px 0px 300px 0px' }
     );
-    observer.observe(sentinelRef.current);
+    observer.observe(sentinel);
     return () => observer.disconnect();
-  }, [loadMore]);
+  }, []); // set up once — loadMoreRef always stays current
 
   // Generic togglers
   const toggleSingleFilter = (key, value) => {
@@ -587,13 +592,11 @@ const SearchPage = () => {
           : <div className={`grid ${viewMode === 'grid3' ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3' : 'grid-cols-2 sm:grid-cols-3 md:grid-cols-5'} gap-4`}>{searchResults.map(result => renderSearchItem(result, true))}</div>
       )}
 
-      {/* Infinite scroll sentinel */}
-      {!loading && (
-        <div ref={sentinelRef} className="py-4 flex justify-center">
-          {loadingMore && <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />}
-          {!hasMore && searchResults.length > 0 && <p className="text-gray-400 dark:text-gray-500 text-sm">No more results</p>}
-        </div>
-      )}
+      {/* Infinite scroll sentinel — always rendered so observer can attach on mount */}
+      <div ref={sentinelRef} className="py-4 flex justify-center">
+        {loadingMore && <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />}
+        {!loading && !hasMore && searchResults.length > 0 && <p className="text-gray-400 dark:text-gray-500 text-sm">No more results</p>}
+      </div>
 
       {selectedPost && (
         <CommentModal post={selectedPost} onClose={() => setSelectedPost(null)} />
