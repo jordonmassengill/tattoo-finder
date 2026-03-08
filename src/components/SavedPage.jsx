@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
 import { Heart, MessageCircle, Search, Filter, Bookmark, MapPin, Users, Image, BarChart2, LayoutGrid, Grid } from 'lucide-react';
@@ -142,12 +142,15 @@ const EMPTY_ARTIST_FILTERS = {
   subjectSpecialties: [],
 };
 
+const PAGE_SIZE = 30;
+
 const SavedPage = () => {
   // Posts tab
   const [savedPosts, setSavedPosts] = useState([]);
   const [loadingPosts, setLoadingPosts] = useState(true);
   const [selectedPost, setSelectedPost] = useState(null);
   const [filteredPosts, setFilteredPosts] = useState([]);
+  const [visiblePostCount, setVisiblePostCount] = useState(PAGE_SIZE);
   const [postFilters, setPostFilters] = useState(EMPTY_POST_FILTERS);
   const [postQuery, setPostQuery] = useState('');
   const [submittedPostQuery, setSubmittedPostQuery] = useState('');
@@ -157,6 +160,7 @@ const SavedPage = () => {
   // Following tab
   const [followedUsers, setFollowedUsers] = useState([]);
   const [filteredFollowing, setFilteredFollowing] = useState([]);
+  const [visibleFollowingCount, setVisibleFollowingCount] = useState(PAGE_SIZE);
   const [loadingFollowing, setLoadingFollowing] = useState(false);
   const [followingQuery, setFollowingQuery] = useState('');
   const [submittedFollowingQuery, setSubmittedFollowingQuery] = useState('');
@@ -166,6 +170,8 @@ const SavedPage = () => {
   const [viewTab, setViewTab] = useState('posts');
   const [showFilters, setShowFilters] = useState(false);
   const [viewMode, setViewMode] = useState('grid3');
+  const sentinelRef = useRef(null);
+  const loadMoreRef = useRef(null);
 
   // Load saved posts once
   useEffect(() => {
@@ -249,6 +255,33 @@ const SavedPage = () => {
     }
     setFilteredFollowing(users);
   }, [submittedFollowingQuery, artistFilters, followedUsers, followingSortOption]);
+
+  // Reset visible counts when filtered results change
+  useEffect(() => { setVisiblePostCount(PAGE_SIZE); }, [filteredPosts]);
+  useEffect(() => { setVisibleFollowingCount(PAGE_SIZE); }, [filteredFollowing]);
+
+  // Infinite scroll for saved page
+  const loadMoreVisible = useCallback(() => {
+    if (viewTab === 'posts') {
+      setVisiblePostCount(prev => Math.min(prev + PAGE_SIZE, filteredPosts.length));
+    } else {
+      setVisibleFollowingCount(prev => Math.min(prev + PAGE_SIZE, filteredFollowing.length));
+    }
+  }, [viewTab, filteredPosts.length, filteredFollowing.length]);
+
+  // Keep ref always pointing to latest loadMoreVisible without recreating observer
+  loadMoreRef.current = loadMoreVisible;
+
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+    const observer = new IntersectionObserver(
+      (entries) => { if (entries[0].isIntersecting) loadMoreRef.current(); },
+      { rootMargin: '0px 0px 300px 0px' }
+    );
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, []); // set up once — loadMoreRef always stays current
 
   // Toggle helpers
   const togglePostSingle = (key, value) => setPostFilters(prev => ({ ...prev, [key]: prev[key] === value ? '' : value }));
@@ -533,9 +566,9 @@ const SavedPage = () => {
           )}
           {!loadingPosts && filteredPosts.length > 0 && (
             viewMode === 'feed'
-              ? <div className="max-w-xl mx-auto">{filteredPosts.map(post => <PostItem key={post._id} post={post} onPostClick={setSelectedPost} isGrid={false} />)}</div>
+              ? <div className="max-w-xl mx-auto">{filteredPosts.slice(0, visiblePostCount).map(post => <PostItem key={post._id} post={post} onPostClick={setSelectedPost} isGrid={false} />)}</div>
               : <div className={`grid ${viewMode === 'grid3' ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3' : 'grid-cols-2 sm:grid-cols-3 md:grid-cols-5'} gap-1`}>
-                  {filteredPosts.map(post => <PostItem key={post._id} post={post} onPostClick={setSelectedPost} isGrid={true} />)}
+                  {filteredPosts.slice(0, visiblePostCount).map(post => <PostItem key={post._id} post={post} onPostClick={setSelectedPost} isGrid={true} />)}
                 </div>
           )}
         </>
@@ -564,7 +597,7 @@ const SavedPage = () => {
           {!loadingFollowing && filteredFollowing.length > 0 && (
             viewMode === 'feed'
               ? <div className="max-w-xl mx-auto">
-                  {filteredFollowing.map(user => (
+                  {filteredFollowing.slice(0, visibleFollowingCount).map(user => (
                     <div key={user._id} className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-lg overflow-hidden mb-6">
                       <div className="flex">
                         <div className="w-24 h-24 sm:w-32 sm:h-32 flex-shrink-0">
@@ -588,7 +621,7 @@ const SavedPage = () => {
                   ))}
                 </div>
               : <div className={`grid ${viewMode === 'grid3' ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3' : 'grid-cols-2 sm:grid-cols-3 md:grid-cols-5'} gap-1`}>
-                  {filteredFollowing.map(user => (
+                  {filteredFollowing.slice(0, visibleFollowingCount).map(user => (
                     <div key={user._id} className="relative group">
                       <Link to={profileUrl(user)} className="block">
                         <div className="aspect-square relative overflow-hidden rounded-lg border border-gray-200">
@@ -619,6 +652,22 @@ const SavedPage = () => {
           )}
         </>
       )}
+
+      {/* Infinite scroll sentinel */}
+      <div ref={sentinelRef} className="py-4 flex justify-center">
+        {viewTab === 'posts' && !loadingPosts && visiblePostCount < filteredPosts.length && (
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />
+        )}
+        {viewTab === 'posts' && !loadingPosts && filteredPosts.length > 0 && visiblePostCount >= filteredPosts.length && (
+          <p className="text-gray-400 dark:text-gray-500 text-sm">No more posts</p>
+        )}
+        {viewTab === 'following' && !loadingFollowing && visibleFollowingCount < filteredFollowing.length && (
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />
+        )}
+        {viewTab === 'following' && !loadingFollowing && filteredFollowing.length > 0 && visibleFollowingCount >= filteredFollowing.length && (
+          <p className="text-gray-400 dark:text-gray-500 text-sm">No more results</p>
+        )}
+      </div>
 
       {selectedPost && (
         <CommentModal post={selectedPost} onClose={() => setSelectedPost(null)} />

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { LayoutGrid, Grid, BarChart2, MapPin, Star, Trash2, Pencil, AlertTriangle, Heart, MessageCircle, Bookmark, UserPlus, UserCheck, Clock as ClockIcon } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -108,11 +108,16 @@ const formatNum = (n) => {
   return String(n);
 };
 
+const PAGE_SIZE = 30;
+
 const ArtistProfile = () => {
   const [viewMode, setViewMode] = useState('grid3');
   const [artistData, setArtistData] = useState(null);
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [postsPage, setPostsPage] = useState(1);
+  const [hasMore, setHasMore] = useState(false);
   const [following, setFollowing] = useState(false);
   const [followersCount, setFollowersCount] = useState(0);
   const [isFollowLoading, setIsFollowLoading] = useState(false);
@@ -122,6 +127,8 @@ const ArtistProfile = () => {
   const [postToEdit, setPostToEdit] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState('');
+  const sentinelRef = useRef(null);
+  const loadMoreRef = useRef(null);
 
   // Affiliation state
   const [affiliationStatus, setAffiliationStatus] = useState(null); // 'none'|'pending_sent'|'pending_received'|'affiliated'
@@ -138,6 +145,9 @@ const ArtistProfile = () => {
       if (!id) return;
       try {
         setLoading(true);
+        setPosts([]);
+        setPostsPage(1);
+        setHasMore(false);
         const profileResponse = await api.getUserById(id);
         const data = profileResponse.data;
 
@@ -149,8 +159,9 @@ const ArtistProfile = () => {
           setFollowing(isUserFollowing);
         }
 
-        const postsResponse = await api.getUserPosts(id);
+        const postsResponse = await api.getUserPosts(id, { page: 1 });
         setPosts(postsResponse.data);
+        setHasMore(postsResponse.data.length === PAGE_SIZE);
 
         // Affiliation status for a shop viewing this artist
         if (currentUser && currentUser.userType === 'shop') {
@@ -169,6 +180,40 @@ const ArtistProfile = () => {
 
     fetchArtistData();
   }, [id, currentUser?.id]);
+
+  const loadMore = useCallback(async () => {
+    if (loadingMore || !hasMore || !artistData) return;
+    try {
+      setLoadingMore(true);
+      const nextPage = postsPage + 1;
+      const response = await api.getUserPosts(id, { page: nextPage });
+      if (response.data.length === 0) {
+        setHasMore(false);
+      } else {
+        setPosts(prev => [...prev, ...response.data]);
+        setPostsPage(nextPage);
+        setHasMore(response.data.length === PAGE_SIZE);
+      }
+    } catch (error) {
+      console.error('Error loading more posts:', error);
+    } finally {
+      setLoadingMore(false);
+    }
+  }, [loadingMore, hasMore, postsPage, artistData, id]);
+
+  // Keep ref always pointing to latest loadMore without recreating observer
+  loadMoreRef.current = loadMore;
+
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+    const observer = new IntersectionObserver(
+      (entries) => { if (entries[0].isIntersecting) loadMoreRef.current(); },
+      { rootMargin: '0px 0px 300px 0px' }
+    );
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, []); // set up once — loadMoreRef always stays current
 
   const handleFollowToggle = async () => {
     if (!currentUser) return;
@@ -546,6 +591,12 @@ const ArtistProfile = () => {
           ))}
         </div>
       )}
+
+      {/* Infinite scroll sentinel — always rendered so observer can attach on mount */}
+      <div ref={sentinelRef} className="py-4 flex justify-center">
+        {loadingMore && <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />}
+        {!loading && !hasMore && posts.length > 0 && <p className="text-gray-400 dark:text-gray-500 text-sm">No more posts</p>}
+      </div>
 
       {showDeleteConfirm && postToDelete && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
