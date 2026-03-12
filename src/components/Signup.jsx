@@ -108,10 +108,10 @@ const Signup = () => {
         });
       }
 
-      const success = await signup(userData);
+      const result = await signup(userData);
 
-      if (success) {
-        navigate('/home');
+      if (result.success) {
+        navigate('/verify-email-sent', { state: { email: result.email, emailSent: result.emailSent } });
       } else {
         setFormError(error || 'Failed to create account');
       }

@@ -11,6 +11,8 @@ import NavBar from './components/NavBar';
 import PublicNavBar from './components/PublicNavBar';
 import Login from './components/Login';
 import Signup from './components/Signup';
+import VerifyEmailSent from './components/VerifyEmailSent';
+import VerifyEmail from './components/VerifyEmail';
 import SavedPage from './components/SavedPage';
 import RequestsPage from './components/RequestsPage';
 import { AuthProvider, useAuth } from './context/AuthContext';
@@ -30,6 +32,8 @@ const Layout = ({ children }) => {
           <Route path="/search" element={<PublicNavBar />} />
           <Route path="/login" element={<PublicNavBar />} />
           <Route path="/signup" element={<PublicNavBar />} />
+          <Route path="/verify-email-sent" element={<PublicNavBar />} />
+          <Route path="/verify-email" element={<PublicNavBar />} />
           <Route path="/artist/*" element={<PublicNavBar />} />
           <Route path="/shop/*" element={<PublicNavBar />} />
         </Routes>
@@ -86,6 +90,8 @@ function AppContent() {
         <Route path="/" element={!currentUser ? <LandingPage /> : <Navigate to="/home" />} />
         <Route path="/login" element={!currentUser ? <Login /> : <Navigate to="/home" />} />
         <Route path="/signup" element={!currentUser ? <Signup /> : <Navigate to="/home" />} />
+        <Route path="/verify-email-sent" element={<VerifyEmailSent />} />
+        <Route path="/verify-email" element={<VerifyEmail />} />
         <Route path="/search" element={<SearchPage />} />
         <Route path="/artist/:id" element={<ArtistProfile />} />
         <Route path="/shop/:id" element={<ShopProfile />} />
