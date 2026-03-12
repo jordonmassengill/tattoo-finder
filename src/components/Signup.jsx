@@ -1,10 +1,20 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { BAY_AREA_CITIES } from '../constants/locations';
 import ArtistStylesForm, { EMPTY_ARTIST_STYLES } from './ArtistStylesForm';
 
+const API_BASE = 'https://tattoo-finder-backend-production.up.railway.app/api';
+
 const Signup = () => {
+  const [searchParams] = useSearchParams();
+  const inviteCode = searchParams.get('code');
+
+  // Invite code state
+  const [inviteValid, setInviteValid] = useState(null); // null = checking, true/false = result
+  const [inviteUserType, setInviteUserType] = useState(''); // 'artist' or 'shop' from the code
+  const [inviteError, setInviteError] = useState('');
+
   const [step, setStep] = useState(1);
   const [userType, setUserType] = useState('');
   const [formData, setFormData] = useState({
@@ -22,6 +32,36 @@ const Signup = () => {
 
   const { signup, error } = useAuth();
   const navigate = useNavigate();
+
+  // Validate invite code on mount if present
+  useEffect(() => {
+    if (!inviteCode) {
+      setInviteValid(false);
+      return;
+    }
+
+    const validate = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/invite-codes/validate/${inviteCode}`);
+        const data = await res.json();
+        if (data.valid) {
+          setInviteValid(true);
+          setInviteUserType(data.userType);
+          setUserType(data.userType);
+          // Skip account type step — go straight to credentials
+          setStep(2);
+        } else {
+          setInviteValid(false);
+          setInviteError(data.message || 'Invalid or expired invite code');
+        }
+      } catch {
+        setInviteValid(false);
+        setInviteError('Could not validate invite code. Please try again.');
+      }
+    };
+
+    validate();
+  }, [inviteCode]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -59,27 +99,45 @@ const Signup = () => {
     return true;
   };
 
-  const validateStep3 = () => { setFormError(''); return true; };
+  // Determine total steps based on flow
+  // - Invite (artist): credentials → profile details → specialties = 3 extra steps (steps 2, 3, 4)
+  // - Invite (shop): credentials → profile details = 2 extra steps (steps 2, 3)
+  // - Enthusiast (no invite): account type → credentials = steps 1, 2
+  const getTotalSteps = () => {
+    if (inviteValid && inviteUserType === 'artist') return 4;
+    if (inviteValid && inviteUserType === 'shop') return 3;
+    return 2; // enthusiast
+  };
 
+  const totalSteps = getTotalSteps();
+  const isLastStep = step === totalSteps;
 
   const handleNext = () => {
     let isValid = false;
     switch (step) {
-      case 1: isValid = validateStep1(); break;
+      case 1:
+        isValid = validateStep1();
+        if (isValid && (userType === 'artist' || userType === 'shop')) {
+          navigate('/artist-shop-signup');
+          return;
+        }
+        break;
       case 2: isValid = validateStep2(); break;
-      case 3: isValid = validateStep3(); break;
       default: isValid = true;
     }
     if (isValid) setStep(prev => prev + 1);
   };
 
-  const handleBack = () => setStep(prev => prev - 1);
+  const handleBack = () => {
+    // If using invite code, don't go back past step 2 (no type selection step)
+    if (inviteValid && step === 2) return;
+    setStep(prev => prev - 1);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (step !== totalSteps) return; // guard against accidental submission on earlier steps
+    if (!isLastStep) return;
     setFormError('');
-
     setIsLoading(true);
 
     try {
@@ -88,8 +146,11 @@ const Signup = () => {
         password: formData.password,
         username: formData.username,
         userType,
-        profilePic: '/api/placeholder/150/150',
       };
+
+      if (inviteCode) {
+        userData.inviteCode = inviteCode;
+      }
 
       if (userType === 'artist' || userType === 'shop') {
         userData.bio = formData.bio;
@@ -123,14 +184,14 @@ const Signup = () => {
     }
   };
 
-  // Step 1: Select Account Type
+  // Step 1: Select Account Type (enthusiast-only flow)
   const renderStep1 = () => (
     <div className="space-y-6">
       <h2 className="text-xl font-semibold mb-4 dark:text-gray-100">Choose Account Type</h2>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {[
-          { type: 'enthusiast', title: 'Tattoo Enthusiast', desc: 'Follow artists, save tattoo ideas, and book appointments.' },
-          { type: 'artist', title: 'Tattoo Artist', desc: 'Showcase your work, gain followers, and manage appointments.' },
+          { type: 'enthusiast', title: 'Tattoo Enthusiast', desc: 'Follow artists, save tattoo ideas, and discover new art.' },
+          { type: 'artist', title: 'Tattoo Artist', desc: 'Showcase your work, gain followers, and connect with clients.' },
           { type: 'shop', title: 'Tattoo Shop', desc: 'Manage your shop, add artists, and showcase your collective work.' },
         ].map(({ type, title, desc }) => (
           <div
@@ -174,43 +235,39 @@ const Signup = () => {
     </div>
   );
 
-  // Step 3: Profile Details (artist / shop)
+  // Step 3: Profile Details (artist / shop — invite flow only)
   const renderStep3 = () => (
     <div className="space-y-6">
       <h2 className="text-xl font-semibold mb-4 dark:text-gray-100">Profile Details</h2>
       <div className="space-y-4">
-        {(userType === 'artist' || userType === 'shop') && (
-          <>
-            <div>
-              <label htmlFor="bio" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Bio</label>
-              <textarea id="bio" name="bio" rows={3} value={formData.bio} onChange={handleChange} className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-zinc-700 dark:bg-zinc-800 dark:text-gray-200 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
+        <div>
+          <label htmlFor="bio" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Bio</label>
+          <textarea id="bio" name="bio" rows={3} value={formData.bio} onChange={handleChange} className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-zinc-700 dark:bg-zinc-800 dark:text-gray-200 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
+        </div>
+        <div>
+          <label htmlFor="location" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Location</label>
+          <select id="location" name="location" value={formData.location} onChange={handleChange} className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-zinc-700 dark:bg-zinc-800 dark:text-gray-200 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+            <option value="">Select a Location</option>
+            {BAY_AREA_CITIES.map(city => <option key={city} value={city}>{city}</option>)}
+          </select>
+        </div>
+        {userType === 'artist' && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Price Range</label>
+            <div className="flex flex-wrap gap-2">
+              {['$', '$$', '$$$', '$$$$'].map(price => (
+                <button key={price} type="button" onClick={() => setFormData({ ...formData, priceRange: formData.priceRange === price ? '' : price })} className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${formData.priceRange === price ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-zinc-800 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-zinc-700'}`}>
+                  {price}
+                </button>
+              ))}
             </div>
-            <div>
-              <label htmlFor="location" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Location</label>
-              <select id="location" name="location" value={formData.location} onChange={handleChange} className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-zinc-700 dark:bg-zinc-800 dark:text-gray-200 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                <option value="">Select a Location</option>
-                {BAY_AREA_CITIES.map(city => <option key={city} value={city}>{city}</option>)}
-              </select>
-            </div>
-            {userType === 'artist' && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Price Range</label>
-                <div className="flex flex-wrap gap-2">
-                  {['$', '$$', '$$$', '$$$$'].map(price => (
-                    <button key={price} type="button" onClick={() => setFormData({ ...formData, priceRange: formData.priceRange === price ? '' : price })} className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${formData.priceRange === price ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-zinc-800 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-zinc-700'}`}>
-                      {price}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-          </>
+          </div>
         )}
       </div>
     </div>
   );
 
-  // Step 4: Artist Specialties
+  // Step 4: Artist Specialties (invite artist flow only)
   const renderStep4 = () => (
     <div>
       <h2 className="text-xl font-semibold mb-1">Your Specialties</h2>
@@ -221,14 +278,43 @@ const Signup = () => {
     </div>
   );
 
-  const totalSteps = userType === 'artist' ? 4 : 3;
-  const isLastStep = step === totalSteps;
+  // Loading state while validating code
+  if (inviteCode && inviteValid === null) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-zinc-950">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500" />
+      </div>
+    );
+  }
+
+  // Invalid invite code
+  if (inviteCode && inviteValid === false) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-zinc-950 px-4">
+        <div className="max-w-md w-full text-center space-y-4">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Invalid Invite Link</h2>
+          <p className="text-red-600 dark:text-red-400">{inviteError}</p>
+          <p className="text-gray-600 dark:text-gray-400">
+            Contact <a href="mailto:jordonkindred@gmail.com" className="text-blue-600 dark:text-blue-400 hover:underline">jordonkindred@gmail.com</a> to request a new invite.
+          </p>
+          <Link to="/signup" className="inline-block mt-4 text-blue-600 dark:text-blue-400 hover:underline">
+            Sign up as an enthusiast instead
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-zinc-950 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-gray-100">Create Your InkSpace Account</h2>
+          {inviteValid && (
+            <p className="mt-2 text-center text-sm text-blue-600 dark:text-blue-400 font-medium">
+              You've been invited to create a {inviteUserType} account.
+            </p>
+          )}
           <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
             Or{' '}
             <Link to="/login" className="font-medium text-blue-600 hover:text-blue-500">log in to your existing account</Link>
@@ -249,16 +335,16 @@ const Signup = () => {
           {step === 1 && renderStep1()}
           {step === 2 && renderStep2()}
           {step === 3 && renderStep3()}
-          {step === 4 && userType === 'artist' && renderStep4()}
+          {step === 4 && renderStep4()}
 
           <div className="flex justify-between">
-            {step > 1 && (
+            {step > (inviteValid ? 2 : 1) && (
               <button type="button" onClick={handleBack} className="py-2 px-4 border border-gray-300 dark:border-zinc-700 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-700">
                 Back
               </button>
             )}
 
-            <div className={step === 1 ? 'ml-auto' : ''}>
+            <div className={step === 1 || (inviteValid && step === 2) ? 'ml-auto' : ''}>
               {!isLastStep ? (
                 <button type="button" onClick={handleNext} className="py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">
                   Next

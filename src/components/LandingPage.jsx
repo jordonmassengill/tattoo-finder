@@ -3,17 +3,11 @@ import { Link } from 'react-router-dom';
 
 const LandingPage = () => {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-black">
       {/* Hero Section */}
       <div className="relative h-screen">
-        {/* Hero Background Image */}
-        <div className="absolute inset-0 bg-black">
-          <img 
-            src="/api/placeholder/1920/1080" 
-            alt="Tattoo artwork showcase" 
-            className="w-full h-full object-cover opacity-70"
-          />
-        </div>
+        {/* Hero Background */}
+        <div className="absolute inset-0 bg-black"></div>
         
         {/* Content Overlay */}
         <div className="relative z-10 flex flex-col items-center justify-center h-full text-white px-4">

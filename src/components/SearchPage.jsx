@@ -374,20 +374,39 @@ const SearchPage = () => {
 
   return (
     <div className="max-w-screen-xl mx-auto px-4 py-8">
-      {/* Title (left) + Posts / Artists toggle (centered) */}
-      <div className="grid grid-cols-3 items-center mb-6">
-        <h1 className="text-3xl font-bold">Search</h1>
-        <div className="flex justify-center">
-          <div className="inline-flex rounded-md shadow-sm" role="group">
-            <button type="button" onClick={() => handleSearchTypeToggle('posts')} className={`flex items-center px-4 py-2 text-sm font-medium rounded-l-lg ${searchType === 'posts' ? 'bg-blue-500 text-white' : 'bg-white dark:bg-zinc-800 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-700'}`}>
-              <Image size={16} className="mr-2" /> Posts
-            </button>
-            <button type="button" onClick={() => handleSearchTypeToggle('artists')} className={`flex items-center px-4 py-2 text-sm font-medium rounded-r-lg ${searchType === 'artists' ? 'bg-blue-500 text-white' : 'bg-white dark:bg-zinc-800 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-700'}`}>
-              <Users size={16} className="mr-2" /> Artists
-            </button>
+      {/* Title + Posts/Artists toggle + Grid selector */}
+      {/* Desktop: 3-column row. Mobile: title+toggle on row 1, grid selector on row 2 */}
+      <div className="mb-6">
+        {/* Row shared by desktop col-1 and col-2, and mobile row-1 */}
+        <div className="flex items-center justify-between md:grid md:grid-cols-3 mb-3 md:mb-0">
+          <h1 className="text-3xl font-bold">Search</h1>
+          <div className="flex justify-center">
+            <div className="inline-flex rounded-md shadow-sm" role="group">
+              <button type="button" onClick={() => handleSearchTypeToggle('posts')} className={`flex items-center px-4 py-2 text-sm font-medium rounded-l-lg ${searchType === 'posts' ? 'bg-blue-500 text-white' : 'bg-white dark:bg-zinc-800 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-700'}`}>
+                <Image size={16} className="mr-2" /> Posts
+              </button>
+              <button type="button" onClick={() => handleSearchTypeToggle('artists')} className={`flex items-center px-4 py-2 text-sm font-medium rounded-r-lg ${searchType === 'artists' ? 'bg-blue-500 text-white' : 'bg-white dark:bg-zinc-800 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-700'}`}>
+                <Users size={16} className="mr-2" /> Artists
+              </button>
+            </div>
+          </div>
+          {/* Grid selector — visible only on desktop in this row */}
+          <div className="hidden md:flex justify-end">
+            <div className="flex bg-gray-100 dark:bg-zinc-800 rounded-lg p-1">
+              <button onClick={() => setViewMode('feed')} className={`p-2 rounded ${viewMode === 'feed' ? 'bg-white dark:bg-zinc-600 shadow' : 'dark:text-gray-300'}`}>
+                <BarChart2 size={20} />
+              </button>
+              <button onClick={() => setViewMode('grid3')} className={`p-2 rounded mx-1 ${viewMode === 'grid3' ? 'bg-white dark:bg-zinc-600 shadow' : 'dark:text-gray-300'}`}>
+                <LayoutGrid size={20} />
+              </button>
+              <button onClick={() => setViewMode('grid5')} className={`p-2 rounded ${viewMode === 'grid5' ? 'bg-white dark:bg-zinc-600 shadow' : 'dark:text-gray-300'}`}>
+                <Grid size={20} />
+              </button>
+            </div>
           </div>
         </div>
-        <div className="flex justify-end">
+        {/* Grid selector — mobile only, shown on its own row below */}
+        <div className="flex justify-end md:hidden">
           <div className="flex bg-gray-100 dark:bg-zinc-800 rounded-lg p-1">
             <button onClick={() => setViewMode('feed')} className={`p-2 rounded ${viewMode === 'feed' ? 'bg-white dark:bg-zinc-600 shadow' : 'dark:text-gray-300'}`}>
               <BarChart2 size={20} />
