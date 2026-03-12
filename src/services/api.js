@@ -20,6 +20,8 @@ export default {
   // Auth endpoints
   login: (username, password) => api.post('/auth/login', { username, password }),
   register: (userData) => api.post('/auth/register', userData),
+  verifyEmail: (token) => api.get(`/auth/verify-email?token=${token}`),
+  resendVerification: (email) => api.post('/auth/resend-verification', { email }),
   
   // User endpoints
   getCurrentUser: () => api.get('/users/me'),

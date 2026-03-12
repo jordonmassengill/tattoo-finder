@@ -8,27 +8,31 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [formError, setFormError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  
+  const [unverifiedEmail, setUnverifiedEmail] = useState('');
+
   const { login, error } = useAuth();
   const navigate = useNavigate();
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setFormError('');
-    
-    // Simple validation
+    setUnverifiedEmail('');
+
     if (!username || !password) {
       setFormError('Please fill in all fields');
       return;
     }
-    
+
     setIsLoading(true);
-    
+
     try {
-      const success = await login(username, password);
-      
-      if (success) {
+      const result = await login(username, password);
+
+      if (result.success) {
         navigate('/home');
+      } else if (result.emailNotVerified) {
+        setUnverifiedEmail(result.email || '');
+        setFormError(error || 'Email not verified');
       } else {
         setFormError(error || 'Failed to log in');
       }
@@ -36,7 +40,7 @@ const Login = () => {
       setFormError('An unexpected error occurred');
       console.error(err);
     }
-    
+
     setIsLoading(false);
   };
   
@@ -56,11 +60,24 @@ const Login = () => {
         </div>
         
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          {(formError || error) && (
+          {unverifiedEmail ? (
+            <div className="rounded-md bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 p-4 space-y-2">
+              <p className="text-sm text-yellow-800 dark:text-yellow-300">
+                Your email address hasn't been verified yet. Please check your inbox.
+              </p>
+              <Link
+                to="/verify-email-sent"
+                state={{ email: unverifiedEmail }}
+                className="block text-sm font-medium text-yellow-700 dark:text-yellow-400 underline"
+              >
+                Resend verification email &rarr;
+              </Link>
+            </div>
+          ) : (formError || error) ? (
             <div className="rounded-md bg-red-50 p-4">
               <div className="text-sm text-red-700">{formError || error}</div>
             </div>
-          )}
+          ) : null}
           
           <div className="rounded-md shadow-sm -space-y-px">
             <div>

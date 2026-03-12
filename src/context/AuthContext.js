@@ -43,31 +43,38 @@ export const AuthProvider = ({ children }) => {
   const login = async (username, password) => {
     setError('');
     try {
-      console.log('Attempting login with username:', username);
       const res = await api.login(username, password);
-      console.log('Login response:', res);
       localStorage.setItem('token', res.data.token);
       setCurrentUser(res.data.user);
-      return true;
+      return { success: true };
     } catch (err) {
-      console.error('Login error:', err);
-      setError(err.response?.data?.message || 'Login failed. Please try again.');
-      return false;
+      const data = err.response?.data;
+      setError(data?.message || 'Login failed. Please try again.');
+      return {
+        success: false,
+        emailNotVerified: data?.emailNotVerified || false,
+        email: data?.email || '',
+      };
     }
   };
   
-  // Register
+  // Register — account is created but not activated until email is verified
   const signup = async (userData) => {
     setError('');
     try {
       const res = await api.register(userData);
-      localStorage.setItem('token', res.data.token);
-      setCurrentUser(res.data.user);
-      return true;
+      // Return the email so the "check your email" page can display it
+      return { success: true, email: userData.email, emailSent: res.data.emailSent };
     } catch (err) {
       setError(err.response?.data?.message || 'Registration failed. Please try again.');
-      return false;
+      return { success: false };
     }
+  };
+
+  // Called after a successful email verification — logs the user in
+  const verifyAndLogin = (token, user) => {
+    localStorage.setItem('token', token);
+    setCurrentUser(user);
   };
   
   // Logout
@@ -84,7 +91,8 @@ export const AuthProvider = ({ children }) => {
     login,
     signup,
     logout,
-    updateCurrentUser // Add this to the context value
+    updateCurrentUser,
+    verifyAndLogin,
   };
   
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
