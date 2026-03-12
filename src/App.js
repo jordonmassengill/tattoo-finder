@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import './App.css';
 import LandingPage from './components/LandingPage';
 import SearchPage from './components/SearchPage';
@@ -15,6 +15,7 @@ import VerifyEmailSent from './components/VerifyEmailSent';
 import VerifyEmail from './components/VerifyEmail';
 import SavedPage from './components/SavedPage';
 import RequestsPage from './components/RequestsPage';
+import ArtistShopContact from './components/ArtistShopContact';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 import './styles.css';
@@ -22,7 +23,9 @@ import './styles.css';
 // Layout component conditionally renders the appropriate NavBar
 const Layout = ({ children }) => {
   const { currentUser } = useAuth();
-  
+  const location = useLocation();
+  const isLandingPage = location.pathname === '/';
+
   return (
     <>
       {currentUser ? (
@@ -32,14 +35,15 @@ const Layout = ({ children }) => {
           <Route path="/search" element={<PublicNavBar />} />
           <Route path="/login" element={<PublicNavBar />} />
           <Route path="/signup" element={<PublicNavBar />} />
+          <Route path="/artist-shop-signup" element={<PublicNavBar />} />
           <Route path="/verify-email-sent" element={<PublicNavBar />} />
           <Route path="/verify-email" element={<PublicNavBar />} />
           <Route path="/artist/*" element={<PublicNavBar />} />
           <Route path="/shop/*" element={<PublicNavBar />} />
         </Routes>
       )}
-      
-      <main className={currentUser ? "pb-16 md:pt-16 md:pb-0" : "pt-16"}>
+
+      <main className={currentUser ? "pb-16 md:pt-16 md:pb-0" : (isLandingPage ? "" : "pt-16")}>
         {children}
       </main>
     </>
@@ -92,6 +96,7 @@ function AppContent() {
         <Route path="/signup" element={!currentUser ? <Signup /> : <Navigate to="/home" />} />
         <Route path="/verify-email-sent" element={<VerifyEmailSent />} />
         <Route path="/verify-email" element={<VerifyEmail />} />
+        <Route path="/artist-shop-signup" element={<ArtistShopContact />} />
         <Route path="/search" element={<SearchPage />} />
         <Route path="/artist/:id" element={<ArtistProfile />} />
         <Route path="/shop/:id" element={<ShopProfile />} />

@@ -96,7 +96,7 @@ const UploadPost = ({ onClose, onPostCreated }) => {
       if (styles.length > 0) formData.append('styles', styles.join(','));
       if (subjects.length > 0) formData.append('subjects', subjects.join(','));
 
-      const response = await fetch('http://localhost:5000/api/posts', {
+      const response = await fetch('https://tattoo-finder-backend-production.up.railway.app/api/posts', {
         method: 'POST',
         headers: { 'x-auth-token': localStorage.getItem('token') },
         body: formData,

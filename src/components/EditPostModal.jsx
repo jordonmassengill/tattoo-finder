@@ -53,7 +53,7 @@ const EditPostModal = ({ post, onClose, onPostUpdated }) => {
     setIsSubmitting(true);
     setError('');
     try {
-      const response = await fetch(`http://localhost:5000/api/posts/${post._id}`, {
+      const response = await fetch(`https://tattoo-finder-backend-production.up.railway.app/api/posts/${post._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -138,7 +138,7 @@ const EditPostModal = ({ post, onClose, onPostUpdated }) => {
           {/* Image preview (read-only) */}
           <div className="md:w-1/2 p-4 flex items-center justify-center bg-black min-h-[400px]">
             <img
-              src={`http://localhost:5000/${post.image}`}
+              src={`https://tattoo-finder-backend-production.up.railway.app/${post.image}`}
               alt="Post"
               className="w-full max-h-[520px] object-contain"
             />
