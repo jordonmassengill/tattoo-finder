@@ -29,7 +29,7 @@ const ProfileImage = ({ user, size = 'md', className = '' }) => {
     <div className={`${sizeClass} rounded-full overflow-hidden flex-shrink-0 ${className}`}>
       {hasValidProfilePic ? (
         <img 
-          src={`http://localhost:5000/${user.profilePic}`} 
+          src={`https://tattoo-finder-backend-production.up.railway.app/${user.profilePic}`} 
           alt={user?.username || "User"} 
           className="w-full h-full object-cover"
           onError={(e) => {

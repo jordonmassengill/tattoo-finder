@@ -73,7 +73,7 @@ const PostItem = ({ post, onCommentClick }) => {
 
   return (
     <div className="relative group cursor-pointer" onClick={() => onCommentClick(post)}>
-      <img src={`http://localhost:5000/${post.image}`} alt={post.caption} className="w-full aspect-portrait object-cover rounded-lg" />
+      <img src={`https://tattoo-finder-backend-production.up.railway.app/${post.image}`} alt={post.caption} className="w-full aspect-portrait object-cover rounded-lg" />
       <div className="absolute inset-0 bg-black bg-opacity-40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white p-2 rounded-lg">
         <div className="flex items-center text-lg font-bold">
           <button onClick={handleLikeToggle} className="flex items-center mr-5">
@@ -166,7 +166,7 @@ const SearchPage = () => {
         setHasMore(false);
         const params = buildParams(1);
         const endpoint = searchType === 'artists' ? '/api/search/artists' : '/api/search/posts';
-        const response = await fetch(`http://localhost:5000${endpoint}?${params.toString()}`);
+        const response = await fetch(`https://tattoo-finder-backend-production.up.railway.app${endpoint}?${params.toString()}`);
         if (!response.ok) throw new Error('Failed to fetch search results');
         const data = await response.json();
         setSearchResults(data);
@@ -187,7 +187,7 @@ const SearchPage = () => {
       const nextPage = page + 1;
       const params = buildParams(nextPage);
       const endpoint = searchType === 'artists' ? '/api/search/artists' : '/api/search/posts';
-      const response = await fetch(`http://localhost:5000${endpoint}?${params.toString()}`);
+      const response = await fetch(`https://tattoo-finder-backend-production.up.railway.app${endpoint}?${params.toString()}`);
       if (!response.ok) throw new Error('Failed to fetch more results');
       const data = await response.json();
       if (data.length === 0) {
@@ -340,7 +340,7 @@ const SearchPage = () => {
               </div>
             </Link>
           </div>
-          <img src={`http://localhost:5000/${item.image}`} alt={item.caption} className="w-full object-cover" />
+          <img src={`https://tattoo-finder-backend-production.up.railway.app/${item.image}`} alt={item.caption} className="w-full object-cover" />
           <div className="p-3">
             <p className="dark:text-gray-200"><Link to={profileUrl(item.user)} className="font-semibold dark:text-gray-100">{item.user.username}</Link> {item.caption}</p>
           </div>

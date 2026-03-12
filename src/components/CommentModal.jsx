@@ -132,7 +132,7 @@ const CommentModal = ({ post, onClose }) => {
       <div className="bg-white dark:bg-zinc-900 rounded-lg w-full max-w-5xl h-full max-h-[80vh] flex overflow-hidden" onClick={(e) => e.stopPropagation()}>
         <div className="hidden md:block md:w-3/5 bg-black flex-shrink-0">
           <img
-            src={`http://localhost:5000/${post.image}`}
+            src={`https://tattoo-finder-backend-production.up.railway.app/${post.image}`}
             alt={post.caption}
             className="w-full h-full object-contain"
           />

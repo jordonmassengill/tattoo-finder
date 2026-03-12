@@ -53,7 +53,7 @@ const ProfilePage = () => {
       }
 
       if (currentUser.profilePic && currentUser.profilePic !== '/default-profile.png') {
-        setProfileImagePreview(`http://localhost:5000/${currentUser.profilePic}`);
+        setProfileImagePreview(`https://tattoo-finder-backend-production.up.railway.app/${currentUser.profilePic}`);
       } else {
         setProfileImagePreview(null);
       }
@@ -80,7 +80,7 @@ const ProfilePage = () => {
   const handleCancelProfilePic = () => {
     setProfileImageFile(null);
     if (currentUser?.profilePic && currentUser.profilePic !== '/default-profile.png') {
-      setProfileImagePreview(`http://localhost:5000/${currentUser.profilePic}`);
+      setProfileImagePreview(`https://tattoo-finder-backend-production.up.railway.app/${currentUser.profilePic}`);
     } else {
       setProfileImagePreview(null);
     }
@@ -93,7 +93,7 @@ const ProfilePage = () => {
     try {
       const fd = new FormData();
       fd.append('profilePic', profileImageFile);
-      const response = await fetch('http://localhost:5000/api/users/profile-picture', {
+      const response = await fetch('https://tattoo-finder-backend-production.up.railway.app/api/users/profile-picture', {
         method: 'PUT',
         headers: { 'x-auth-token': localStorage.getItem('token') },
         body: fd
@@ -135,7 +135,7 @@ const ProfilePage = () => {
         }),
       };
 
-      const response = await fetch('http://localhost:5000/api/users/update', {
+      const response = await fetch('https://tattoo-finder-backend-production.up.railway.app/api/users/update', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -166,7 +166,7 @@ const ProfilePage = () => {
     setIsDeleting(true);
     setError('');
     try {
-      await fetch(`http://localhost:5000/api/users/${currentUser._id}`, {
+      await fetch(`https://tattoo-finder-backend-production.up.railway.app/api/users/${currentUser._id}`, {
         method: 'DELETE',
         headers: { 'x-auth-token': localStorage.getItem('token') }
       });
@@ -197,7 +197,7 @@ const ProfilePage = () => {
     }
     setIsChangingPassword(true);
     try {
-      const response = await fetch('http://localhost:5000/api/users/change-password', {
+      const response = await fetch('https://tattoo-finder-backend-production.up.railway.app/api/users/change-password', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

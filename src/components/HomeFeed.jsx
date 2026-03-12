@@ -75,7 +75,7 @@ const Post = ({ post: initialPost, isGrid, onCommentClick }) => {
     return (
       <div className="relative group cursor-pointer" onClick={() => onCommentClick(post)}>
         <img 
-          src={`http://localhost:5000/${post.image}`} 
+          src={`https://tattoo-finder-backend-production.up.railway.app/${post.image}`} 
           alt={post.caption} 
           className="w-full aspect-portrait object-cover"
         />
@@ -127,7 +127,7 @@ const Post = ({ post: initialPost, isGrid, onCommentClick }) => {
       </div>
 
       <img
-        src={`http://localhost:5000/${post.image}`}
+        src={`https://tattoo-finder-backend-production.up.railway.app/${post.image}`}
         alt={post.caption}
         className="w-full aspect-portrait object-cover"
       />
