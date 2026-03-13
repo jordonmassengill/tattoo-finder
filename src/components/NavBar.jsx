@@ -52,7 +52,7 @@ const NavBar = () => {
   
   return (
     <>
-      <nav className="bg-white dark:bg-zinc-950 border-b dark:border-zinc-800 fixed bottom-0 left-0 right-0 md:top-0 md:bottom-auto z-40">
+      <nav className="bg-white dark:bg-zinc-950 border-b dark:border-zinc-800 fixed top-0 left-0 right-0 z-40">
         <div className="max-w-screen-xl mx-auto px-4 py-3">
           <div className="flex justify-between items-center">
             {/* Logo - only visible on medium screens and up */}
@@ -99,12 +99,12 @@ const NavBar = () => {
                   ) : (
                     <User size={24} className="md:mr-1" />
                   )}
-                  <span className="text-xs md:text-sm">Profile</span>
+                  <span className="hidden md:inline md:text-sm">Profile</span>
                 </button>
                 
                 {/* Profile Menu Dropdown - Using fixed positioning to ensure it appears where we want */}
                 {showProfileMenu && (
-                  <div style={{ position: 'absolute', top: '60px', right: '-110px', zIndex: 9999 }} className="bg-white dark:bg-zinc-900 rounded-lg shadow-lg p-2 w-48 hidden md:block">
+                  <div style={{ position: 'absolute', top: '60px', right: '0', zIndex: 9999 }} className="bg-white dark:bg-zinc-900 rounded-lg shadow-lg p-2 w-48 hidden md:block">
                     <div className="px-3 py-2 border-b dark:border-zinc-800 mb-1">
                       <p className="font-medium dark:text-gray-100">{currentUser?.username}</p>
                       <p className="text-xs text-gray-500 dark:text-gray-400 capitalize">{userType}</p>
@@ -158,7 +158,7 @@ const NavBar = () => {
 
                 {/* Mobile dropdown - positioned above */}
                 {showProfileMenu && (
-                  <div className="absolute bottom-full left-0 mb-2 bg-white dark:bg-zinc-900 rounded-lg shadow-lg p-2 w-48 z-50 block md:hidden">
+                  <div className="absolute top-full right-0 mt-2 bg-white dark:bg-zinc-900 rounded-lg shadow-lg p-2 w-48 z-50 block md:hidden">
                     <div className="px-3 py-2 border-b dark:border-zinc-800 mb-1">
                       <p className="font-medium dark:text-gray-100">{currentUser?.username}</p>
                       <p className="text-xs text-gray-500 dark:text-gray-400 capitalize">{userType}</p>
