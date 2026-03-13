@@ -73,7 +73,7 @@ const PostItem = ({ post, onCommentClick }) => {
 
   return (
     <div className="relative group cursor-pointer" onClick={() => onCommentClick(post)}>
-      <img src={`https://tattoo-finder-backend-production.up.railway.app/${post.image}`} alt={post.caption} className="w-full aspect-portrait object-cover rounded-lg" />
+      <img src={post.image} alt={post.caption} className="w-full aspect-portrait object-cover rounded-lg" />
       <div className="absolute inset-0 bg-black bg-opacity-40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white p-2 rounded-lg">
         <div className="flex items-center text-lg font-bold">
           <button onClick={handleLikeToggle} className="flex items-center mr-5">
@@ -340,7 +340,7 @@ const SearchPage = () => {
               </div>
             </Link>
           </div>
-          <img src={`https://tattoo-finder-backend-production.up.railway.app/${item.image}`} alt={item.caption} className="w-full object-cover" />
+          <img src={item.image} alt={item.caption} className="w-full object-cover" />
           <div className="p-3">
             <p className="dark:text-gray-200"><Link to={profileUrl(item.user)} className="font-semibold dark:text-gray-100">{item.user.username}</Link> {item.caption}</p>
           </div>

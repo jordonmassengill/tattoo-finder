@@ -138,7 +138,7 @@ const EditPostModal = ({ post, onClose, onPostUpdated }) => {
           {/* Image preview (read-only) */}
           <div className="md:w-1/2 p-4 flex items-center justify-center bg-black min-h-[400px]">
             <img
-              src={`https://tattoo-finder-backend-production.up.railway.app/${post.image}`}
+              src={post.image}
               alt="Post"
               className="w-full max-h-[520px] object-contain"
             />
