@@ -58,7 +58,7 @@ const PostGridItem = ({ post, isOwnPost, onPostClick, onDeleteClick, onEditClick
   return (
     <div className="relative group cursor-pointer" onClick={() => onPostClick(post)}>
       <img
-        src={`https://tattoo-finder-backend-production.up.railway.app/${post.image}`}
+        src={post.image}
         alt={post.caption}
         className="w-full aspect-portrait object-cover"
       />
@@ -474,7 +474,7 @@ const ShopProfile = () => {
             </p>
             <div className="mb-4 border dark:border-zinc-700 rounded overflow-hidden">
               <img
-                src={`https://tattoo-finder-backend-production.up.railway.app/${postToDelete.image}`}
+                src={postToDelete.image}
                 alt="Post to delete"
                 className="w-full h-40 object-cover"
               />

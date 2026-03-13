@@ -77,7 +77,7 @@ const PostItem = ({ post, onPostClick, isGrid = true }) => {
             </div>
           </Link>
         </div>
-        <img src={`https://tattoo-finder-backend-production.up.railway.app/${post.image}`} alt={post.caption} className="w-full object-cover cursor-pointer" onClick={() => onPostClick(post)} />
+        <img src={post.image} alt={post.caption} className="w-full object-cover cursor-pointer" onClick={() => onPostClick(post)} />
         <div className="p-3">
           <div className="flex items-center gap-4 mb-2">
             <button onClick={handleLikeToggle} className="flex items-center gap-1">
@@ -101,7 +101,7 @@ const PostItem = ({ post, onPostClick, isGrid = true }) => {
   return (
     <div className="relative group cursor-pointer" onClick={() => onPostClick(post)}>
       <img
-        src={`https://tattoo-finder-backend-production.up.railway.app/${post.image}`}
+        src={post.image}
         alt={post.caption}
         className="w-full aspect-portrait object-cover"
       />
