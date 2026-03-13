@@ -230,7 +230,6 @@ const SavedPage = () => {
     } else if (postSortOption === 'new') {
       posts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     }
-    // 'recent' = preserve server order (most recently saved)
     setFilteredPosts(posts);
   }, [submittedPostQuery, postFilters, postSortOption, savedPosts]);
 
@@ -251,7 +250,7 @@ const SavedPage = () => {
     if (followingSortOption === 'followers') {
       users.sort((a, b) => (b.followers?.length || 0) - (a.followers?.length || 0));
     } else {
-      users.reverse(); // server returns oldest-first; flip to most-recently-followed at top
+      users.reverse();
     }
     setFilteredFollowing(users);
   }, [submittedFollowingQuery, artistFilters, followedUsers, followingSortOption]);
@@ -260,7 +259,7 @@ const SavedPage = () => {
   useEffect(() => { setVisiblePostCount(PAGE_SIZE); }, [filteredPosts]);
   useEffect(() => { setVisibleFollowingCount(PAGE_SIZE); }, [filteredFollowing]);
 
-  // Infinite scroll for saved page
+  // Infinite scroll
   const loadMoreVisible = useCallback(() => {
     if (viewTab === 'posts') {
       setVisiblePostCount(prev => Math.min(prev + PAGE_SIZE, filteredPosts.length));
@@ -269,7 +268,6 @@ const SavedPage = () => {
     }
   }, [viewTab, filteredPosts.length, filteredFollowing.length]);
 
-  // Keep ref always pointing to latest loadMoreVisible without recreating observer
   loadMoreRef.current = loadMoreVisible;
 
   useEffect(() => {
@@ -281,7 +279,7 @@ const SavedPage = () => {
     );
     observer.observe(sentinel);
     return () => observer.disconnect();
-  }, []); // set up once — loadMoreRef always stays current
+  }, []);
 
   // Toggle helpers
   const togglePostSingle = (key, value) => setPostFilters(prev => ({ ...prev, [key]: prev[key] === value ? '' : value }));
@@ -312,7 +310,6 @@ const SavedPage = () => {
 
   const activeFilterCount = viewTab === 'posts' ? postActiveFilterCount : artistActiveFilterCount;
 
-  // Sub-components
   const EitherOrRow = ({ label, options, filterKey, onToggle, active }) => (
     <div className="mb-4">
       <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">{label}</p>
@@ -355,7 +352,6 @@ const SavedPage = () => {
 
   return (
     <div className="max-w-screen-xl mx-auto p-8">
-<<<<<<< HEAD
       {/* Title (left) + Posts / Following toggle (right on mobile, centered on desktop) + grid selector (right on desktop only) */}
       <div className="flex items-center justify-between mb-6 md:grid md:grid-cols-3 md:items-center">
         <h1 className="text-3xl font-bold">Saved</h1>
@@ -383,20 +379,6 @@ const SavedPage = () => {
               <Grid size={20} />
             </button>
           </div>
-=======
-      {/* Title (left) + Posts / Following toggle (right) */}
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold">Saved</h1>
-        <div className="inline-flex rounded-md shadow-sm" role="group">
-          <button type="button" onClick={() => handleTabSwitch('posts')}
-            className={`flex items-center px-4 py-2 text-sm font-medium rounded-l-lg ${viewTab === 'posts' ? 'bg-blue-500 text-white' : 'bg-white dark:bg-zinc-800 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-700'}`}>
-            <Image size={16} className="mr-2" /> Posts
-          </button>
-          <button type="button" onClick={() => handleTabSwitch('following')}
-            className={`flex items-center px-4 py-2 text-sm font-medium rounded-r-lg ${viewTab === 'following' ? 'bg-blue-500 text-white' : 'bg-white dark:bg-zinc-800 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-700'}`}>
-            <Users size={16} className="mr-2" /> Following
-          </button>
->>>>>>> ff244fd0b561d5526906a03843d6d43cc6f4a523
         </div>
       </div>
 
@@ -440,11 +422,7 @@ const SavedPage = () => {
               {followingSortOption === 'recent' ? 'Sort - Recent' : 'Sort - Followers'}
             </button>
           )}
-<<<<<<< HEAD
           <div className="flex md:hidden bg-gray-100 dark:bg-zinc-800 rounded-lg p-1">
-=======
-          <div className="flex bg-gray-100 dark:bg-zinc-800 rounded-lg p-1">
->>>>>>> ff244fd0b561d5526906a03843d6d43cc6f4a523
             <button onClick={() => setViewMode('feed')} className={`p-2 rounded ${viewMode === 'feed' ? 'bg-white dark:bg-zinc-600 shadow' : 'dark:text-gray-300'}`}>
               <BarChart2 size={20} />
             </button>
@@ -466,7 +444,6 @@ const SavedPage = () => {
           {viewTab === 'posts' ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8">
               <div>
-                {/* Flash Sheet / Tattoo Work toggle */}
                 <div className="mb-4">
                   <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Type</p>
                   <div className="flex rounded-full border border-gray-300 overflow-hidden">
@@ -510,7 +487,6 @@ const SavedPage = () => {
               </div>
             </div>
           ) : (
-            /* Following tab filters */
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8">
               <div>
                 <div className="mb-4">
