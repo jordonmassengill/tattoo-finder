@@ -405,20 +405,6 @@ const SearchPage = () => {
             </div>
           </div>
         </div>
-        {/* Grid selector — mobile only, shown on its own row below */}
-        <div className="flex justify-end md:hidden">
-          <div className="flex bg-gray-100 dark:bg-zinc-800 rounded-lg p-1">
-            <button onClick={() => setViewMode('feed')} className={`p-2 rounded ${viewMode === 'feed' ? 'bg-white dark:bg-zinc-600 shadow' : 'dark:text-gray-300'}`}>
-              <BarChart2 size={20} />
-            </button>
-            <button onClick={() => setViewMode('grid3')} className={`p-2 rounded mx-1 ${viewMode === 'grid3' ? 'bg-white dark:bg-zinc-600 shadow' : 'dark:text-gray-300'}`}>
-              <LayoutGrid size={20} />
-            </button>
-            <button onClick={() => setViewMode('grid5')} className={`p-2 rounded ${viewMode === 'grid5' ? 'bg-white dark:bg-zinc-600 shadow' : 'dark:text-gray-300'}`}>
-              <Grid size={20} />
-            </button>
-          </div>
-        </div>
       </div>
 
       {/* Search bar */}
@@ -449,6 +435,17 @@ const SearchPage = () => {
           <button onClick={handleSortToggle} className="px-4 py-2 bg-gray-100 dark:bg-zinc-800 dark:text-gray-200 rounded-lg hover:bg-gray-200 dark:hover:bg-zinc-700 transition font-medium whitespace-nowrap">
             {sortOption === 'newest' ? 'Sort - New' : (searchType === 'artists' ? 'Sort - Followers' : 'Sort - Likes')}
           </button>
+          <div className="flex md:hidden bg-gray-100 dark:bg-zinc-800 rounded-lg p-1">
+            <button onClick={() => setViewMode('feed')} className={`p-2 rounded ${viewMode === 'feed' ? 'bg-white dark:bg-zinc-600 shadow' : 'dark:text-gray-300'}`}>
+              <BarChart2 size={20} />
+            </button>
+            <button onClick={() => setViewMode('grid3')} className={`p-2 rounded mx-1 ${viewMode === 'grid3' ? 'bg-white dark:bg-zinc-600 shadow' : 'dark:text-gray-300'}`}>
+              <LayoutGrid size={20} />
+            </button>
+            <button onClick={() => setViewMode('grid5')} className={`p-2 rounded ${viewMode === 'grid5' ? 'bg-white dark:bg-zinc-600 shadow' : 'dark:text-gray-300'}`}>
+              <Grid size={20} />
+            </button>
+          </div>
         </div>
       </div>
 

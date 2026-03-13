@@ -43,7 +43,7 @@ const Layout = ({ children }) => {
         </Routes>
       )}
 
-      <main className={currentUser ? "pb-16 md:pt-16 md:pb-0" : (isLandingPage ? "" : "pt-16")}>
+      <main className={currentUser ? "pt-16" : (isLandingPage ? "" : "pt-16")}>
         {children}
       </main>
     </>

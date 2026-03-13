@@ -239,7 +239,7 @@ const HomeFeed = () => {
     <div className="max-w-screen-xl mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-semibold">Your Feed</h2>
-        <div className="flex bg-gray-100 dark:bg-zinc-800 rounded-lg p-1 mr-20">
+        <div className="flex bg-gray-100 dark:bg-zinc-800 rounded-lg p-1">
           <button
             onClick={() => setViewMode('feed')}
             className={`p-2 rounded ${viewMode === 'feed' ? 'bg-white dark:bg-zinc-600 shadow' : 'dark:text-gray-300'}`}
