@@ -355,33 +355,18 @@ const SavedPage = () => {
 
   return (
     <div className="max-w-screen-xl mx-auto p-8">
-      {/* Title (left) + Posts / Following toggle (centered) + grid selector (right) */}
-      <div className="grid grid-cols-3 items-center mb-6">
+      {/* Title (left) + Posts / Following toggle (right) */}
+      <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold">Saved</h1>
-        <div className="flex justify-center">
-          <div className="inline-flex rounded-md shadow-sm" role="group">
-            <button type="button" onClick={() => handleTabSwitch('posts')}
-              className={`flex items-center px-4 py-2 text-sm font-medium rounded-l-lg ${viewTab === 'posts' ? 'bg-blue-500 text-white' : 'bg-white dark:bg-zinc-800 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-700'}`}>
-              <Image size={16} className="mr-2" /> Posts
-            </button>
-            <button type="button" onClick={() => handleTabSwitch('following')}
-              className={`flex items-center px-4 py-2 text-sm font-medium rounded-r-lg ${viewTab === 'following' ? 'bg-blue-500 text-white' : 'bg-white dark:bg-zinc-800 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-700'}`}>
-              <Users size={16} className="mr-2" /> Following
-            </button>
-          </div>
-        </div>
-        <div className="flex justify-end">
-          <div className="flex bg-gray-100 dark:bg-zinc-800 rounded-lg p-1">
-            <button onClick={() => setViewMode('feed')} className={`p-2 rounded ${viewMode === 'feed' ? 'bg-white dark:bg-zinc-600 shadow' : 'dark:text-gray-300'}`}>
-              <BarChart2 size={20} />
-            </button>
-            <button onClick={() => setViewMode('grid3')} className={`p-2 rounded mx-1 ${viewMode === 'grid3' ? 'bg-white dark:bg-zinc-600 shadow' : 'dark:text-gray-300'}`}>
-              <LayoutGrid size={20} />
-            </button>
-            <button onClick={() => setViewMode('grid5')} className={`p-2 rounded ${viewMode === 'grid5' ? 'bg-white dark:bg-zinc-600 shadow' : 'dark:text-gray-300'}`}>
-              <Grid size={20} />
-            </button>
-          </div>
+        <div className="inline-flex rounded-md shadow-sm" role="group">
+          <button type="button" onClick={() => handleTabSwitch('posts')}
+            className={`flex items-center px-4 py-2 text-sm font-medium rounded-l-lg ${viewTab === 'posts' ? 'bg-blue-500 text-white' : 'bg-white dark:bg-zinc-800 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-700'}`}>
+            <Image size={16} className="mr-2" /> Posts
+          </button>
+          <button type="button" onClick={() => handleTabSwitch('following')}
+            className={`flex items-center px-4 py-2 text-sm font-medium rounded-r-lg ${viewTab === 'following' ? 'bg-blue-500 text-white' : 'bg-white dark:bg-zinc-800 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-700'}`}>
+            <Users size={16} className="mr-2" /> Following
+          </button>
         </div>
       </div>
 
@@ -425,6 +410,17 @@ const SavedPage = () => {
               {followingSortOption === 'recent' ? 'Sort - Recent' : 'Sort - Followers'}
             </button>
           )}
+          <div className="flex bg-gray-100 dark:bg-zinc-800 rounded-lg p-1">
+            <button onClick={() => setViewMode('feed')} className={`p-2 rounded ${viewMode === 'feed' ? 'bg-white dark:bg-zinc-600 shadow' : 'dark:text-gray-300'}`}>
+              <BarChart2 size={20} />
+            </button>
+            <button onClick={() => setViewMode('grid3')} className={`p-2 rounded mx-1 ${viewMode === 'grid3' ? 'bg-white dark:bg-zinc-600 shadow' : 'dark:text-gray-300'}`}>
+              <LayoutGrid size={20} />
+            </button>
+            <button onClick={() => setViewMode('grid5')} className={`p-2 rounded ${viewMode === 'grid5' ? 'bg-white dark:bg-zinc-600 shadow' : 'dark:text-gray-300'}`}>
+              <Grid size={20} />
+            </button>
+          </div>
         </div>
       </div>
 
