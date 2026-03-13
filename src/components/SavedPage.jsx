@@ -355,6 +355,7 @@ const SavedPage = () => {
 
   return (
     <div className="max-w-screen-xl mx-auto p-8">
+<<<<<<< HEAD
       {/* Title (left) + Posts / Following toggle (right on mobile, centered on desktop) + grid selector (right on desktop only) */}
       <div className="flex items-center justify-between mb-6 md:grid md:grid-cols-3 md:items-center">
         <h1 className="text-3xl font-bold">Saved</h1>
@@ -382,6 +383,20 @@ const SavedPage = () => {
               <Grid size={20} />
             </button>
           </div>
+=======
+      {/* Title (left) + Posts / Following toggle (right) */}
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-3xl font-bold">Saved</h1>
+        <div className="inline-flex rounded-md shadow-sm" role="group">
+          <button type="button" onClick={() => handleTabSwitch('posts')}
+            className={`flex items-center px-4 py-2 text-sm font-medium rounded-l-lg ${viewTab === 'posts' ? 'bg-blue-500 text-white' : 'bg-white dark:bg-zinc-800 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-700'}`}>
+            <Image size={16} className="mr-2" /> Posts
+          </button>
+          <button type="button" onClick={() => handleTabSwitch('following')}
+            className={`flex items-center px-4 py-2 text-sm font-medium rounded-r-lg ${viewTab === 'following' ? 'bg-blue-500 text-white' : 'bg-white dark:bg-zinc-800 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-700'}`}>
+            <Users size={16} className="mr-2" /> Following
+          </button>
+>>>>>>> ff244fd0b561d5526906a03843d6d43cc6f4a523
         </div>
       </div>
 
@@ -425,7 +440,11 @@ const SavedPage = () => {
               {followingSortOption === 'recent' ? 'Sort - Recent' : 'Sort - Followers'}
             </button>
           )}
+<<<<<<< HEAD
           <div className="flex md:hidden bg-gray-100 dark:bg-zinc-800 rounded-lg p-1">
+=======
+          <div className="flex bg-gray-100 dark:bg-zinc-800 rounded-lg p-1">
+>>>>>>> ff244fd0b561d5526906a03843d6d43cc6f4a523
             <button onClick={() => setViewMode('feed')} className={`p-2 rounded ${viewMode === 'feed' ? 'bg-white dark:bg-zinc-600 shadow' : 'dark:text-gray-300'}`}>
               <BarChart2 size={20} />
             </button>
